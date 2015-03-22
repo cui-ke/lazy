@@ -1,0 +1,35 @@
+Some updates
+
+important+ easy+
+- put prefixes into the project description OR (better) into the connection descripiton
+
+important= easy-
+- implement true sparql syntax parsing
+
+- multi-sites
+
+principles
+- no site discovery at query time
+- provide rewriting rules in the connection description or in the project description
+   - direct rw: symbol --> symbol
+   - as_path rw: property --> path
+   - path_as_prop rw: path --> property (if path detected in a query, with no variables used elsewhere --> reduce to one property
+   
+   * check if a query can be fully computed on an endpoint 
+   
+OR
+- use alignments
+  prog. to 
+    - produce rewriting rules from alignements
+    - generate a vocabulary for a module (on a set of endpoints)
+  add rw rules to modules (projects)
+
+----
+
+KW graph queries
+
+?x authored "les misérables". who authored "les misérables"
+what produces furnitures and is located in france
+
+
+

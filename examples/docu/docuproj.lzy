@@ -1,0 +1,141 @@
+define
+
+project DOCU
+
+node docu_all
+<titre1>( "GESTION DE PROJETS"),
+{<table1>(
+     <ligne>(<cellule>(include docu_all_projet)),
+     <ligne>(<cellule>(include docu_all_develop))
+               )}
+
+
+
+
+node docu_all_projet
+<table1>(
+     <tabTitre>( href docu_new_projet(<icon>("new")), "<b>PROJETS</b>"),
+     {<ligne>(include docu_projet[id]),
+      <ligne>(<cellule>(expand href docu_new_projdev[id](<icon>("new")), "Développeurs"
+                       ,include docu_projdev[id]))
+               })
+from projets
+order by id
+
+
+node docu_projet[selectid]
+              {<cellule3>(expand href docu_del_projet[id] (<icon>("del")),id),                        
+              <cellule>(expand href docu_maj_lib_projet[id] (<icon>("maj")), lib),
+              <cellule>(expand href docu_maj_com_projet[id] (<icon>("maj")), com)
+              }
+from projets selected by id = selectid
+
+node docu_projdev[selectid]
+  <table2>(
+          {<ligne>( <cellule3>(expand href docu_del_projdev[selectid,iddev] (<icon>("del"))),
+                    <cellule1>(expand href docu_maj_iddev_projdev[selectid,iddev] (<icon>("maj"))),
+                    <cellule1>(expand href docu_develop[iddev](iddev)),
+                    <cellule1>(expand href docu_maj_com_projdev[selectid,iddev] (<icon>("maj"))),
+                    <cellule1>(com)
+                   )
+           })
+from projdev selected by idproj=selectid order by iddev
+
+node docu_new_projdev[selectid]
+ {active href docu_all (
+   "projet: ", set idproj = selectid ,
+   "développeur :", set iddev = select(include docu_list_id_develop) ,
+   "commentaire  : ", set com = textarea(5,80, "") ,
+   on "insert" do insert projdev
+ )}
+ 
+node docu_del_projdev[selectidproj,selectiddev]
+   {active href docu_all ( on "confirm delete" do delete projdev[idproj,iddev])} 
+from projdev 
+  selected by idproj=selectidproj and iddev=selectiddev
+  order by iddev
+
+
+node docu_maj_iddev_projdev[selectidproj,selectiddev]
+   {active href docu_all ( on "maj" do update projdev[idproj,iddev],
+                                        set iddev = select(include docu_list_id_develop))} 
+from projdev 
+  selected by idproj=selectidproj and iddev=selectiddev
+  order by iddev
+  
+node docu_maj_com_projdev[selectidproj,selectiddev]
+   {active href docu_all ( on "maj" do update projdev[idproj,iddev],
+                                        set com = textarea(5,50, com))} 
+from projdev 
+  selected by idproj=selectidproj and iddev=selectiddev
+  order by iddev
+  
+  
+
+
+node docu_new_projet
+ {active href docu_all (
+   "id_projet: ", set id = textfield(12, "1212") ,
+   "libellé  : ", set lib = textfield(32, "") ,
+   "commentaire  : ", set com = textarea(5,80, "") ,
+   on "insert" do insert projets
+ )}
+
+node docu_del_projet[selectid]
+   {active href docu_all ( on "confirm delete" do delete projets[id])} 
+   from projets selected by id = selectid
+
+node docu_maj_lib_projet[selectid]
+   {active href docu_all ( on "maj" do update projets[id] ,set lib = textfield(32, lib))} 
+   from projets selected by id = selectid
+
+node docu_maj_com_projet[selectid]
+   {active href docu_all ( on "maj" do update projets[id],set com = textarea(5,50, com))} 
+   from projets selected by id = selectid
+
+/* les noeuds développeurs */
+
+node docu_all_develop
+<table1>(
+     <tabTitre>(expand href docu_new_develop(<icon>("new")), "DEVELOPPEURS"),
+     {<ligne>(include docu_develop[id])
+               })
+from develops
+order by id
+
+
+node docu_develop[selectid]
+              {<cellule>(expand href docu_del_develop[id] (<icon>("del"))),
+              <cellule>(id),                        
+              <cellule>(expand href docu_maj_name_develop[id] (<icon>("maj")), name),
+              <cellule>(expand href docu_maj_com_develop[id] (<icon>("maj")), com)}
+from develops selected by id = selectid order by 1
+
+node docu_new_develop
+ {active href docu_all (
+   "id_user: ", set id = textfield(12, "1212") ,
+   "prénom nom  : ", set name = textfield(32, "") ,
+   "commentaire  : ", set com = textarea(5,80, "") ,
+   on "insert" do insert develops
+ )}
+
+node docu_del_develop[selectid]
+   {active href docu_all ( on "confirm delete" do delete develops[id])} 
+   from develops selected by id = selectid
+
+node docu_maj_name_develop[selectid]
+   {active href docu_all ( on "maj" do update develops[id],set name = textfield(32, name))} 
+   from develops selected by id = selectid
+
+node docu_maj_com_develop[selectid]
+   {active href docu_all ( on "maj" do update develops[id],set com = textarea(5,50, com))} 
+   from develops selected by id = selectid
+
+node docu_list_id_develop
+     {<option>(id)}
+   from develops order by id
+
+
+end
+                     
+ 

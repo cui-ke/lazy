@@ -1,0 +1,232 @@
+
+define
+
+  project ADMIN [ nodetype = html ]
+
+/* ------------- Code Categories ------------------- */
+
+ node all_categories
+ include top ,
+ <h2>("Categories of codes") ,
+ <table width="80%" align="center">(
+ 	<tr>(
+	 	<td class="CELL_WARNING">(expand href new_categories(include ICON.new, " new")),
+		<td class="CELL_BG3">("Category"), 
+		<td class="CELL_BG3">("Description"),
+		<td class="CELL_BG3">("&nbsp;")
+	) ,
+    include categories
+ )
+ 
+ 
+ node categories
+     {<tr>(
+	 	<td class="CELL_BG1">(expand href del_categories[catid] (include ICON.del),
+                 expand href maj_categories[catid] (include ICON.maj)) ,
+		<td class="CELL_BG1">(catid),
+                 // expand href new_codes[catid](include ICON.new)),                        
+     	<td class="CELL_BG1">(com),
+                 
+        <td class="CELL_BG1">( href all_codes[catid] (include ICON.definition, " Codes"))
+		)
+     }
+ from lazy_categories
+ 
+ 
+ node new_categories
+  <table width="100%">(
+  active href all_categories (
+    <tr>(<td class="CELL_WARNING">("Category ID ", set catid = textfield(12))),
+    <tr>(<td class="CELL_WARNING">("Comment ", set com = textarea(3,40))),
+    <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_categories))
+  ))
+ 
+ node del_categories[cat]
+     <table width="100%">(<tr>(<td class="CELL_WARNING">(
+     {active href all ( on "Delete" do delete lazy_categories[catid],<b>(" category ",cat))}))) 
+    from lazy_categories selected by catid = cat
+ 
+ node maj_categories[cat]
+    <table width="100%">({active href all (
+       <tr>(<td class="CELL_WARNING">("Comment     : ", set com = textarea(3,40, com))),
+       <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_categories[catid],<b>("modification de: ",cat)))
+       )}) 
+    from lazy_categories selected by catid = cat
+ 
+ 
+ /* ------------------ Codes ---------------------- */
+ 
+ node all_codes[c]
+ include top ,
+ <p>(href all_categories ("Categories"), " &rarr;"),
+ <h2>("Codes in category ", <font color="red">(c)) ,
+ <table width="80%" align="center">(
+ 	<tr>(
+      <td class="CELL_WARNING" align="center">( expand href new_codes[c](include ICON.new, " new")),
+	  <td class="CELL_BG3">("Code ID"),
+ 	  <td class="CELL_BG3">("Abbreviation")
+	),
+    include codes[c]
+ )
+ 
+ 
+ node codes[selectcatid]
+     {<tr>(
+	 	<td class="CELL_BG1">(expand href del_codes[catid,codeid] (include ICON.del),
+                 expand href maj_codes[catid,codeid] (include ICON.maj)),		 
+        <td class="CELL_BG1">(codeid),
+       	<td class="CELL_BG1">(abr) //,
+        //<td>(listdef)
+		)
+     }
+ from lazy_codes 
+ selected by catid=selectcatid 
+ order by codeid
+ 
+ 
+ node new_codes[selectcatid]
+  <table width="100%">(
+    active href all_codes[selectcatid] (
+    set catid = selectcatid,
+	set listdef = "N" ,
+    <tr>(<td class="CELL_WARNING">("Code ID" ,set codeid = textfield(12, ""))),
+    <tr>(<td class="CELL_WARNING">("Abbreviationr ", set abr = textfield(40, ""))),
+    // <tr>(<td class="CELL_WARNING">("List Def.    : ", set listdef = select(include list_admin_YN["N"]))),
+    <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_codes))
+  ))
+ 
+ node del_codes[selectcatid,selectcodeid]
+     <table width="100%">(<tr>(<td class="CELL_WARNING">(
+      {active href all_codes[selectcatid] ( on "Delete" do delete lazy_codes[catid,codeid])})))
+ from lazy_codes 
+ selected by catid=selectcatid and codeid=selectcodeid
+ 
+ node maj_codes[selectcatid,selectcodeid]
+    <table width="100%">(
+	{
+	active href all_codes[selectcatid] (
+    set catid = selectcatid,
+    set codeid =selectcodeid,
+    <tr>(<td class="CELL_WARNING">("Abbreviation ", set abr = textfield(40, abr))),
+    // <tr>(<td class="CELL_WARNING">("List Def.    : ", set listdef = select(include list_admin_YN[listdef]))),
+    <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_codes[catid,codeid]))
+       )
+	}) 
+ from lazy_codes 
+ selected by catid=selectcatid and codeid=selectcodeid
+ 
+
+
+/* Texts */
+
+node all_txt[selectprojectid]
+    include top ,
+	<h2>("Strings for project: ",<font color="red">(href project_details[selectprojectid](selectprojectid))),
+	<table width="80%" align="center">(
+	     <tr>(<td class="CELL_WARNING">(expand href new_txt[selectprojectid](include ICON.new)),
+		      <td class="CELL_BG3">("ID"),
+			  <td class="CELL_BG3">("String")
+			 ),
+		 include txt[selectprojectid]
+	)
+	 
+
+node txt[selectprojectid]
+    {<tr>(<td class="CELL_BG1">(expand href del_txt[projectid,txtid] (include ICON.del)),
+		  <td class="CELL_BG1">(txtid),
+          <td class="CELL_BG1">(lib, "&nbsp;", expand href maj_txt[projectid,txtid] (include ICON.maj),		  
+                 href all_txtlang[projectid,txtid]("[INTL]" ))
+		 )
+    }
+from lazy_txt 
+selected by projectid=selectprojectid
+order by txtid
+
+
+node new_txt[selectprojectid]
+ <table width="100%">({active href all_txt[selectprojectid] (
+   set projectid = selectprojectid,
+   <tr>(<td class="CELL_WARNING">("ID: " ,set txtid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("String: ", set lib = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_txt))
+ )})
+
+node del_txt[selectprojectid,selecttxtid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href all_txt[selectprojectid] ( on "Delete" do delete lazy_txt[projectid,txtid] )}))) 
+from lazy_txt 
+selected by projectid=selectprojectid and txtid=selecttxtid
+
+node maj_txt[selectprojectid,selecttxtid]
+   <table width="100%">({active href all_txt[selectprojectid] (
+   set projectid = selectprojectid,
+   set txtid =selecttxtid,
+   <tr>(<td class="CELL_WARNING">("String: ", set lib = textarea(3,40, lib))),
+      <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_txt[projectid,txtid]))
+      )}) 
+from lazy_txt 
+selected by projectid=selectprojectid and txtid=selecttxtid
+
+
+
+
+/* Texts in other languages */
+
+
+node all_txtlang[selectprojectid,selecttxtid]
+   include top ,
+   <p>(href project_details[selectprojectid](selectprojectid), "&gt;" , href all_txt[selectprojectid]("Strings")),
+	<h3>("Translations for string ", <font color="blue">(selecttxtid), " in project ",<font color="red">(selectprojectid)),
+	<table width="100%">(
+	     <tr>(<td width="15%">(expand href new_txtlang[selectprojectid, selecttxtid](include ICON.new)),
+		      <td width="15%">("ID"),
+			  <td width="15%">("Language"),
+			  <td width="70%">("String")
+			 ),
+	     include txtlang[selectprojectid,selecttxtid]
+	)
+
+
+node txtlang[selectprojectid,selecttxtid,selectlang]
+
+        {<tr>(<td class="CELL_BG1">(expand href del_txtlang[projectid,txtid,lang] (include ICON.del)),
+			  <td class="CELL_BG1">(txtid),
+			  <td class="CELL_BG1">(lang),
+              <td class="CELL_BG1">(lib,
+                        expand href maj_txtlang[projectid,txtid,lang] (include ICON.maj))
+              )
+		}
+from lazy_txtlang 
+selected by projectid=selectprojectid and txtid=selecttxtid
+
+node new_txtlang[selectprojectid,selecttxtid]
+ <table width="100%">(
+ {active href all_txtlang[selectprojectid,selecttxtid] (
+   set projectid = selectprojectid,
+   set txtid = selecttxtid,
+   <tr>(<td class="CELL_WARNING">("Language: " ,set lang = select(include list_superlang["ENG"]))),
+   <tr>(<td class="CELL_WARNING">("String: ", set lib = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_txtlang))
+ )})
+
+
+node del_txtlang[selectprojectid,selecttxtid,selectlang]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href all_txtlang[selectprojectid,selecttxtid] ( on "Delete" do delete lazy_txtlang[projectid,txtid,lang])}))) 
+from lazy_txtlang 
+selected by projectid=selectprojectid and txtid=selecttxtid and lang=selectlang
+
+
+node maj_txtlang[selectprojectid,selecttxtid,selectlang]
+   <table width="100%">(
+   {active href all_txtlang[selectprojectid,selecttxtid] (
+      set projectid = selectprojectid,
+      set txtid =selecttxtid,
+      set lang=selectlang,
+     <tr>(<td class="CELL_WARNING">("String: ", set lib = textarea(3,40, lib))),
+     <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_txtlang[projectid,txtid,lang]))
+      )}) 
+from lazy_txtlang 
+selected by projectid=selectprojectid and txtid=selecttxtid and lang=selectlang
+
+end

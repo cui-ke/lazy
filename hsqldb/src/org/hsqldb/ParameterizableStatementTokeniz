@@ -1,0 +1,928 @@
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group. 
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved. 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: 
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer. 
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution. 
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL." 
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group. 
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL." 
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage. 
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG, 
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group.
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer.
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution.
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL."
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group.
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL."
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage.
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG,
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.hsqldb;
+
+import java.sql.Types;
+import java.util.Hashtable;
+import java.sql.SQLException;
+import java.math.BigDecimal;
+
+// fredt@users 20020218 - patch 455785 by hjbusch@users - large DECIMAL inserts
+// also Long.MIN_VALUE (bug 473388) inserts - applied to different parts
+// fredt@users 20020408 - patch 1.7.0 by fredt - exact integral types
+// integral values are cast into the smallest type that can hold them
+
+/**
+ *  Tokenizes (possibly parameterized) SQL.
+ *  @author Thomas Mueller (for original HypersonicSQL Tokenizer.java work)
+ *  @author Fred Toussi - fredt@users.sf.net (many patch merges and upgrades)
+ *  @author hjbusch@users patch 455785 - large DECIMAL inserts
+ *  @author Campbell Boucher-Burnet, Camco & Associates - Work added to implement parameterized prepared statements
+ *  @version    1.7.1
+ */
+class ParameterizableStatementTokenizer {
+
+    private static final int NAME      = 1,
+                             LONG_NAME = 2,
+                             SPECIAL   = 3,
+                             NUMBER    = 4,
+                             FLOAT     = 5,
+                             STRING    = 6,
+                             LONG      = 7,
+                             DECIMAL   = 8;
+
+    // used only internally
+    private static final int QUOTED_IDENTIFIER = 9,
+                             REMARK_LINE       = 10,
+                             REMARK            = 11;
+    private String           sCommand;
+    private char             cCommand[];
+    private int              iLength;
+    private Object           oValue;
+    private int              iIndex;
+    private int              beginIndex;
+    private int              iType;
+    private String           sToken;
+    private String           sLongNameFirst;
+    private String           sLongNameLast;
+    private boolean          bWait;
+    private static Hashtable hKeyword;
+
+    static {
+        hKeyword = new Hashtable();
+
+        String keyword[] = {
+            "AND", "ALL", "AVG", "BY", "BETWEEN", "COUNT", "CASEWHEN",
+            "DISTINCT", "EXISTS", "EXCEPT", "FALSE", "FROM", "GROUP", "IF",
+            "INTO", "IFNULL", "IS", "IN", "INTERSECT", "INNER", "LEFT",
+            "LIKE", "MAX", "MIN", "NULL", "NOT", "ON", "ORDER", "OR", "OUTER",
+            "PRIMARY", "SELECT", "SET", "SUM", "TO", "TRUE", "UNIQUE",
+            "UNION", "VALUES", "WHERE", "CONVERT", "CAST", "CONCAT", "MINUS",
+            "CALL"
+        };
+
+        for (int i = 0; i < keyword.length; i++) {
+            hKeyword.put(keyword[i], hKeyword);
+        }
+    }
+
+    /**
+     * Constructs a new ParameterizableStatementTokenizer to tokenize the
+     * specified (possibly parameterized) SQL.
+     *
+     * @param s the SQL to tokenize
+     */
+    ParameterizableStatementTokenizer(String s) {
+
+        sCommand = s;
+        cCommand = s.toCharArray();
+        iLength  = cCommand.length;
+        iIndex   = 0;
+    }
+
+    /**
+     * Back this tokenizer up one token. <p>
+     *
+     * This method is used to back up one token, in cases
+     * where it is discovered that an optional syntactic production
+     * is not used.  For instance, parsing a statment with an optional "where"
+     * clause  needs to read a token and check if it is "WHERE" at the point
+     * the optional "where" clause can legally begin.  However, the just read
+     * token needs to be placed back at the front of the token stream for
+     * later parsing as part of another statement, if it is found that the
+     * token is not "WHERE".
+     *
+     * @throws SQLException if this method has been called previously, without an
+     * intervening call to a method that clears the state set by the previous call
+     */
+    void back() throws SQLException {
+
+        Trace.doAssert(!bWait, "back");
+
+        bWait = true;
+    }
+
+    /**
+     * An Atomic read and check tokenizing action. <p>
+     *
+     * This method gets the next token and compares it to the specified
+     * match string, throwing and exception if the token is not equal
+     * to match.
+     *
+     * @param match the String that the next token must match
+     *
+     * @throws SQLException if the next token does not match the specified String
+     */
+    void getThis(String match) throws SQLException {
+
+        getToken();
+
+        if (!sToken.equals(match)) {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+        }
+    }
+
+    /**
+     * Produces an upper-case String value from the next token, as long
+     * as it is a SQL string or simple (possibly quoted) SQL identifier.
+     *
+     * @return upper-case String value of the next token
+     *
+     * @throws SQLException if the next token is not a SQL string or
+     * simple (possibly quoted) SQL identifier
+     */
+    String getStringToken() throws SQLException {
+
+        getToken();
+
+        // todo: this is just compatibility for old style USER 'sa'
+        if (iType == STRING) {
+            return sToken.substring(1).toUpperCase();
+        } else if (iType == NAME) {
+            return sToken;
+        } else if (iType == QUOTED_IDENTIFIER) {
+            return sToken.toUpperCase();
+        }
+
+        throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+    }
+
+    /**
+     * Determine if the current token represents a SQL number, string, boolean, or null.
+     *
+     * @return true if so, else false
+     */
+    boolean wasValue() {
+
+        if (iType == STRING || iType == NUMBER || iType == FLOAT
+                || iType == DECIMAL) {
+            return true;
+        }
+
+        if (sToken.equals("NULL")) {
+            return true;
+        }
+
+        if (sToken.equals("TRUE") || sToken.equals("FALSE")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the current token represents a SQL quoted identifier.
+     * @return return true if so, else false
+     */
+    boolean wasQuotedIdentifier() {
+        return iType == QUOTED_IDENTIFIER;
+    }
+
+    /**
+     * Determine if the current token represents a long (dotted) SQL identifer.
+     *
+     * Long names are of the form IDENT.IDENT where IDENT is either a simple
+     * or quoted SQL identifier.
+     *
+     * @return true if so, else false
+     */
+    boolean wasLongName() {
+        return iType == LONG_NAME;
+    }
+
+    /**
+     * Determine if the current token represents a SQL identifier that is not
+     * a long SQL identifier
+     *
+     * @return true if so, else false
+     */
+    boolean wasName() {
+
+        if (iType == QUOTED_IDENTIFIER) {
+            return true;
+        }
+
+        if (iType != NAME) {
+            return false;
+        }
+
+        return !hKeyword.containsKey(sToken);
+    }
+
+    /**
+     * Produce the first part of the last encountered long (dotted) SQL
+     * identifer token. <p>
+     *
+     * Long names are of the form IDENT.IDENT where IDENT is either a simple
+     * or quoted SQL identifier.
+     *
+     * @return first part of the last encountered long (dotted) SQL
+     * identifer token.
+     */
+    String getLongNameFirst() {
+        return sLongNameFirst;
+    }
+
+    /**
+     * Produce the second part of the last encountered long (dotted) SQL
+     * identifer token. <p>
+     *
+     * Long names are of the form IDENT.IDENT where IDENT is either a simple
+     * or quoted SQL identifier.
+     *
+     * @return second part of the last encountered long (dotted) SQL
+     * identifer token.
+     */
+    String getLongNameLast() {
+        return sLongNameLast;
+    }
+
+    /**
+     * Produce the String value of the next token, if that token is a SQL NAME
+     *
+     * @return the String value of the next token
+     * @throws SQLException if the next token is not a SQL NAME
+     */
+    String getName() throws SQLException {
+
+        getToken();
+
+        if (!wasName()) {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+        }
+
+        return sToken;
+    }
+
+    /**
+     * Produce the String value of the next token, regardless of its
+     * classification. <p>
+     *
+     * @return the String value of the next token
+     * @throws SQLException if there is a problem producing the next token
+     */
+    String getString() throws SQLException {
+
+        getToken();
+
+        return sToken;
+    }
+
+    /**
+     * Produce the SQL type of objects obtained by calling getAsValue(). <p>
+     *
+     * Warning:  no attempt is made to determine if the last method called
+     * was getAsValue.  If not, the type code returned is meaningless.
+     *
+     * @return the SQL type of the the Object returned from getAsValue()
+     */
+    int getType() {
+
+        // todo: make sure it's used only for Values!
+        // todo: synchronize iType with hColumn
+        switch (iType) {
+
+            case STRING :
+                return Types.VARCHAR;
+
+            case NUMBER :
+                return Types.INTEGER;
+
+            case LONG :
+                return Types.BIGINT;
+
+            case FLOAT :
+                return Types.DOUBLE;
+
+            case DECIMAL :
+                return Types.DECIMAL;
+
+            default :
+                return Types.NULL;
+        }
+    }
+
+    /**
+     * Produce an Object representation of the next token that is appropriate
+     * for internal use as a SQL value object. <p>
+     *
+     * Note:  to determine the SQL type corresponding to the returned object,
+     * a call to getType() should be made before getting another token.
+     *
+     * @return an Object representation of the next token
+     * @throws SQLException if the next token is not a SQL value
+     * (i.e. a SQL number, string, boolean, or null)
+     */
+    Object getAsValue() throws SQLException {
+
+        if (!wasValue()) {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+        }
+
+        if (iType == STRING) {
+
+            // todo: this is a bad solution: remove '
+            return sToken.substring(1);
+        }
+
+        // convert NULL to null String if not a String
+        // todo: make this more straightforward
+        if (sToken.equals("NULL")) {
+            return null;
+        }
+
+        if (iType == NUMBER) {
+
+            // fredt - this returns unsigned values which are later negated.
+            // as a result Integer.MIN_VALUE or Long.MIN_VALUE are promoted
+            // to a wider type.
+            if (sToken.length() < 10) {
+                return new Integer(sToken);
+            }
+
+            if (sToken.length() == 10) {
+                try {
+                    return new Integer(sToken);
+                } catch (Exception e1) {
+                    iType = LONG;
+
+                    return new Long(sToken);
+                }
+            }
+
+            if (sToken.length() < 20) {
+                iType = LONG;
+
+                return new Long(sToken);
+            }
+
+            if (sToken.length() == 20) {
+                try {
+                    return new Long(sToken);
+                } catch (Exception e2) {
+                    iType = DECIMAL;
+
+                    return new BigDecimal(sToken);
+                }
+            }
+
+            iType = DECIMAL;
+
+            return new BigDecimal(sToken);
+        } else if (iType == FLOAT) {
+            return new Double(sToken);
+        } else if (iType == DECIMAL) {
+            return new BigDecimal(sToken);
+        }
+
+        return sToken;
+    }
+
+    /**
+     * Retrieve the current position to which this tokenizer has advanced into
+     * the character sequence (String) with which it was constructed. <p>
+     *
+     * The value returned by this method is primarily used for VIEW processing.
+     *
+     * @return the current position to which this tokenizer has advanced into
+     * the character sequence it is tokenizing
+     */
+    int getPosition() {
+        return iIndex;
+    }
+
+    /**
+     * Produce a sub-sequence from the character sequence (String) with which this
+     * tokenizer was constructed. <p>
+     *
+     * The value returned by this method is used primarly for logging individual
+     * statements contained within a SQL document that is being processed.
+     * @param begin the starting position of the requested subsequence
+     * @param end the ending position of the requested subsequence
+     * @return a sub-sequence of the character sequence being tokenized
+     */
+    String getPart(int begin, int end) {
+        return sCommand.substring(begin, end);
+    }
+
+    /**
+     * Retrive the part marker postion that is used in getLastPart() calls.
+     *
+     * @return the current part marker postion
+     */
+    int getPartMarker() {
+        return beginIndex;
+    }
+
+    /**
+     * Mark the current tokenizing positino so that it will be used in
+     * future getLastPart() calls. <p>
+     *
+     * This is shorthand for setPartMarker(getPosition()).
+     *
+     */
+    void setPartMarker() {
+        beginIndex = iIndex;
+    }
+
+    /**
+     * Set the part marker position that will be used in future
+     * getLastPart() calls. <p>
+     *
+     * @param position  
+     */
+    void setPartMarker(int position) {
+        beginIndex = position;
+    }
+
+    /**
+     * Produce the subsequence of the character sequence being tokenized,
+     * staring at the last set part marker and ending with the current
+     * tokenizing position. <p>
+     *
+     * Given some preceding code like: <p>
+     *
+     * <PRE>
+     * // do some work
+     * // ...
+     * if (condition) {
+     *    tokenizer.setPartMarker() }
+     * }
+     * // do some more work
+     * // ...
+     * if (someothercondition) {
+     *   tokenizer.setPartMarker(somevalue)
+     * } else {
+     * ...
+     * }
+     * // more work ...
+     * </PRE>
+     *
+     * then calling this method is shorthand for:
+     *
+     * <PRE>
+     * int start = tokenizer.getPartMarker();
+     * int end = tokenizer.getPosition();
+     * String lastPart = tokenizer.getPart(start,end)
+     * </PRE>
+     *
+     * @return the subsequence of the character sequence being tokenized, in the range
+     * from the current part marker to the current tokenizer position
+     */
+    String getLastPart() {
+        return sCommand.substring(beginIndex, iIndex);
+    }
+
+    /**
+     * Process the next token. <p>
+     *
+     * @throws SQLException if the next token is ill-formed
+     */
+
+// fredt@users 20020501 - patch 550970 by boucherb@users - fewer StringBuffers
+    private void getToken() throws SQLException {
+
+        if (bWait) {
+            bWait = false;
+
+            return;
+        }
+
+        while (iIndex < iLength && Character.isWhitespace(cCommand[iIndex])) {
+            iIndex++;
+        }
+
+        sToken = "";
+
+        if (iIndex >= iLength) {
+            iType = 0;
+
+            return;
+        }
+
+        // boucherb@users put these first so that they take advantage of
+        // implicit local variable slot instructions
+        StringBuffer name     = null;
+        char         c        = cCommand[iIndex];
+        boolean      point    = false,
+                     digit    = false,
+                     exp      = false,
+                     afterexp = false;
+        boolean      end      = false;
+        char         cfirst   = 0;
+
+        if (Character.isJavaIdentifierStart(c)) {
+            iType = NAME;
+        } else if ("(),*=;+%?".indexOf(c) >= 0) {
+            iType = SPECIAL;
+
+            iIndex++;
+
+            sToken = String.valueOf(c);
+
+            return;
+        } else if (Character.isDigit(c)) {
+            iType = NUMBER;
+            digit = true;
+        } else if ("!<>|/-".indexOf(c) >= 0) {
+            cfirst = c;
+            iType  = SPECIAL;
+        } else if (c == '\"') {
+            iType = QUOTED_IDENTIFIER;
+
+            // delay create to here, avoiding unneccessary StringBuffer
+            name = new StringBuffer();
+        } else if (c == '\'') {
+            iType = STRING;
+
+            // delay create to here, avoiding unneccessary StringBuffer
+            name = new StringBuffer();
+
+            name.append('\'');
+        } else if (c == '.') {
+            iType = DECIMAL;
+            point = true;
+        } else {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, String.valueOf(c));
+        }
+
+        int start = iIndex++;
+
+        while (true) {
+            if (iIndex >= iLength) {
+                c   = ' ';
+                end = true;
+
+                Trace.check(iType != STRING && iType != QUOTED_IDENTIFIER,
+                            Trace.UNEXPECTED_END_OF_COMMAND);
+            } else {
+                c = cCommand[iIndex];
+            }
+
+            switch (iType) {
+
+                case NAME :
+                    if (Character.isJavaIdentifierPart(c)) {
+                        break;
+                    }
+
+                    sToken = sCommand.substring(start, iIndex).toUpperCase();
+
+                    if (c == '.') {
+                        sLongNameFirst = sToken;
+
+                        iIndex++;
+
+                        getToken();        // todo: eliminate recursion
+
+                        sLongNameLast = sToken;
+                        iType         = LONG_NAME;
+                        sToken        = sLongNameFirst + "." + sLongNameLast;
+                    }
+
+                    return;
+
+                case QUOTED_IDENTIFIER :
+                    if (c == '\"') {
+                        iIndex++;
+
+                        if (iIndex >= iLength) {
+                            sToken = name.toString();
+
+                            return;
+                        }
+
+                        c = cCommand[iIndex];
+
+                        if (c == '.') {
+                            sLongNameFirst = name.toString();
+
+                            iIndex++;
+
+                            getToken();    // todo: eliminate recursion
+
+                            sLongNameLast = sToken;
+                            iType         = LONG_NAME;
+                            sToken = sLongNameFirst + "." + sLongNameLast;
+
+                            return;
+                        }
+
+                        if (c != '\"') {
+                            sToken = name.toString();
+
+                            return;
+                        }
+                    }
+
+                    name.append(c);
+                    break;
+
+                case STRING :
+                    if (c == '\'') {
+                        iIndex++;
+
+                        if (iIndex >= iLength || cCommand[iIndex] != '\'') {
+                            sToken = name.toString();
+
+                            return;
+                        }
+                    }
+
+                    name.append(c);
+                    break;
+
+                case REMARK :
+                    if (end) {
+
+                        // unfinished remark
+                        // maybe print error here
+                        iType = 0;
+
+                        return;
+                    } else if (c == '*') {
+                        iIndex++;
+
+                        if (iIndex < iLength && cCommand[iIndex] == '/') {
+
+                            // using recursion here
+                            iIndex++;
+
+                            getToken();
+
+                            return;
+                        }
+                    }
+                    break;
+
+                case REMARK_LINE :
+                    if (end) {
+                        iType = 0;
+
+                        return;
+                    } else if (c == '\r' || c == '\n') {
+
+                        // using recursion here
+                        getToken();
+
+                        return;
+                    }
+                    break;
+
+                case SPECIAL :
+                    if (c == '/' && cfirst == '/') {
+                        iType = REMARK_LINE;
+
+                        break;
+                    } else if (c == '-' && cfirst == '-') {
+                        iType = REMARK_LINE;
+
+                        break;
+                    } else if (c == '*' && cfirst == '/') {
+                        iType = REMARK;
+
+                        break;
+                    } else if (">=|".indexOf(c) >= 0) {
+                        break;
+                    }
+
+                    sToken = sCommand.substring(start, iIndex);
+
+                    return;
+
+                case NUMBER :
+                case FLOAT :
+                case DECIMAL :
+                    if (Character.isDigit(c)) {
+                        digit = true;
+                    } else if (c == '.') {
+                        iType = DECIMAL;
+
+                        if (point) {
+                            throw Trace.error(Trace.UNEXPECTED_TOKEN, ".");
+                        }
+
+                        point = true;
+                    } else if (c == 'E' || c == 'e') {
+                        if (exp) {
+                            throw Trace.error(Trace.UNEXPECTED_TOKEN, "E");
+                        }
+
+                        // HJB-2001-08-2001 - now we are sure it's a float
+                        iType = FLOAT;
+
+                        // first character after exp may be + or -
+                        afterexp = true;
+                        point    = true;
+                        exp      = true;
+                    } else if (c == '-' && afterexp) {
+                        afterexp = false;
+                    } else if (c == '+' && afterexp) {
+                        afterexp = false;
+                    } else {
+                        afterexp = false;
+
+                        if (!digit) {
+                            if (point && start == iIndex - 1) {
+                                sToken = ".";
+                                iType  = SPECIAL;
+
+                                return;
+                            }
+
+                            throw Trace.error(Trace.UNEXPECTED_TOKEN,
+                                              String.valueOf(c));
+                        }
+
+                        sToken = sCommand.substring(start, iIndex);
+
+                        return;
+                    }
+            }
+
+            iIndex++;
+        }
+    }
+
+// fredt@users 20020420 - patch523880 by leptipre@users - VIEW support
+
+    /**
+     * Reinitialize this tokenizier, using the specified String and starting
+     * position. <p>
+     *
+     * This method has the same effect as constructing a new tokenizer
+     * with the specified string, but with the additional ability
+     * to set the initial tokenizing position (which is always zero
+     * for a newly constructed tokenizer).
+     *
+     * @param pos the position in the supplied String from which to start
+     * tokenizing
+     * @param s the new SQL string to be tokenized
+     */
+    void setString(String s, int pos) {
+
+        sCommand = s;
+        cCommand = s.toCharArray();
+        iLength  = cCommand.length;
+        bWait    = false;
+        iIndex   = pos;
+    }
+
+    /**
+     * Retrieve the length of the character sequence (String) being tokenized
+     * @return the total length of the character sequence being tokenized
+     */
+    int getLength() {
+        return iLength;
+    }
+
+// boucherb@users 200206 - added convenience method to allow parser to perform
+// atomic test and throw in places where parameter tokens are illegal, i.e. 
+// column lists items, table list items, and aliases 
+
+    /**
+     * A check for whether or not a parameter token ('?') is unexpected in the current
+     * tokenizing context
+     *
+     * @param msg to display in exception if check determines
+     * @throws SQLException if current token value is '?' and the token class
+     * is not QUOTED_IDNETIFIER
+     */
+    void checkUnexpectedParameterToken(String msg) throws SQLException {
+
+        if ("?".equals(sToken)) {
+            Trace.check(wasQuotedIdentifier(), Trace.UNEXPECTED_TOKEN,
+                        "[" + getLastPart() + "] " + msg);
+        }
+    }
+}

@@ -1,0 +1,230 @@
+define 
+
+node updateallpays
+  pre "<atlas><tabletitrecol><col>Nom</col><col>Capitale</col>",
+      "<col>Surface</col><col>Habitants (Mio.)</col><col>drapeau</col></tabletitrecol>"
+  items <pays>(
+               <nom> (  nom, expand href updatenompays[rowid] (" up")),
+               <capitale> ( capitale ),
+               <surface> ( surface ),
+               <population> ( population ),
+               <drapeau> ( drapeau )
+               )
+  post   "</atlas>"
+  from pays 
+  selected by 1=1
+  order by nom
+
+node updatenompays[rowidpays]
+  items <update>(<table> ("pays"),
+                 <rowid> (rowid),
+                 <champ> ("nom"),
+                 <valeur> (nom)
+                )
+  from pays
+  selected by rowid=rowidpays
+  order by rowid
+
+node graphpays
+  pre   "<graphic>",
+    "<type nom=\"barre\" largeur=\"500\" hauteur=\"150\"/>",
+    "<titre>Analyse des pays</titre>",
+    "<series nbr=\"2\" echantillon=\"",count(nom),
+    "\" libelle=\"population,surface\">",
+        <echantillon>(include listenompays),
+        <echantillon1>(include listepopulationpays),
+        <echantillon2>(include listesurfacepays)
+  items ""
+  post 
+    "</series>",
+    "<style nom=\"defautbarre\"/>",      
+    "</graphic>"
+  from pays selected by 1=1 order by nom
+
+node listenompays
+   items <echantillon>(nom, ",")
+  from pays selected by 1=1 order by nom
+
+node listepopulationpays
+   items <echantillon1>(population, ",")
+  from pays selected by 1=1 order by nom
+
+node listesurfacepays
+   items <echantillon2>(surface, ",")
+  from pays selected by 1=1 order by nom
+  
+
+node allpaysbig
+  pre "<atlas><tabletitrecol><col>Nom</col><col>Capitale</col><col>Villes</col>",
+      "<col>Surface(1000Km2)</col><col>Habitants (Mio.)</col></tabletitrecol>"
+  items <pays>(
+               <nom> ( expand href getdrapeau[nom] (nom) ),
+               <capitale> ( expand href villes[capitale] (capitale) ),
+               <ville> ( expand href villesparpays[nom] ("?") ),
+               <surface> ( surface ),
+               <population> ( population )
+               )
+  post   "</atlas>"
+  from pays
+  selected by 1=1
+  order by nom
+
+node allpays
+  pre "<atlas><tabletitrecol><col>Nom</col><col>Capitale</col><col>Villes</col>",
+      "<col>Surface(1000Km2)", sum(surface),"</col><col>Habitants (Mio.)"
+      , sum(population),"</col></tabletitrecol>"
+  items <pays>(
+               <nom> ( expand href getdrapeau[nom] (upper(nom)) ),
+               <capitale> ( capitale ),
+               <ville> ( expand href villesparpays[nom] ("?") ),
+               <surface> ( surface ),
+               <population> ( population )
+               )
+  post   "</atlas>", <post>("moyenne des surfaces: ", avg(surface)),
+                     <post>( expand href graphpays ("GRAPHIQUE") )
+  from pays
+  selected by 1=1
+  order by nom
+
+node allpays1
+  items <pays>(
+               <nom> ( nom ),
+               <capitale> ( capitale ),
+               <population> ( population )
+               )
+  from pays
+  selected by 1=1
+  order by nom
+
+node getdrapeau[selecteurpays]
+  items  expand href getnompays[nom] (<image> (drapeau))
+  from pays
+  selected by nom=selecteurpays
+  order by nom
+
+node getnompays[selecteurpays]
+  items expand href getdrapeau[nom] (nom)
+  from pays
+  selected by nom=selecteurpays
+  order by nom
+
+node pays [selecteurpays]
+  pre "<atlas><tabletitrecol><col>Nom</col><col>Capitale</col><col>Surface (1000Km2)</col><col>Habitants (Mio.)</col></tabletitrecol>"
+  items <pays>(
+               <nom> ( nom , <image> (drapeau) ),
+               <capitale> ( capitale ),
+               <surface> ( surface ),
+               <population> ( population )
+               )
+  post "</atlas>"
+  from pays
+  selected by nom=selecteurpays
+  order by nom
+
+
+node villes[selecteurville]
+  pre "<atlas><tabletitrecol><col>ville</col><col>En</col><col>Habitants (Mio.)</col></tabletitrecol>"
+  items <villes>(
+               <ville> ( ville ),
+               <nom> ( href pays[danspays] (danspays) ),
+               <population> ( populationville )
+               )
+  post "</atlas>"
+  from villes
+  selected by ville=selecteurville
+  order by ville
+
+node getphotoville[selecteurville]
+  items  expand href getnomville[ville] (<image> (photoville))
+  from villes
+  selected by ville=selecteurville
+  order by ville
+
+node getnomville[selecteurville]
+  items expand href getphotoville[ville] (ville)
+  from villes
+  selected by ville=selecteurville
+  order by ville
+
+
+node invillesparpays[selecteurpays]
+  items href getdrapeau[selecteurpays] (include villesparpays[selecteurpays])
+  from dual
+  selected by 1=1
+  order by 1
+
+node villesparpays[selecteurpays]
+  pre "<atlas><tabletitrecol><col>",
+      href getdrapeau[selecteurpays] ("ville"),"</col>",
+      "<col>Habitants (Mio.)</col></tabletitrecol>"
+  items <villes>(
+               <ville> ( expand href getphotoville[ville] (ville),
+                         expand href museesparville[ville] (" Musée ?")),
+               <population> ( populationville )
+               )
+  post "</atlas>"
+  from villes
+  selected by danspays=selecteurpays
+  order by ville
+
+node museesparville[selecteurville]
+  pre "<atlas><tabletitrecol><col>Musées</col>",
+      "<col>Oeuvres</col></tabletitrecol>"
+  items <musees>(
+               <musee> ( expand href getphotomusee[musee] (musee) ),
+               <musee> ( expand href oeuvreparmusee[musee] ("?") )
+               )
+  post "</atlas>"
+  from musees
+  selected by dansville=selecteurville
+  order by musee
+
+node getphotomusee[selecteurmusee]
+  items  expand href getnommusee[musee] (<image> (photomusee))
+  from musees
+  selected by musee=selecteurmusee
+  order by musee
+
+node getnommusee[selecteurmusee]
+  items expand href getphotomusee[musee] (musee)
+  from musees
+  selected by musee=selecteurmusee
+  order by musee
+
+node oeuvreparmusee[selecteurmusee]
+  pre "<atlas><tabletitrecol><col>Artiste</col>",
+      "<col>Oeuvres</col></tabletitrecol>"
+  items <oeuvres>(
+               <artiste> (  artiste ),
+               <nomoeuvre> ( expand href getphotooeuvre[nomoeuvre] (nomoeuvre) )
+               )
+  post "</atlas>"
+  from oeuvres
+  selected by dansmusee=selecteurmusee
+  order by nomoeuvre
+
+node getphotooeuvre[selecteurnomoeuvre]
+  items  expand href getnomoeuvre[nomoeuvre] (<image> (photooeuvre))
+  from oeuvres
+  selected by nomoeuvre=selecteurnomoeuvre
+  order by nomoeuvre
+
+node getnomoeuvre[selecteurnomoeuvre]
+  items expand href getphotooeuvre[nomoeuvre] (nomoeuvre)
+  from oeuvres
+  selected by nomoeuvre=selecteurnomoeuvre
+  order by nomoeuvre
+
+node allvilles
+  pre "<atlas><tabletitrecol><col>ville</col><col>En</col><col>Habitants (Mio.)</col></tabletitrecol>"
+  items <villes>(
+               <ville> ( ville ),
+               <nom> ( href pays[danspays] (danspays) ),
+               <population> ( populationville )
+               )
+  post "</atlas>"
+  from villes
+  selected by 1=1
+  order by ville
+  
+end

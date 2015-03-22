@@ -1,0 +1,120 @@
+define
+
+project EMP
+
+
+node alldept
+{<P>(
+   href in empframe empsOfDept[deptno]  (deptno),   
+   " ",href in _blank empsOfDept[deptno]  ("in new window"),   /* _blank for a new windows */
+   " ",dname," ",loc) }
+from dept
+order by deptno
+
+node empsOfDept[d] 
+  {
+    <p>("No: " , empno, " => ", ename,
+        " Hire date: ", hiredate
+       )
+  }
+  from emp
+  selected by deptno = d
+  order by empno
+
+node new_dept
+     {active href dept["[[!deptno]]"] (
+           set parameter_encoding="XML",
+           "deptno:",set deptno=textfield(2),
+           "name:",set dname=textfield(14),
+           "location:",set loc=textfield(13),
+           on "insert" do insert dept)}
+
+node dept[selectdeptno]
+{<P>(deptno, " ",dname, " ",loc)}
+from dept
+selected by deptno = selectdeptno
+
+node concat[u1,u2]
+{include __Externe.show[u1,u2]}
+
+node alldept1
+cachesize=3
+{<P>(
+   deptno," ",include bold[dname]," ",loc) }
+from dept
+order by deptno
+
+node dept_name [n]
+  {dname}
+  from dept
+  selected by deptno = n order by deptno
+  
+node emp_with_dept
+  {
+    "[", empno, "] ", <b>(ename) ,
+    " works in ", <i>(include dept_name [deptno]),
+    " and earns ", sal, ".<hr/>"
+  }
+  from emp
+  order by ename
+
+
+node emp_with_join
+  { 
+    "[", empno, "] ", <b>(ename) ,
+    " works in ", <i>(dept.dname),
+    " and earns ", sal, ".<hr/>"
+  }
+  from emp, dept
+  selected by emp.deptno = dept.deptno
+  order by ename
+
+node emp_with_mgr[e]
+  { 
+    <P>("No: ", <b>(empno), " => ", <b>(ename)),
+    <P>("Hire date: ", hiredate),
+    <blockquote>(include emp_with_mgr [ mgr ])
+  }
+  from emp
+  selected by empno = e
+  order by empno
+
+
+node empview1
+  /*
+create view empview1 as
+  select empno,ename,job,dname,sal
+  from emp, dept
+  where emp.deptno = dept.deptno;
+  */
+  { <p>("No: " , empno, " => ", ename,
+        "dept:", dname,
+        "job: ", job,
+        "sal: ", sal
+       )
+  }
+  from empview1
+ 
+node empview2
+  /*
+create view empview2 as
+  select *
+  from empview1
+  where job in ('MANAGER','PRESIDENT');
+  */
+  { <p>("No: " , empno, " => ", ename,
+        "dept:", dname,
+        "job: ", job,
+        "sal: ", sal
+       )
+  }
+  from empview2
+
+
+node bold[s]
+cachesize=0
+  {<b>(s)}
+  
+  
+  
+end

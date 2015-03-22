@@ -1,0 +1,7 @@
+#!/bin/sh
+javac ns.java \
+-classpath .:$TOMCAT_HOME/lib/servlet.jar:\
+$TOMCAT_HOME/common/lib/servlet.jar:\
+$TOMCAT_HOME/webapps/lazy/WEB-INF/classes \
+-d $TOMCAT_HOME/webapps/lazy/WEB-INF/classes
+

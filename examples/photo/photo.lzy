@@ -1,0 +1,93 @@
+define
+
+node photo_all
+<titre1>( "GESTION DES IMAGES"),
+include photosearch,
+{<table1>(
+     <ligne>(<cellule>(include photo_all_photo))
+               )}
+
+node photosearch
+   {active href searchIndexDB (on "display" do display node,
+                                         "search for", set parameter = textfield(32, "rouge"),
+                                         "mode", set parameter = select("include","expand","href")
+                               )}
+node photobyrowid[selecteurrowid]
+  {<p>(
+       id,"(", auteur, ")", 
+       ":",com
+     )}
+  from photodesc 
+  selected by rowid=selecteurrowid
+  order by id,auteur
+
+
+
+node photo_all_photo
+<table1>(
+     <tabTitre>( href photo_new_photo(<icon>("new")), "<b>NOUVELLE PHOTO</b>"),
+     {<ligne>(include photo[id]),
+      <ligne>(<cellule>(href photo_new_desc[id,concat(lib,": ."),refimg](<icon>("new")), "Description"
+                       ,include photo_desc[id]))
+               })
+from photo
+order by id
+
+
+node photo[selectid]
+              {<cellule3>(expand href photo_del_photo[id] (<icon>("del")),id,
+                expand href photo_maj_lib_photo[id,lib] (<icon>("maj")), <b>(lib)),
+              <cellule>(expand href photo_maj_refimg_photo[id,refimg] (<icon>("maj")), <image_small>(refimg))
+              }
+from photo selected by id = selectid
+
+
+node photo_desc[selectid]
+  <table2>(
+          {<ligne>( <cellule3>(expand href photo_del_desc[selectid,auteur] (<icon>("del"))),
+                    <cellule1>(auteur),            
+                    <cellule1>(expand href photo_maj_com_desc[selectid,auteur] (<icon>("maj"))),
+                    <cellule1>(com)
+                   )
+           })
+from photodesc selected by id=selectid order by auteur
+
+
+node photo_new_photo
+ {active href photo_all (
+   set id = photoid.nextval ,
+       "title     :", set lib = textfield(50, "") ,
+   "<p/>ref. img  : ", set refimg = textfield(50, "") ,
+   on "insert" do insert photo
+ )}
+
+node photo_del_photo[selectid]
+   {active href photo_all ( on "confirm delete" do delete photo[id])} 
+from photo selected by id = selectid
+
+node photo_maj_lib_photo[selectid]
+   {active href photo_all ( on "maj" do update photo[id] ,set lib = textfield(50, lib))} 
+from photo selected by id = selectid
+
+node photo_maj_refimg_photo[selectid]
+   {active href photo_all ( on "maj" do update photo[id] ,set refimg = textfield(50, refimg))} 
+from photo selected by id = selectid
+
+node photo_new_desc[selectid,lib,refimg]
+ {active href photo_all (
+   set id = selectid ,
+       "auteur       :", set auteur = textfield(50, "JG") ,
+   "<p/>com          : ", set com = textarea(5,50, lib) ,
+   "<p/>",<image>(refimg),
+   on "insert" do insert photodesc
+ )}
+
+node photo_del_desc[selectid,selectauteur]
+   {active href photo_all ( on "confirm delete" do delete photodesc[id,auteur])} 
+from photodesc selected by id = selectid and auteur=selectauteur
+
+node photo_maj_auteur_desc[selectid,selectauteur]
+   {active href photo_all ( on "maj" do update photodesc[id,auteur] ,set com = textarea(5,50, com))} 
+from photodesc selected by id = selectid and auteur=selectauteur
+
+end

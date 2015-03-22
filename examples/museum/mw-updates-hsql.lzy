@@ -1,0 +1,121 @@
+define
+
+project MW
+
+/*
+    Nodes to update the database
+
+*/
+
+node mw_new_Work
+  <h2>("Adding a new work") ,
+  active href mw_Work_index (
+     // <p>("Unique identifier: " , set wno = textfield(10)) ,
+     <p>("Title: ", set title = textfield(60) ),
+     <p>("Author: ", set author = textfield(10) , <font color="red">(" (artist no.)")) ,
+     <p>("Support: ", set support = textfield(30)),
+     <p>("Date: ", set c_date = textfield(10)),
+     <p>("Height: ", set height = textfield(10)),
+     <p>("Width: ", set Width = textfield(10)),
+     <p>("Picture location: ", set picture=textfield(50), " (URL)"),
+
+     on "Add" do insert work
+  )
+  
+node mw_add_work_by_artist[a, n]
+  <h2>("Adding a new work") ,
+  active href mw_Artist[a] (
+     // <p>("Unique identifier: " , set wno = textfield(10)) ,
+     <p>("Author: ", n , set author = a),
+     <p>("Title: ", set title = textfield(60) ),
+     <p>("Support: ", set support = textfield(30)),
+     <p>("Date: ", set c_date = textfield(10)),
+     <p>("Height: ", set height = textfield(10)),
+     <p>("Width: ", set Width = textfield(10)),
+     <p>("Picture location: ", set picture=textfield(50), " (URL)"),
+
+     on "Add" do insert work
+   )
+
+node mw_upd_Work[w]
+  <h2>("Updating a work") ,
+  active href mw_Work[w] (
+     <p>("Unique identifier: " , wno) ,
+     <p>("Title: ", set title = textfield(60, title) ),
+     <p>("Author: ", set author = textfield(10, author) , <font color="red">(" (artist no.)")) ,
+     <p>("Support: ", set support = textfield(30, support)),
+     <p>("Date: ", set c_date = textfield(10, c_date )),
+     <p>("Height: ", set height = textfield(10, height)),
+     <p>("Width: ", set Width = textfield(10, Width)),
+     <p>("Picture location: ", set picture=textfield(50, picture), " (URL)"),
+
+     on "Update" do update work[wno]
+  )
+  from work selected by wno=w
+
+node mw_new_Artist
+  <h2>("Adding a new artist") ,
+  active href mw_Artist_index (
+     // <p>("Artist identifier: " , set ano = textfield(10)) ,
+     <p>("Name: ", set name = textfield(60) ),
+     <p>("Birthdate: ", set birthdate = textfield(10, "1800"), " mandatory"),
+     <p>("Deathdate: ", set deathdate = textfield(10, "1900"), " mandatory"),
+
+     on "Add" do insert artist
+  )
+ 
+
+node mw_upd_Artist[w]
+  <h2>("Updating an artist description") ,
+  active href mw_Artist[w] (
+     <p>("Unique identifier: " , ano) ,
+     <p>("Name: ", set name = textfield(60, name) ),
+     <p>("Birthdate: ", set birthdate = textfield(10, birthdate)),
+     <p>("Deathdate: ", set deathdate = textfield(10, deathdate)),
+
+     on "Update" do update artist[ano]
+  )
+  from artist selected by ano=w
+
+/*
+node mw_new_Exhibition
+   <h2>("Creating a new exhibition") ,
+   active href mw_Exhibition_index (
+     <p>("Unique identifier: " , set exno =  textfield(10), 
+       " (a number not in { " , include mw_Exh_numbers , "} )" ) ,
+     <p>("Title: " , set title = textfield(60) ) ,
+     <p>("Organizer: " , set organizer = textfield(30)) ,
+     <p>("Description: " , set description = textarea(10, 50)) ,
+
+     on "Create" do insert exhibition
+   )
+   
+
+node mw_Exh_numbers
+   { exno, " " }
+   from exhibition
+      
+node mw_add_work_exh[e, w]
+   <h3>("Add " , work.title , " to " , exhibition.title) ,
+   active href mw_Exhibition[e] (
+      set work = w , set exhibition = e ,
+      <p>("Comment: " , set org_comment = textarea(10, 30)) ,     
+      on "Add" do insert ex_content
+   )
+   from exhibition, work
+     selected by exno = e and wno = w
+
+
+node mw_select_work[e]
+   <h3>("Select a work to include in the exhibition") ,
+   <dl>(
+      {<dd>( href mw_add_work_exh[e, wno]("[Add to exhibition]") ,
+            " ", title, " " , expand href mw_Work[wno]("[Details]" ) 
+             
+       )
+      }
+   )
+   from work 
+*/
+      
+end

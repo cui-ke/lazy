@@ -1,0 +1,695 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us_ascii">
+<title>HSQLDB Advanced Guide</title></head>
+<body>
+<h2>ADVANCED TOPICS</h2>
+<h3>PROPERTIES FILES</h3>
+<p>HSQLDB relies on a set of properties files for different settings. Version 
+  1.7.0 streamlines property naming and introduces a number of new properties. 
+  This process will continue with future versions and the properties will be used 
+  in a hierarchical manner. The properties files and the settings stored in them 
+  are as follows:</p>
+<table width="750" border="1">
+   <tr>
+      <td width="33%" valign="top">FILE NAME</td>
+      <td width="33%" valign="top">LOCATION</td>
+      <td width="33%" valign="top">FUNCTION</td>
+   </tr>
+   <tr>
+      <td width="33%" valign="top"><code>server.properties</code></td>
+      <td width="33%" valign="top">the directory where the command to run the <code>Server</code> class is issued</td>
+      <td width="33%" valign="top">settings for running HSQLDB as a database 
+  server communicating with the HSQL protocol</td>
+   </tr>
+   <tr>
+      <td width="33%" valign="top"><code>webserver.properties</code></td>
+      <td width="33%" valign="top">the directory where the command to run the <code>WebServer</code> class is issued</td>
+      <td width="33%" valign="top">settings for running HSQLDB as a database 
+  server communicating with the HTTP protocol</td>
+   </tr>
+   <tr>
+      <td width="33%" valign="top"><code>&lt;dbname&gt;.properties</code></td>
+      <td width="33%" valign="top">the directory where all the files for a database are located</td>
+      <td width="33%" valign="top">settings for each particular database</td>
+   </tr>
+</table>
+<p>In all properties files, values are case-sensitive. All values apart from names 
+  of files or pages are required in lowercase (e.g.<code> server.silent=FALSE</code> 
+  will have no effect, but <code>server.silent=false </code>will work).</p>
+<p>&nbsp;In both  <code>server.properties</code> and <code>webserver.properties</code> 
+  files, supported values and their defaults are as follows:</p>
+<table border cellspacing=1 cellpadding=9 width=750>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <p>VALUE 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DEFAULT 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DESCRIPTION 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.database </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>test </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>the path and file name of the database file to use 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.silent </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>true </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>no extensive messages displayed on console 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.trace </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>false </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>JDBC trace messages displayed on console 
+    </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>Values specific to <code>server.properties</code> are:</p>
+<table border cellspacing=1 cellpadding=9 width=750>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <p>VALUE 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DEFAULT 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DESCRIPTION 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.port </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>9001</pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>TCP/IP port used for talking to clients 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.no_system_exit </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>false</pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>no <code>System.exit()</code> call when the database is closed 
+    </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>Values specific to <code>webserver.properties</code> are:</p>
+<table border cellspacing=1 cellpadding=9 width=750>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <p>VALUE 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DEFAULT 
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>DESCRIPTION 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.port </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>80 </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>TCP/IP port used for talking to clients 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.default_page </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>index.html </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>the default page for server 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>server.root </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>./ </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>the location of served pages 
+    </td>
+  </tr>
+  <tr> 
+    <td width="33%" valign="TOP"> 
+      <pre>.&lt;extension&gt; </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <pre>? </pre>
+    </td>
+    <td width="33%" valign="TOP"> 
+      <p>multiple entries such as <code>.html=text/html</code> define the mime 
+        types of the static files served by the web server. See the source for 
+        <code>WebServer.java</code> for a list. 
+    </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>All the above values can be specified on the command line by omitting the <code>server.</code> 
+  prefix.</p>
+<p><i>Upgrading: If you have existing custom properties files, change the values 
+  to the new naming convention.</i></p>
+<h4>Individual Database Properties</h4>
+<p>Each database has its own <code>&lt;dbname&gt;.properties</code> file as part 
+  of a small group of files which also includes <code>&lt;dbname&gt;.script </code>and 
+  <code>&lt;dbname&gt;.data</code> . The properties files contain key/value pairs 
+  for some important settings. Only the user-defined values listed below should 
+  ever be modified. Changing any other value will result in unexpected malfunction 
+  in database operations. Most of these values have been introduced for the new features in 1.7.0 and are listed 
+  below with their default values in different contexts:</p>
+<table border cellspacing=1 cellpadding=9 width=750>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <p>VALUE 
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>DEFAULT 
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>DESCRIPTION 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> <code> 
+         <p>readonly 
+         </code></td>
+      <td width="33%" valign="TOP"> <code> 
+         <p>no 
+         </code></td>
+      <td width="33%" valign="TOP"> 
+         <p>whole database is read-only 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>When true, the database cannot be modified in use. This setting can be 
+        changed to <code>yes </code>if the database is to be opened from a CD. 
+        Prior to changing this setting, the database should be closed with the 
+        <code>SHUTDOWN COMPACT </code>command to ensure consistency and compactness 
+        of the data. 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>sql.month</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>true</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>month(Date) return value 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>When true, returns month 1-12 with the Library function, <code>month(java.sql.Date 
+        d)</code></p>
+         <p>When false, returns 0-11 as it did before 1.7.0 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>sql.enforce_size </pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>false</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>trimming and padding string columns 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>When true, all CHARACTER and VARCHAR values that are in a row affected 
+        by an INSERT INTO or UPDATE statement are trimmed to the size specified 
+        in the SQL table definition. Also all char strings that are shorter than 
+        the specified size are padded with spaces. When false (default), stores 
+        the exact string that is inserted. 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>sql.compare_in_locale </pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>false</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>locale used for sorting 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>CHARACTER and VARCHAR columns are by default sorted according to POSIX 
+        standards. Setting the value to true will result in sorting in the character 
+        set of the current JRE locale.</p>
+         <p>Changing this value for an existing database that contains cached tables 
+        will break the indexing and result in inconsistent operation. To avoid 
+        this, first change the value in the properties file, then open the database 
+        and issue the SHUTDOWN COMPACT command to recreate all the indexes. 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>sql.strict_fk</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>true (false for existing db's)</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>require unique index for foreign keys 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>The default is false when opening a database created with an older version 
+        of HSQLDB; true when creating a new database.</p>
+         <p>If true, requires a pre-existing unique index for the column(s) referenced 
+        by a foreign key constraint and returns an error if the index does not 
+        already exist.</p>
+         <p>If false, creates an index if no index exists, based on the<code> sql.strong_fk 
+        </code>property below.</p>
+         <p>Changing this value to true on an existing database may result in errors 
+        when the database is opened. 
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>sql.strong_fk</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>true</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>make unique index for foreign keys 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>Has no effect if <code>sql.strict_fk</code> is true. By default, when 
+        1.7.0 opens a database created by a previous version of the program, it 
+        creates a unique index for referenced column of the foreign key instead 
+        of a non-unique index created by previous versions of HSQLDB. This is 
+        done if there isn't already a primary key or unique constraint on the 
+        referenced column(s).</p>
+         <p>If you have an existing database which relies on an automatic index (there 
+        is no primary key or unique constraint on the referenced columns) and 
+        has duplicate values in the columns, then 1.7.0 will report an exception 
+        when you attempt to open the database. If this happens, you can manually 
+        add a line to the .properties file with:</p>
+         <code> 
+         <p>sql.strong_fk=false</p>
+         </code> 
+         <p>in order to allow the old database to be opened. It is a good idea to 
+        modify the data and remove the duplicate values, as these would cause 
+        data integrity problems. You can then change the value to <code>sql.strong_fk=true</code> for future 
+        operations. 
+    
+         
+      </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>hsqldb.cache_scale</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>15</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>memory cache exponent 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>Indicates the size of memory cache used with cached tables, calculated 
+        as 2^value. The default results in just over 32000 rows from all cached 
+        tables being held in memory at any time. </p>
+         <p>The value can range between 8-16. 
+      </td>
+   </tr>
+   <tr>
+      <td width="33%" valign="TOP">
+         <pre>hsqldb.log_size</pre>
+      </td>
+      <td width="33%" valign="TOP">
+         <pre>200</pre>
+      </td>
+      <td width="33%" valign="TOP">size of log when checkpoint is performed</td>
+   </tr>
+   <tr>
+      <td width="99%" valign="TOP" colspan="3">
+         <p>The value is the size in megabytes that the <tt>.script</tt> file can reach before an automatice checkpoint occurs to rewrite the file. The value can be changed via the<tt> SET LOGSIZE nnn </tt>SQL command.</p>
+         </td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>hsqldb.gc_interval</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>&nbsp;</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>forced garbage collection 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>This setting forces garbage collection each time a set number of result 
+        set row or cache row objects are created. The default, "0" means no garbage 
+        collection is forced by the program.</p>
+         <p>This should not be set when the database engine is acting as a server. 
+        The setting can be useful, when the database is used in-process with some 
+        Java Runtime Environments (JRE’s). Some JRE’s increase the size of the 
+        memory heap before doing any automatic garbage collection. This setting 
+        would prevent any unnecessary enlargement of the heap. Typical values 
+        for this setting would probably be between 10,000 to 100,000. 
+      </td>
+   </tr>
+</table>
+<p>&nbsp;</p>
+<p><i>Upgrading: The location of the database files can no longer be overridden 
+  by paths defined in the properties file. All files belonging to a database should 
+  reside in the same directory.</i></p>
+<p>&nbsp;</p>
+<h4>Connection properties</h4>
+<p>Connection properties are not files. Each JDBC connection to the DB can specify the following optional properties for special purposes. This is done by establishing the connection via the:</p>
+<pre>DriverManager.<b>getConnection</b> (String url, Properties info); </pre>
+<p>method call.</p>
+<table border cellspacing=1 cellpadding=9 width=750>
+   <tr>
+      <td width="33%" valign="TOP"><tt>jdbc.strict_md</tt></td>
+      <td width="33%" valign="TOP"><tt>false</tt></td>
+      <td width="33%" valign="TOP">throw exceptions for unsupported methods</td>
+   </tr>
+   <tr>
+      <td width="99%" valign="TOP" colspan="3">When true, several  <tt>ResultSetMetaData.isXXX(int column)</tt> methods throw an <tt>SQLException</tt> to indicate they are not supported. In the default mode, these methods return <tt>true/false</tt> values that are not always correct for the specific column. The default mode allows compatibility with known implementations of the <tt>javax.sql.RowSet</tt> interface.</td>
+   </tr>
+   <tr> 
+      <td width="33%" valign="TOP"> 
+         <pre>jdbc.get_column_name </pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <pre>true</pre>
+      </td>
+      <td width="33%" valign="TOP"> 
+         <p>column name in ResultSet 
+      </td>
+   </tr>
+   <tr> 
+      <td valign="TOP" colspan=3> 
+         <p>When true, <code>ResultSet.getColumnName(int 
+        c)</code> returns the underlying column name</p>
+         <p>When false, the above method returns the same value as <code>ResultSet.getColumnLabel(int 
+        column)</code> 
+      </td>
+   </tr>
+</table>
+<p>&nbsp;</p>
+<h3>CONSTRAINTS AND INDEXES</h3>
+<p>Version 1.7.0 features major improvements on previous versions in this area. 
+  Previously a<code> CONSTRAINT &lt;name&gt; PRIMARY KEY</code> was translated 
+  internally to a unique index and, in addition, a hidden column was added to 
+  the table with an extra unique index. In 1.7.0 both single-column and multi-column 
+  PRIMARY KEY constraints are supported. They are supported by a unique index 
+  on the primary key column(s) specified and no extra hidden column is added.</p>
+<p><code>CONSTRAINT &lt;name&gt; UNIQUE</code> always creates a unique index on the columns, as with previous 
+  versions.</p>
+<p>Note that in HSQLDB a unique index on multiple columns is used internally as 
+  a non-unique index on the first column in the list. For example: <code>CREATE 
+  UNIQUE INDEX name1 ON atable(c1, c2, c3);</code> means there is the equivalent 
+  of <code>CREATE INDEX name2 ON atable(c1);</code> So you do not need to specify 
+  an extra index if you require one on the first column of the list.</p>
+<p>A multi-column index will not speed up queries that contain joins on any column 
+  other than the first. You should declare individual indexes (or unique constraints) 
+  on those columns if they appear in joins or query conditions.</p>
+<p>In multiple key indexes, the order of declared columns can affect the speed 
+  of searches. If the column that contains more diverse values appears first, 
+  the searches will be faster.</p>
+<h4>FOREIGN KEYS</h4>
+<p>Version 1.7.0 features single and multiple column foreign keys. A foreign key 
+  can also be specified to reference a target table without naming the target 
+  column(s). In this case the primary key column(s) of the target table is used 
+  as the referenced column(s). Each pair of referencing and referenced columns 
+  in any foreign key should be of identical type. In the default mode, when a 
+  foreign key is declared, a unique index (or primary key index) must exist on 
+  the referenced columns in the primary key table. A non-unique index is automatically 
+  created on the referencing columns. For example:</p>
+<pre>CREATE TABLE child(c1 INTEGER, c2 VARCHAR, FOREIGN KEY (c1, c2) REFERENCES parent(p1, p2));</pre>
+<p>There must be a UNIQUE CONSTRAINT or UNIQUE INDEX on columns<code> (p1,p2)</code> 
+  in the table named "parent". A non-unique index is automatically created on 
+  columns <code>(c1, c2)</code> in the table named "child". Columns <code>p1</code> 
+  and <code>c1</code> must be of the same type (INTEGER). Columns<code> p2</code> 
+  and <code>c2</code> must be of the same type (VARCHAR).</p>
+<h3>TYPES AND ARITHMETIC OPERATIONS</h3>
+<p>Table columns of all types supported by HSQLDB can be indexed and can feature 
+  in comparisons. Types can be explicitly converted using the CONVERT() library 
+  function, but in most cases they are converted automatically.</p>
+<p>Previous versions of HSQLDB featured poor handling of arithmetic operations. 
+  For example, it was not possible to insert <code>10/2.5</code> into any DOUBLE or DECIMAL 
+  column. In 1.7.0, full operations are possible with the following rules:</p>
+<p>TINYINT, SMALLINT, INTEGER, BIGINT, NUMBER and DECIMAL (without a decimal point) 
+  are supported integral types and map to byte, short, int, long and BigDecimal 
+  in Java. The SQL type dictates the maximum and minimum values that can be held 
+  in a field of each type. For example the value range for SMALLINT is –128 to 
+  +127, although the actual Java type used for handling SMALLINT is java.lang.Integer.</p>
+<p>REAL, FLOAT, DOUBLE are all mapped to double in Java.</p>
+<p>DECIMAL and NUMERIC are mapped to <code>java.math.BigDecimal</code> and can 
+  have very large numbers of digits before or after the decimal point.</p>
+<h4>INTEGRAL TYPES</h4>
+<p>TINYINT, SMALLINT, INTEGER, BIGINT, NUMBER and DECIMAL (without a decimal point) 
+  are fully interchangeable internally, and no data narrowing takes place. Depending 
+  on the types of the operands, the result of the operations is returned in a 
+  JDBC <code>ResultSet</code> in any of related Java types: <code>Integer</code>, <code>Long</code> or <code>BigDecimal</code>. 
+  The <code>ResultSet.getXXXX()</code> methods can be used to retrieve the value 
+  work so long as the returned value can be represented by the resulting type.</p>
+<p>If the SELECT statement refers to a simple column or function, then the return 
+  type is the type corresponding to the column or the return type of the function. 
+  For example:</p>
+<pre>CREATE TABLE t(a INTEGER, b BIGINT);
+SELECT a, MAX(b) FROM t;</pre>
+<p>Would return a result set where the type of the first column is <code>java.lang.Integer 
+  </code>and the second column is <code>java.lang.Long</code>. However,</p>
+<pre>SELECT a + 0, MAX(b) + 0 FROM t;</pre>
+<p>would return <code>java.lang.Long</code> and <code>BigDecimal</code> values, 
+  generated as a result of uniform type promotion for all the return values.</p>
+<p>There is no built-in limit on the size of intermediate integral values in expressions. 
+  As a result, you should check for the type of the <code>ResultSet</code> column and choose 
+  an appropriate <code>getXXXX()</code> method to retrieve it. Alternatively, 
+  you can use the <code>getObject() </code>method, then cast the result to <code>java.lang.Number</code> 
+  and use the<code> intValue()</code> or <code>longValue()</code> methods on the 
+  result.</p>
+<p>When the result of an expression is stored in a column of a database table, 
+  it has to fit in the target column, otherwise an error is returned. For example 
+  when <code>1234567890123456789012 / 12345687901234567890</code> is evaluated, 
+  the result can be stored in any integral type column, even a SMALLINT column, 
+  as it is a small value.</p>
+<h4>OTHER NUMERIC TYPES</h4>
+<p>In SQL statements, numbers with a decimal point are treated as DECIMAL unless 
+  they are written with an exponent. Thus <code>0.2 </code>is considered a DECIMAL value but 
+  <code>0.2E0</code> is considered a DOUBLE value.</p>
+<p>When <code>PreparedStatement.setDouble()</code> or <code>setFloat()</code> 
+  is used, the value is treated as a DOUBLE automatically. </p>
+<p>When a REAL, FLOAT or DOUBLE (all synonymous) is part of an expression, the 
+  type of the result is DOUBLE. </p>
+<p>Otherwise, when no DOUBLE value exists, if a DECIMAL or NUMBER value is part 
+  an expression, the type of the result is DECIMAL. The result can be retrieved 
+  from a <code>ResultSet</code> in the required type so long as it can be represented. 
+  This means DECIMAL values can be converted to DOUBLE unless they are beyond 
+  the <code>Double.MIN_VALUE - Double.MAX_VALUE</code> range. Similar to integral 
+  values, when the result of an expression is stored in a table column, it has 
+  to fit in the target column, otherwise an error is returned.</p>
+<p>The distinction between DOUBLE and DECIMAL is important when a division takes 
+  place. When the terms are DECIMAL, the result is a value with a scale (number 
+  of digits to the right of the decimal pint) equal to the larger of the scales 
+  of the two terms. With a DOUBLE term, the scale will reflect the actual result 
+  of the operation. For example, <code>10.0/8.0</code> (DECIMAL) equals <code>1.2</code> but <code>10.0E0/8.0E0</code> 
+  (DOUBLE) equals <code>1.25</code>. Without division operations, DECIMAL values represent 
+  exact arithmetic; the resulting scale is the sum of the scales of the two terms 
+  when multiplication is performed.</p>
+<h4>BIT TYPE</h4>
+<p>BIT columns in HSQLDB are in fact boolean columns. BIT columns can be initialised 
+  using values of any numeric type. In this case <code>0</code> is translated to <code>false</code> 
+  and any other value is translated to <code>true</code>. Note that the primary 
+  representation of BIT column is <code>'true'</code> or <code>'false'</code> 
+  either as strings or as the boolean type when used from JDBC.</p>
+<h4>IDENTITY AUTO-INCREMENT TYPE</h4>
+<p>Each table can contain one auto-increment column, known as the IDENTITY column. An IDENTITY column is always  treated as the primary key for the table. Support has been added for <code>CREATE TABLE &lt;tablename&gt;(&lt;colname&gt; 
+  IDENTITY, ...)</code> to allow IDENTITY used on it's own as a type. This is 
+  translated internally to <code>(&lt;colname&gt; INTEGER IDENTITY, ...)</code> 
+  which is the default syntax.</p>
+<p>When you add  a new row to  such a table using 
+  an <code>INSERT INTO &lt;tablename&gt; ...; </code>statement, you can use the 
+  NULL value for the IDENTITY column, which results in an auto-generated value 
+  for the column. The <code>IDENTITY() </code>function returns the last value inserted into any  IDENTITY column by this connection. Use <code>CALL IDENTITY(); </code>as an SQL statement to retrieve this value. If you want to use the value for a field in a child table, you can use  <code>INSERT INTO &lt;childtable&gt; VALUES (...,IDENTITY(),...);</code></p>
+<h4>HANDLING OF JAVA OBJECTS</h4>
+<p>In version 1.7.0 any serializable JAVA Object can be inserted directly into 
+  an OTHER column using any variation of <code>PreparedStatement.setObject()</code> methods 
+  or its appropriate <code>setXXX()</code> method. The exception is with <code>String</code> 
+  and<code> byte[]</code> Objects: <code>setString()</code> will not act as expected, nor <code>setObject(int 
+  index Object object)</code>. The <code>setObject(int index, Object object, int 
+  type)</code> with the type parameter <code>Types.OTHER</code> should be explicitly 
+  called to insert a<code> String</code> or <code>byte[]</code> into an OTHER column.</p>
+<p>This is because when the <code>execute</code> methods of <code>PreparedStatement</code> 
+  are called, everything is passed to the database as an SQL query string. As 
+  a result, the system needs to distinguish between a user supplied string and 
+  a string generated by <code>PreparedStatement</code>. The string generated by 
+  <code>PreparedStatement</code> for an Object consists of hex digits only, with 
+  each pair of digits representing a byte of a byte array formed by calling the 
+  <code>serialize()</code> method of the object. The internal HSQLDB method, <code>org.hsqldb.ByteArray.serializeToString(Object 
+  o)</code> performs the conversion.</p>
+<p>For comparison purposes and in indexes, any two Java Objects are considered 
+  equal unless one of them is NULL.</p>
+<h4>JDBC STREAM BASED METHODS</h4>
+<p>The <code>ResultSet</code> interface methods, <code>getAsciiStream()</code>, 
+  <code>getUnicodeStream()</code> and <code>getCharacterStream()</code> are now 
+  supported to return byte or char values from CHARACTER columns and its variants. 
+  Complementary methods in <code>PreparedStatemen</code>t, <code>setAsciiStream()</code>, <code>setUnicodeStream()</code> 
+  and <code>setCharacterStream()</code> are also supported. Unlike most other 
+  databases, the <code>getString()</code> methods can be used to retrieve very 
+  long character strings and is faster than the stream based methods. </p>
+<p><em>Upgrading: Several JDBC methods that previously returned incorrect values 
+    now throw an SQLException. All these changes have been documented in the Javadoc 
+    for the jdbcXXX classes.</em></p> 
+<h3>MEMORY AND DISK USE</h3>
+<p>Memory used by the program can be thought of as two distinct pools: memory 
+  used for table data, and memory used for building result sets. In addition, 
+  when transactions are used, memory is utilised for storing the information needed 
+  for a rollback.</p>
+<p>The memory used for a table is the sum of memory used by each row. Each table 
+  row is a Java object that has 10 slots for int or reference variables. It contains 
+  an array of objects for the fields in the row. Each field is an object such 
+  as <code>Integer</code>, <code>Long</code>, <code>String</code>, etc. In addition each index on the table adds a node 
+  object to the row. Each node object has 12 slots for int or reference variables. 
+  As a result, a table with just one column of type INTEGER will have four objects 
+  per row, with a total of 24 slots of 4 bytes each - well over 100 bytes per 
+  row. Beyond this, each extra column in the table adds at least a few bytes to 
+  the size of each row.</p>
+<p>The memory used for a result set row has fewer overheads (fewer slots and no 
+  index nodes) but still uses a lot of memory. The result set memory is released 
+  once the database server has returned the result set; in the case of in-process 
+  databases, it is released when the application program releases the <code>java.sql.ResultSet</code> 
+  object.</p>
+<p>With cached tables, only up to a maximum number of rows are held in memory 
+  at any time. The default is 32000 rows. The <code>hsqldb.cache_scale</code> 
+  property can be set to alter this amount. </p>
+<h3>ISSUES WITH TRANSACTIONS</h3>
+<p>HSQLDB supports transactions at the READ_UNCOMMITTED level, also known as level 
+  0 transaction isolation. This means that during the lifetime of a transaction, 
+  other connections to the database can see the changes made to the data. Transaction 
+  support works well in general. Reported bugs concerning transactions being committed 
+  if the database is abruptly closed have been fixed. However, the following issues 
+  may be encountered only with multiple connections to a database using transactions:</p>
+<p>When an <code>ALTER TABLE .. INSERT COLUMN</code> or <code>DROP COLUMN</code> command results in changes 
+  to the table structure, the current session is committed. If an uncommitted 
+  transaction started by another connections has changed the data in the affected 
+  table, it may not be possible to roll it back after the <code>ALTER TABLE</code> command. 
+  This may also apply to <code>ADD INDEX</code> or <code>ADD CONSTRAINT</code> commands. It is recommended 
+  to use these <code>ALTER</code> commands only when it is known that other connections are 
+  not using transactions.</p>
+<p>After a CHECKPOINT command is issued, uncommitted transactions can be continued, 
+  committed, or rolled back. However, if the database is not subsequently closed 
+  properly with the SHUTDOWN command, any such transaction that still remains 
+  uncommitted, is committed at the next startup. It is recommended not to use 
+  the CHECKPOINT command when there are any uncommitted transactions.</p>
+<h3>UPGRADING DATABASES</h3>
+<p>Databases created with Hypersonic version 1.43 and HSQLDB 1.6x can be seamlessly 
+  upgraded to the new version. However, there may be cases where due to data inconsistencies, 
+  the upgrade may not be so simple. The following procedure is suggested for making 
+  the upgrade in the safest possible way.</p>
+<ol>
+  <li>Make a backup of your database.</li>
+  <li>Open the database using the old version of the Database Manager software. 
+    Use the SHUTDOWN COMPACT command.</li>
+  <li>Open with the old version Database Manager again and check the data is consistent, 
+    then close it.</li>
+  <li>Open the database with the new version 1.7.0 of Database Manager. Check 
+    the data is consistent.</li>
+  <li>Issue the SHUTDOWN COMPACT command.</li>
+  <li>Start using the database.</li>
+</ol>
+<p>Once a database is upgraded, it can no longer be used with Hypersonic or HSQLDB 
+  1.6x.</p>
+<p>The new ALTER commands allow you to improve and streamline the design of your 
+  database after a successful import.</p>
+<h4>Some Potential Problems </h4>
+<p>Version 1.7.0 does not accept duplicate names for indexes.<br>
+  Version 1.7.0 does not accept duplicate names for table columns. <br>
+  Version 1.7.0 does not create the same type of index for foreign keys as previous 
+  versions. </p>
+<p>These problems can be resolved only by editing the old database script slightly 
+  to conform to the new restrictions. So long as you just rename index or column 
+  names, you can perform this action on the <code>.script</code> file of the old 
+  database between stages 2 and 3 above in the upgrade process. Use a programming 
+  editor that is capable of handling very large files and does not wrap long lines of text.</p>
+<h4>Manual Changes to the .script File</h4>
+<p>In addition to changing the names of columns or indexes in a <code>.script file</code> mentioned above, the following changes can be applied so long as they do not affect the integrity of existing data.</p>
+<p><code>CREATE UNIQUE INDEX ... </code>to<code> CREATE INDEX ... </code>and vice versa</p>
+<p> A unique index on columns of a  MEMORY tables can always be converted  into a normal index so long as it is not referenced by a foreign key from another table or the same table. A non-unique index can only be converted into a unique index if the table data for the column(s) is  unique in each row. This conversion is not allowed on CACHED tables.</p>
+<p><code>NOT NULL</code></p>
+<p>A not-null constraint can always be removed. It can only be added if  the table data for the column has no null values.</p>
+<p><code>DEFAULT 'defaultvalue'</code></p>
+<p>A default value can always be added, modified or  removed  althogether. If a default value is removed, future inserts must include a value for the column  if there is a  <code>NOT NULL</code> constraint on the same column.</p>
+<p><code>PRIMARY KEY</code></p>
+<p>A primary key constraint can be removed or added only in MEMORY tables (the default type of table). It cannot be removed if there is a foreign key referencing the column(s).  It cannot be added or removed at all in CACHED tables.</p>
+<p><code>COLUMN TYPES</code></p>
+<p>Some changes to column types are possible with MEMORY tables only. For example an INTEGER column can be changed to BIGINT.</p>
+<p>Any other changes to data structures should be made only through the supported <code>ALTER</code> commands. </p>
+<h4>The SCRIPT command</h4>
+<p>In all versions of HSQLDB and Hypersonic 1.43, the <code>SCRIPT 'filename'</code> 
+  command (used as an SQL query) allows you to save a full record of your database, 
+  including database object definitions and data, to a file of your choice. If 
+  you encounter any problems upgrading your database with the normal method, you 
+  can export a script file using the old version of the database engine and import 
+  it into an empty new database created with 1.7.0. The only potential issue involved 
+  with this is with non-ASCII characters in strings. Please let us know if you 
+  encounter any problems. We will be releasing updated versions of DatabaseManager 
+  and Transfer Tool in the near future to facilitate moving data between old and 
+  new databases.</p>
+<h4></h4>
+<p>Author: Fred Toussi - 14 July 2002 - updated 09 Sept 2002</p>
+<p>Copyright 2002 Fred Toussi. Permission is granted to distribute this document 
+  without any alteration under the terms of the HSQLDB license. Additional permission 
+  is granted to the HSQLDB Development Group to distribute this document with 
+  or without alterations under the terms of the HSQLDB license.</p>
+<p><a href="http://hsqldb.sourceforge.net/">http://hsqldb.sourceforge.net&nbsp;</a></p>
+</body>
+</html>

@@ -1,0 +1,159 @@
+define
+
+project ONTOS
+
+node getTerm[selecteurterme]
+  
+  {href SECURE.menu ("home"),active href getTerm (on "look for" do display node,
+                        set parameter = textfield(32,selecteurterme)),
+  include termes_by_terme[selecteurterme]
+  }
+
+node termes_by_terme[selecteurterme]
+  { <Term>( 
+           <TermName>(terme),
+           include termes_idx[id] 
+                )}
+  from termes 
+  selected by terme=selecteurterme
+  order by terme
+
+node all_termes
+  { <b>(",", terme) }
+  from termes
+
+
+
+node termes_idx [selecteurid]
+  <TermIdx>(
+  { <TermIdxItem>(
+          <TypeName> (nice_type),
+          <NbrOfSense>(nbr_sens),
+          <NbrOfOcc> (nbr_occ), 
+          expand HREF concept_by_id[ID, type] ("?")
+         )})
+  from idx_nice
+  selected by id=selecteurid
+  order by nice_order
+
+node concept_by_id[selecteurid,selecteurtype]
+  <Concept>(
+  { <ConceptItem>( 
+             <SenseNumber> (seq),
+             <SenseDef>    (def),
+             include synsetterms[substr(idc,1,9)],
+             <SemanticLink>(
+                  include liensdirects[idc],
+                  include lienssynset[substr(idc,1,9)]
+                 )
+             )})
+  from concepts 
+  selected by id=selecteurid and type=selecteurtype
+  order by type, seq
+
+node concept_by_idc[selecteuridc]
+  <Concept>(
+  { <ConceptItem>( 
+             <SenseNumber> (seq),
+             <SenseDef>    (def),
+             include synsetterms[substr(idc,1,9)],
+              <SemanticLink>(
+                  include liensdirects[idc],
+                  include lienssynset[substr(idc,1,9)]
+                 )
+          )})
+  from concepts 
+  selected by idc=selecteuridc
+  order by type, seq
+
+node synset_by_idc[selecteuridc]
+  <Concept>(
+  { <ConceptItem>( 
+             include synsetterms[idc],            
+             <SenseDef>    (def),
+              <SemanticLink>(
+                  include lienssynset[selecteuridc]
+                 )
+          )})
+  from concepts 
+  selected by idc=selecteuridc
+  order by type, seq
+
+
+node synonyms[selecteuridc]
+  {  <SynonymName>(
+             expand HREF termes_by_terme[terme] (terme))}
+  from synonyms 
+  selected by origine=selecteuridc
+  order by position
+
+node synsetterms[selecteuridc]
+  {  <SynonymName>(
+             expand HREF termes_by_terme[terme] (terme))}
+  from synsetterms 
+  selected by synset=selecteuridc
+  order by position
+
+
+node liensdirects[selecteuridc]
+  {   <SemanticLinkItem>(
+             expand HREF concept_by_idc[destination] (semantique))}
+  from liensdirects 
+  selected by origine=selecteuridc
+  order by type
+
+node lienssynset[selecteuridc]
+  {  <SemanticLinkItem>(
+             expand HREF semantic[synset,semantique,type] (semantique))}
+  from lienssynset 
+  selected by synset=selecteuridc
+  order by type
+
+node semantic[selecteuridc,selecteursemantique,selecteurtype]
+  <Semantic>(
+  {  
+             <SemanticItem>(
+             //include synsetterms[destination],
+             include synset_by_idc[destination] )
+  })
+  from liens 
+  selected by origine=selecteuridc and type=selecteurtype
+  order by position
+
+
+
+// ----- to export API ONTOS
+
+node termes_API []
+  <Termes>(
+    { <T> (<IT>(id),
+            <N>(terme)
+            )})
+  from termes
+  selected by 1=1
+  order by id
+
+node concepts_API []
+  <Concepts>(
+  { <C> (<IT>(id),
+             <IC>(idc),
+             <T>(type),
+             <D> ("?"),
+             <L> (log)
+            )})
+  from concepts
+  selected by 1=1
+  order by id
+
+node liens_API []
+  <Liens>(
+  { <L> (<IO>(origine),
+             <ID>(destination),
+             <T>(type)
+            )})
+  from concepts
+  selected by 1=1
+  order by id
+
+  
+end

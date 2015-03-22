@@ -1,0 +1,117 @@
+define
+
+project XML
+
+node racine[selecteurelement]
+  {"<",typeelement, include attribut[identelement], ">", 
+             donnees,
+             include enfant[identelement],
+        "</",typeelement,">"}
+  from elements 
+  selected by identelement=selecteurelement
+  order by seq
+
+
+node enfant[selecteurparent]
+cachesize=10000
+  {"<",typeelement, include attribut[identelement], ">", 
+             donnees,
+             include enfant[identelement],
+        "</",typeelement,">"}
+  from elements 
+  selected by parent=selecteurparent
+  order by seq
+
+
+
+node attribut[selecteurelement]
+cachesize=10000
+  {" ",typeattribut,"=\"",valeur ,"\" "}
+  from attributs 
+  selected by identelement=selecteurelement
+  order by typeattribut
+
+  
+node elempartype[selecteurtype]
+  {"<",typeelement, include attribut[identelement], ">", 
+             donnees,
+             include enfantexphref[identelement] ,
+        "</",typeelement,">"}
+  from elements 
+  selected by typeelement=selecteurtype
+  order by seq
+
+node enfantexphref[selecteurparent]
+  {expand href enfantexp[selecteurparent] ("<imgexp/>")}
+  from elements 
+  selected by parent=selecteurparent and rownum<=1
+  order by seq
+
+
+node enfantexp[selecteurparent]
+  {"<",typeelement, include attribut[identelement], ">", 
+             donnees,
+              expand href updateelem[rowid] (" up"),
+             include enfantexphref[identelement] ,
+        "</",typeelement,">"}
+  from elements 
+  selected by parent=selecteurparent
+  order by seq
+
+node updateelem[r]
+ {<update>(<table> ("elements"),
+                 <rowid> (rowid),
+                 <champ> ("donnees"),
+                 <valeur> (donnees)
+                )}
+  from elements
+  selected by rowid=r
+  order by rowid
+
+
+node actor[]
+  {"<",typeelement ,">", 
+             href dialogue[donnees] (donnees),
+        "</",typeelement ,">"}
+  from elements
+  selected by typeelement="PERSONA"
+  order by seq
+
+node dialogue[selecteurpersona]
+ {"<",typeelement1 ,">", 
+             donnees1,
+             include enfant[identelement1],
+        "</",typeelement1,">"}
+  from parenf2
+  selected by typeelement2="SPEAKER" and donnees2=selecteurpersona
+  order by seq2
+
+node atom[selecteursymbol]
+  {"<",typeelement1 ,">", 
+             donnees1,
+             include enfant[identelement1],
+        "</",typeelement1,">"}
+  from parenf2
+  selected by typeelement2="SYMBOL" and donnees2=selecteursymbol
+  order by seq2
+
+node searchDB
+   {active href searchIndexDB (on "display" do display node,
+                                         "search for", set parameter = textfield(32, "moon"),
+                                         "mode", set parameter = select("include","expand","href")
+                               )}
+
+
+
+node elements[selecteurelement]
+  {<p>(
+       typeelement,"(", include attribut[identelement], ")", 
+       ":",donnees
+     )}
+  from elements 
+  selected by identelement=selecteurelement
+  order by seq
+
+
+end
+

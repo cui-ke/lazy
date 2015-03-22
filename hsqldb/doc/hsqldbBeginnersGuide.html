@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0034)http://www.admc.com/hsqldb_bg.html -->
+<html><head><title>hsqldb Beginners Guide</title>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<style>BODY {
+	FONT: 16px/17px Times, serif
+}
+DIV.red {
+	MARGIN-TOP: 10px; MARGIN-BOTTOM: 10px; COLOR: red
+}
+UL.toc {
+	FONT: 20px/20px Times, serif
+}
+DIV.pageheading {
+	MARGIN-TOP: 16px; MARGIN-BOTTOM: 16px; FONT: bold 24px/24px Times, serif; COLOR: black
+}
+A.heading {
+	MARGIN-TOP: 30px; DISPLAY: block; MARGIN-BOTTOM: 16px; FONT: bold 20px/20px Times, serif
+}
+DIV.heading {
+	MARGIN-TOP: 30px; MARGIN-BOTTOM: 16px; FONT: bold 20px/20px Times, serif
+}
+SPAN.bold {
+	FONT: bold 16px/17px Times, serif
+}
+SPAN.italic {
+	FONT: italic 16px/17px Times, serif
+}
+LI {
+	MARGIN-TOP: 10px
+}
+</style>
+
+<meta content="MSHTML 5.50.4916.2300" name=GENERATOR></head>
+<body>
+<center>
+<div class=pageheading>HSQLDB <br>Beginner's Guide </div></center>$Revision: 
+1.11 $ 
+<p>WARNING: Don't skip the <a 
+href="#intro">introduction section</a> nor the 
+<a href="#definitions">definitions 
+section</a>. They contain material necessary for an understanding of the rest of 
+this document. 
+<div class=heading>TABLE OF CONTENTS </div>
+<ul class=toc>
+   <li><a href="#intro">Intro</a> 
+   <li><a href="#definitions">Definitions</a> 
+   <li><a href="#install">Installing hsqldb</a> 
+
+   <li><a href="#architecture">Hsqldb 
+  architecture</a> 
+   <li><a href="#running">Running hsqldb</a> 
+   <li><a href="#flatfiles">Character-delimited 
+  flat database files</a> 
+   <li><a href="#tidbits">Tidbits</a> 
+</li>
+</ul><a class=heading name=intro>INTRODUCTION </a>This document is written 
+by <a href="mailto:blaine.simpson@admc.com">Blaine Simpson</a> of <a 
+href="http://admc.com/">Axis Data Management Corp</a>. Distribute freely. Email 
+me if you have any criticisms, suggestions, corrections, additions, etc. Even if 
+you are only running hsqldb embedded in another product, I recommend that you 
+work through this document so that you will understand hsqldb enough to use it 
+effectively. 
+<p>I believe that everything in this document applies to versions 7.x of hsqldb. 
+
+<p>In order to make my examples brief, in most cases I just provide the UNIX 
+usage. If you are a Windows user, you may need to change forward slashes to 
+back-slashes and rework quotes and line-continuations to satisfy your command 
+shell. This unfairness is offset somewhat by the complete disregard of 
+non-Windows platforms in hsqldb-supplied documentation. 
+<p>My tact is to avoid hsqldb <i>scripts</i> altogether. For one thing, hsqldb 
+only supplies scripts for Windows. For another, the build scripts are broken for 
+Linux (1.7.0rc5) , and they explicitly recommend using the Ant build procedure. 
+The developers apparently don't want you to use their scripts in a production 
+setting, because they put the scripts into $HSQLDB_HOME/demo instead of 
+$HSQLDB_HOME/bin. But, most importantly, running the Java commands from the 
+command line gives you a real understanding of how hsqldb works. For example, if 
+you run <i>cd ../demo; ./runWebServer</i> (assuming it is available for your 
+platform), you may have no idea that you are actually instantiating a Java 
+instance of org.hsqldb.WebServer from the hsqldb.jar file. Assuming that you 
+have a basic understanding of Java, if you run the Java commands directly, you 
+will know exaclty what is happening and will gain insights into how you can set 
+up hsqldb for your specific needs. <a 
+href="mailto:%20blaine.simpson@admc.com">Email me</a> if you have a need for 
+UNIX versions of the build scripts and scripts in $HSQLDB_HOME/demo, and I will 
+convert them. 
+<p>For some commands I show how to specify optional arguments. When I do, I use 
+square brackets [like this] around the optional argument(s). You do not type the 
+square brackets, and you can omit the entire [expression] completely. 
+<ul>TODO 
+  <li>Cover hsqldb flat files </li></ul><a class=heading 
+name=definitions>DEFINITIONS </a>These definitions are purely stipulative and 
+are made for the purpose of making this document easy to understand. 
+<p><b>dataset identifier</b> 
+<p>I hereby define "dataset identifier" to be the root filename of the database 
+files for any database. By root filename, I mean the part of the database 
+filenames before the . + extension (this is the only part of the filename that 
+they all have in common). The exceptional case of a memory-only database has a 
+dataset name of ".", by (my) definition. 
+<p><b>$HSQLDB_HOME</b> 
+<p>The base directory in which hsqldb lives (this is not necessariliy where your 
+data or databases reside). 
+<p><b>NODENAME</b> 
+<p>A name that your <i>resolver</i> can resolve to an IP address. This could be, 
+for example, a hostname, the name of floating IP address, <i>localhost</i>, or a 
+dotted-quad IP address string like 127.0.0.1. <a class=heading 
+name=install>INSTALLING HSQLDB </a>Go to <a 
+href="http://hsqldb.sourceforge.net/">http://hsqldb.sourceforge.net/</a> and 
+poke around (I don't want to be too specific because they may change things 
+around). Download the zip or archive for the version of hsqldb that you want. 
+Extract the zip/tar file to wherever you want the hsqldb system to reside (the 
+$HSQLDB_HOME). The contents of production hsqldb archives contain a 
+version-specific base directory (like <i>hsqldb_v.1.61</i>) as is customary. 
+However, at least some non-production archives do not contain a base directory 
+(i.e., the contents are all <b>relative</b> to an unnamed $HSQLDB_HOME base 
+directory). So, after you download the archive, do a <i>unzip -v</i> or <i>tar 
+-tzf</i>. If there is no base directory, then mkdir one and cd to it before 
+extracting with <i>unzip</i>, <i>tar -xzf</i>, etc. 
+<p>Look through $HSQLDB_HOME/readme.txt and/or $HSQLDB_HOME/index.html. (They 
+may or may not be there, depending on whether you are working with a production 
+release, etc.). The most important file of the hsqldb system is hsqldb.jar, 
+which resides at $HSQLDB_HOME/lib/hsqldb.jar. Your index.html or readme.txt file 
+should say what version of Java your hsqldb.jar was built with/for. If they 
+don't say, or it is not your JRE version, then I suggest that you rebuild 
+hsqldb.jar to avoid problems due to JRE version conflicts. 
+<div class=red>The supplied build scripts do not work for me unless the Ant 
+build has run first. It produces a bunch of errors indicating that Java 
+interfaces are not being satisfied, and it results in an incomplete hsqldb.jar 
+file. Therefore, I recommend that you stick to the Ant build, even if this means 
+you have to download and install yet another application. 
+<p>I am told that this problem does not occur in Windows. </p></div>If you don't 
+already have Ant, download any recent production version from <a 
+href="http://jakarta.apache.org/ant/">Apache's Jakarta site</a>, cd to where you 
+want Ant to live, and extract from the archive with <i>unzip</i> or <i>tar 
+-xzf</i>. 
+<p>cd to $HSQLDB_HOME/build. Make sure that the bin directory under your Ant 
+home is in your search path. Make sure that you set the environmental variable 
+JAVA_HOME to the base directory of your Java JRE or SDK. (like "<code>export 
+JAVA_HOME; JAVA_HOME=/usr/java/j2sdk1.4.0</code>" in UNIX, or "<code>set 
+JAVA_HOME=C:\Program Files\Java\J2re1.4.0</code>" in Windows). Run the following 
+command. 
+<blockquote><code>ant jar</code></blockquote>This builds 
+$HSQLDB_HOME/lib/hsqldb.jar. <a class=heading name=architecture>HSQLDB 
+ARCHITECTURE </a>Database files, when there are any, reside in the directory you 
+were in when you issued the Java command that started the database engine 
+(starting the Server, or the Tools in the case of Standalone engines). Four of 
+the files consist of the dataset identifier ("test" is used as the identifier in 
+this exmple) and an extension. Example: <pre>    test.data
+    test.script
+    test.properties (in some cases)
+    test.backup (in some cases)
+    server.properties (in some cases)
+    webserver.properties (in some cases)
+</pre>The exception to the claim about the files residing in the startup 
+directory is when the dataset identifier consists of an absolute file path (less 
+the filename extensions), instead of just a base filename. For example, 
+<i>/home/databases/test</i> or <i>C:/TEMP/DBS/test</i> instead of just 
+<i>test</i>. In that case, the directory is determined by the path given. <a 
+class=heading name=running>RUNNING HSQLDB </a>Add $HSQLDB_HOME/lib/hsqldb.jar to 
+your $CLASSPATH. In perhaps the majority of cases, you will have no pre-existing 
+$CLASSPATH, and will want only the hsqldb classes and the current directory (in 
+order to run your own .class files, etc.) in your classpath. In this trivial 
+case, the command in UNIX would be 
+<blockquote><code>export CLASSPATH; 
+  CLASSPATH=$HSQLDB_HOME/lib/hsqldb.jar:.</code></blockquote>(substitute your real 
+$HSQLDB_HOME, unless you have really set the environmental variable). 
+<p><span class=bold>TOOLS</span> 
+<p>You can use DatabaseManager or QueryTool with any hsqldb database (assuming 
+that you can reach it). (I refer to QueryTool and DatabaseManager below as 
+<i>the Tools</i>) I am writing the Java commands as single long lines because I 
+don't know how wide your browser window is. Be aware that your browser may be 
+folding these single commands into multiple lines (you can check it out by 
+streteching your browser really wide). You can, of course, use any shell 
+functionalities to break any given command into multiple lines. Don't forget to 
+add $HSQLDB_HOME/lib/hsqldb.jar to your $CLASSPATH as explained above. These 
+examples use the sample URL jdbc:hsqldb:hsql://skipper.admc.com. 
+<blockquote><code>java org.hsqldb.util.DatabaseManager ['-?'] [-url 
+  jdbc:hsqldb:hsql://skipper.admc.com]</code> 
+  <p>(Don't forget to refresh the tree after data changes). IMPORTANT: Choose 
+  your Engine type FIRST, because this will change the URL field! 
+</p></blockquote>
+<blockquote><code>java org.hsqldb.util.QueryTool ['-?'] [-url 
+  jdbc:hsqldb:hsql:] [-database //skipper.admc.com]* [-test false] </code>
+  <p>(Loads up a goofy query by default that in most cases has no relationship 
+  to your data) Beware that you need to use "-test false" if you don't want to 
+  add test data to your target database. The url arg is actually the URL 
+  up-to-and-including the last colon. The database arg is actually just the last 
+  part of the URL, which, in the case of Server engines, is not a dataset 
+  identifier. </p></blockquote>These samples show what I consider to be the most 
+widely useful options-- there are other options too. Use the '-?' to get a 
+syntax message. Note that they run in the foreground, so "&gt; /somewhere 
+2&gt;&amp;amt;1 &amp;" if you want your shell back. 
+<p>Default data sources (if you don't give an Applet property of "database" and 
+do not give a command-line argument). 
+<ul>
+  <li>QueryTool defaults to the in-memory database ".". 
+  <li>DatabaseManager has no default. It gives you a nice chooser. 
+</li></ul>Specify database with Applet param of ".", arg of -database for 
+QueryTool, full -url for DatabaseManager (you can't just give the db to 
+DatabaseManager). 
+<p><span class=bold>HSQL Engine Modes</span> 
+<p>The data source <i>URL</i> is dependent on the Engine Mode, but the data 
+source <i>Driver</i> is not. The data source Driver is always <span 
+class=bold>org.hsqldb.jdbcDriver</span>. 
+<ul>
+  <li><span class=bold>In-Memory</span><br>URL format: jdbc:hsqldb:. <br>No 
+  persistence. An applet, for example, could have his very own database running 
+  in his memory. There is no daemon. Database uses no network resources. 
+  <div class=red>For some reason, with in-memory database ".", sometimes you get 
+  default data and sometimes you don't. You get the data with QueryTool on the 
+  command-line, and with DatabaseManager from Applet. Otherwise you get an empty 
+  database. file:/path/to.file.html) </div>
+  <li><span class=bold>Standalone Engine</span><br>URL format: 
+  jdbc:hsqldb:DATASET (where DATASET is the dataset identifier) <br>Uses files 
+  only. No daemon. Just connect with DatabaseManager (or your client code) and 
+  it will access the files directly. Database uses no network resources. 
+  <li><span class=bold>Server Engine</span> and <span class=bold>WebServer 
+  Engine</span><br>URL format: jdbc:hsqldb:hsql://NODENAME[:port] (port defaults 
+  to 9001) <br>and<br>URL format: jdbc:hsqldb:http://NODENAME[:port] (port 
+  defaults to 80) <br>Server STARTUP COMMAND:<br>
+      &nbsp;&nbsp;<code>java 
+  org.hsqldb.Server ['-?'] [-port X] [-database DATASET]</code><a 
+  href="#footnote">*</a> 
+  <br>
+      &nbsp;&nbsp;(where DATASET is the dataset identifier) <br>WebServer 
+  STARTUP COMMAND:<br>
+      &nbsp;&nbsp;<code>java org.hsqldb.WebServer ['-?'] [-port 
+  X] [-database DATASET]</code><a 
+  href="#footnote">*</a> 
+  <br>
+      &nbsp;&nbsp;(where DATASET is the dataset identifier) 
+  <p>These startup commands show what I consider to be the most widely useful 
+  options-- there are other options too. Daemon runs in foreground (just like 
+  the tools). Listens to port 9001/tcp (80 for Web) by default. (tools and apps 
+  connect up to this) Shut down with Interrupt signal, or "shutdown" command 
+  with either tool. 
+  <div class=red>IMPORTANT: With Web/Server engines, the dataset identifier is 
+  only used by the server daemon to name his data files. The clients use a URL 
+  ending in a NODENAME or NODENAME:port to locate the data daemon. You can not 
+  run more than one dataset on one port. </div>WebServer-specific stuff. The 
+  hsqldb WebServer is a lame HTTP/1.0 web server, but for POSTS, instead of 
+  posting to a CGI, username + password + statement are passed to DB and 
+  executed. Query results are returned. You can give settings in a file named 
+  webserver.properties in the directory in which the WebServer will be started 
+  up. Note that the WebServer engine listens to port 80 by default, and this 
+  requires superuser privileges. So, if you are not root, you will need to 
+  change the port by using the appropriate argument to <i>java WebServer...</i> 
+  or webserver.properteis setting, then use the :port suffix in your data source 
+  URLs. </li></ul><span class=bold>Resources</span> Do check out the docs in 
+$HSQLDB_HOME/doc. 
+<p><a name=footnote>*</a> Note the ambiguity with database arguments between 
+QueryTool and Server. QueryTool url arg always ends with : (which is dumb if you 
+ask me), and the database starts with / for Servers engines. <i>java 
+Server...</i> and <i>java WebServer...</i> database arg is just the dataset 
+identifier, like "test". <a class=heading name=flatfiles>CHARACTER DELIMITED 
+FLAT DATABASE FILES </a>For database engines other than In-Memory engines, you 
+can have specific tables use a text-char-delimited table-specific file to store 
+the data. 
+<p>Specific <i>tables</i> may be <i>text tables</i>. You can not change the 
+default mode so that <i>CREATE TABLE</i> commands will create text tables. You 
+must use the special <i>CREATE TEXT TABLE</i> command to create a text table (or 
+use the special SELECT command described below). 
+<blockquote><code>CREATE TEXT TABLE mynewtable...</code></blockquote>
+<p>At this point, the table is read-only and can not store data, because there 
+is no file associated with the text table. 
+<blockquote><code>SET TABLE mynewtable SOURCE 
+"filename.csv"</code></blockquote>Now you are all set. The default delimiter is 
+"<b>,</b>". You can change that by specifying it along with the text file like 
+<blockquote><code>SET TABLE mynewtable SOURCE 
+"filename.csv;fs=|"</code></blockquote>where <it>fs</it> means Field Separator. 
+This and several other useful settings can be made either with the SET TABLE 
+command or in your datasource properties file (like "test.properties"). 
+<p>To create a new text table from the definition and data of an existing normal 
+table, use a command like 
+<blockquote><code>SELECT * INTO TEXT newtable FROM existingtable 
+</code></blockquote>The file name is created automatically (I don't know why the 
+behavior of the SELECT...INTO command is so radically different from the CREATE 
+command). The filename is a lower-cased and normalized version of the table name 
+plus suffix "csv". The file will reside in the same directory as the other 
+database files. 
+<p>My tests show that the text file is not updated upon commits (at least with a 
+Standalone database engine). The files got updated when I exited my client tool. 
+It is likely that the files get updated upon <i>disconnect</i>. This is of 
+concern if you are using some other method to view the data files (perhaps 
+viewing them interactively or accessing them with a non-hsqldb such as a 
+non-Java app or inside a JNLP routine). 
+<p>(Note that you will get a null pointer exception stack trace if you give an 
+SQL disconnect command before exiting the tools. Don't worry about it. 
+Everything continues to work fine. hsqldb bug id #561284) 
+<div></div><a class=heading name=tidbits>TIDBITS </a>This stuff will eventually 
+make it into documents under $HSQLDB_HOME/doc. Please do <a 
+href="mailto:blaine.simpson@admc.com">tell me</a> if something here <i>is</i> 
+documented under $HSQLDB_HOME/doc. 
+<p>By default, in hsqldb, VARCHAR, LONGCHAR and CHAR are completely equivalent. 
+(Therefore I will speak of them here simply as CHAR). I don't know the size 
+limitation, but I have successfully stored and retrieved 2M in single 
+reads/writes of CHAR fields (my JVM ran out of RAM after that and I haven't 
+taken the time to repeate the test with more JVM resources). </p>
+<p>The latest version of this document can be found at <a href="http://www.admc.com/hsqldb_bg.html">http://www.admc.com/hsqldb_bg.html</a></p>
+</body></html>

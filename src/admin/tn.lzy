@@ -1,0 +1,8 @@
+define
+
+  project BOF
+
+node TAUPE { a } from b selected by c
+
+end
+

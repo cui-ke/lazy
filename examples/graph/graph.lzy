@@ -1,0 +1,143 @@
+define
+
+// commentaire
+
+/* commentaire
+*/
+
+project GRAPH
+
+node startgraph
+   {<b>("Graphes - "),
+   expand href add_graph (include ICON.new),
+   include allgraph}
+
+node allgraph
+   {<P>(expand href del_graph[graph] (include ICON.del),
+        href getgraph[graph] (graph), ": ",
+        expand href maj_lib_graph[graph] (include ICON.maj),
+        lib)}
+from graphes
+order by graph
+
+node add_graph
+<hr>({active href startgraph (
+         "Name:", set graph = textfield(16, ""),
+         "Comment:", set lib = textarea(2,40, ""),
+         <P>(on "confirm insert" do insert graphes,<b>("Create a new graph"))
+         )
+     })
+
+node del_graph[selectgraph]
+<hr>({active href startgraph (
+        on "confirm delete" do delete graphes[graph],<b>("delete graph: ",graph))}) 
+from graphes 
+selected by graph=selectgraph
+
+node maj_lib_graph[selectgraph]
+<hr>({active href startgraph (
+               set lib = textarea(2,40,lib),
+               on "confirm update" 
+               do update graphes[graph],<b>("update graph: ",graph))}) 
+from graphes 
+selected by graph=selectgraph
+
+node getgraph[selectgraph]
+   href startgraph ("menu"),
+   "<hr/>",
+   {<b>("Graphe: ", graph, " - "),
+   expand href add_nodes[graph] (include ICON.new),
+   include allnodes[graph],
+   include callapplet[selectgraph]}
+from graphes 
+selected by graph=selectgraph
+
+
+
+node allnodes[selectgraph]
+   {<P_small>(expand href del_nodes[graph,node] (include ICON.del),
+        <b>(node),
+        expand href add_edges[graph,node] ("+++"),
+        "[", include edgesfrom[graph,node], "]"
+        )}
+from graphnodes
+selected by graph=selectgraph
+order by node
+
+node add_nodes[selectgraph]
+{active href getgraph[selectgraph] (
+         set graph=selectgraph,
+         "Node:", set node = textfield(16, ""),
+         on "confirm insert" do insert graphnodes,
+         <b>("add a node to the graph")
+         )
+     }
+
+
+node del_nodes[selectgraph,selectnode]
+{active href getgraph[selectgraph] (
+        on "confirm delete" do delete graphnodes[graph,node],
+        <b>("delete node: ",node))} 
+from graphnodes 
+selected by graph=selectgraph
+     and node=selectnode
+
+node add_edges[selectgraph,selectnode]
+{active href getgraph[selectgraph] (
+         set graph=selectgraph,
+         set nfrom=selectnode,
+         "to:", set nto = select(include listnodes[selectgraph,selectnode]),
+         "length:", set length = textfield(3, ""),
+         on "confirm insert" do insert graphedges,
+         <b>("add a edges from this node")
+         )
+     }
+
+node listnodes[selectgraph,selectnode]
+     {<option>(node)}
+from graphnodes 
+selected by graph=selectgraph
+     and node>=selectnode
+order by node
+
+
+node edgesfrom[selectgraph,selectnode]
+  {expand href modif_edges[graph,nfrom,nto](nto,decode(length,null,"",concat("/",length))),
+       " - "}
+from graphedges
+selected by graph=selectgraph
+     and nfrom=selectnode
+order by nto
+
+
+node modif_edges[selectgraph,selectfrom,selectto]
+   {active href getgraph[selectgraph] (
+         set graph=selectgraph,
+         set nfrom=selectfrom,
+         set nto=selectto,
+         "length:", set length = textfield(3, length),
+         on "confirm update" do update graphedges[graph,nfrom,nto],
+         <b>("modify a edges")),
+     active href getgraph[selectgraph] (
+         on "confirm delete" do delete graphedges[graph,nfrom,nto],
+         <b>("delete a edges"))
+}
+from graphedges
+selected by graph=selectgraph
+     and nfrom=selectfrom
+     and nto=selectto
+
+node callapplet[selectgraph]
+   {<h3>("graphe en 3D"),    
+    <APPLET code="Graph.class" width="400" height="400" >(
+       <PARAM name="edges">(include appletparam[selectgraph]))
+    }
+
+node appletparam[selectgraph]
+  {nfrom,"-",nto,decode(length,null,"",concat("/",length)),"," }
+from graphedges
+selected by graph=selectgraph
+order by nfrom,nto
+
+
+end

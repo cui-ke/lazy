@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=us-ascii">
+<title>HSQLDB Database Files and Recovery</title>
+</head>
+<body>
+<h3>hsqldb version 1.7.0 Database Files and Recovery</h3>
+<p>The Standalone and Client/Server modes will in most cases use files to store 
+  all data to disk in a persistent and safe way. This documentation describes 
+  the meaning of the files and the mechanisms. </p>
+<p>A database named 'test' is used in this description. The database files will 
+  be 'test.script', 'test.properties', 'test.data' and 'test.backup'.</p>
+<h3>Database Files</h3>
+<ul type=disc>
+  <li style='     '><strong>test.properties</strong><br>
+    Contains the entry 'modified'. If the entry 'modified' is set to 'yes' then 
+    the database is either running or was not closed correctly (because the close 
+    algorithm sets 'modified' to 'no' at the end). </li>
+  <li style='     '><strong>test.script</strong><br>
+    This file contains the SQL statements that makes up the database so far (something 
+    like the 'Redo-log' or 'Transaction-log', but just text) </li>
+  <li style='     '><strong>test.data</strong><br>
+    This file contains the (binary) data records for CACHED tables only </li>
+  <li style='     '><strong>test.backup</strong><br>
+    This is compressed file that contains the backup of the old test.data file. 
+  </li>
+</ul>
+<h3>Mechanisms</h3>
+<p><strong>Database is opened</strong> </p>
+<ul type=disc>
+  <li style='     '>Check if test.properties file is in use (algorithm: try to 
+    delete and re-create; if it works then the database it is not in use). </li>
+  <li style='     '>Check in the test.properties file if 'modified=yes'. This 
+    would mean last time it was not closed correctly, and thus the test.data file 
+    may be corrupted. In this case the 'Repair' algorithm is executed (see below) 
+    otherwise </li>
+  <li style='     '>If in the test.properties file 'modified=yes-new-files', then 
+    the (old) test.backup and test.script files are deleted and the new test.script.new 
+    file is renamed to test.script. </li>
+  <li style='     '>Open the test.script file and execute the commands </li>
+  <li style='     '>Append commands to the test.script file </li>
+</ul>
+<p><strong>Database is aborted</strong> </p>
+<p>This may happen by sudden power off, Ctrl+C in Windows, but may be simulated 
+  using the command SHUTDOWN IMMEDIATELY. </p>
+<ul type=disc>
+  <li style='     '>All files are closed; but the test.script file contains all 
+    information to re-do all changes. </li>
+  <li style='     '>The test.data file maybe corrupt because the cache in memory 
+    was not written completely. </li>
+  <li style='     '>The test.properties still containes 'modified=yes' </li>
+  <li style='     '>All files are closed (maybe by the operating system) </li>
+</ul>
+<p><strong>Database is closed correctly</strong> </p>
+<p>This may be done using the command SHUTDOWN, in the Standalone version using 
+  Connection.close() </p>
+<ul type=disc>
+  <li style='     '>The test.data file is written completely </li>
+  <li style='     '>The test.backup.new is created (containing the compressed 
+    test.data file) </li>
+  <li style='     '>The file test.script.new is created using the information 
+    in the database (and thus shrinks because no 'update' and 'delete' statements; 
+    only simple 'inserts'). </li>
+  <li style='     '>The entry 'modified' is set to 'yes-new-files' </li>
+  <li style='     '>The file test.script is deleted </li>
+  <li style='     '>The file test.script.new is renamed to test.script </li>
+  <li style='     '>The file test.backup is deleted </li>
+  <li style='     '>The file test.backup.new is renamed to test.backup </li>
+  <li style='     '>The entry 'modified' is set to 'no' </li>
+</ul>
+<p><strong>Repair</strong> </p>
+<p>The current test.data file is corrupt, but with the old test.data (from the 
+  test.backup file) and the current test.script, the database can be made up-to-date: 
+</p>
+<ul type=disc>
+  <li style='     '>Restore the old test.data file from the backup (uncompress 
+    the test.backup) </li>
+  <li style='     '>Execute all commands in the test.script file. </li>
+  <li style='     '>Close the database correctly (including a backup). </li>
+</ul>
+</body>
+</html>

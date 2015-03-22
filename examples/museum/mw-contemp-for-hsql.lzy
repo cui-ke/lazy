@@ -1,0 +1,20 @@
+define
+
+project MW
+
+/* Special node for hsqldb since hsqldb doesn't want to convert strings to ints before comparisons 
+     and Lazy parameters are strings
+*/
+node mw_Contemporary[a, b,d]
+  {
+    href mw_Artist[ano] (name)," "
+  }
+  from artist
+  selected by 
+ //        ano <> a and (birthdate + 20) < convert(d, int)
+  //      and   deathdate > convert(b, int) + 20   
+		        ano <> a and (birthdate + 20) < d
+                and   (deathdate-20) > b   
+  order by birthdate
+
+end

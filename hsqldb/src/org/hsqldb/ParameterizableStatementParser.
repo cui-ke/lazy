@@ -1,0 +1,1744 @@
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group. 
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved. 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: 
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer. 
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution. 
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL." 
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group. 
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL." 
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage. 
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG, 
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group.
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer.
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution.
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL."
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group.
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL."
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage.
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG,
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.hsqldb;
+
+import org.hsqldb.lib.StringUtil;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Vector;
+import java.util.Hashtable;
+
+// fredt@users 20020130 - patch 491987 by jimbag@users - made optional
+// changes applied to different parts of this method
+// fredt@users 20020215 - patch 1.7.0 by fredt - quoted identifiers
+// support for sql standard quoted identifiers for column and table names
+// fredt@users 20020218 - patch 1.7.0 by fredt - DEFAULT keyword
+// support for default values for table columns
+// fredt@users 20020425 - patch 548182 by skitt@users - DEFAULT enhancement
+// thertz@users 20020320 - patch 473613 by thertz - outer join condition bug
+// fredt@users 20020420 - patch 523880 by leptipre@users - VIEW support
+// fredt@users 20020525 - patch 559914 by fredt@users - SELECT INTO logging
+
+/**
+ *  Constructs ParamterizablePreparedStatement objects from (possibly parameterized) SQL.
+ *  @author Thomas Mueller (for original HypersonicSQL Parser.java work)
+ *  @author Fred Toussi - fredt@users.sf.net (many patch merges and upgrades)
+ *  @author jimbag@users - patch 491987
+ *  @author thertz@users - patch 473613
+ *  @author Campbell Boucher-Burnet, Camco & Associates - Work added to implement parameterized prepared statements
+ *  @version 1.7.1
+ */
+class ParameterizableStatementParser {
+
+    /**
+     * The {@link Database Database} object against which to parse statements.
+     */
+    private Database dDatabase;
+
+    /**
+     * The {@link ParameterizableStatementTokenizerParameterizableStatementTokenizer}
+     * object representing the (possibly parameterized) SQL statement being parsed.
+     */
+    private ParameterizableStatementTokenizer tTokenizer;
+
+    /**
+     * The {@link Session Session} object against which to parse statements.
+     */
+    private Session cSession;
+
+    /**
+     * The name of the current working table
+     */
+    private String sTable;
+
+    /**
+     * The current working token
+     */
+    private String sToken;
+
+    /**
+     * The current working value of the current VALUE-type expression
+     */
+    private Object oData;
+
+    /**
+     * The type of the current working expression
+     */
+    private int iType;
+
+    /**
+     * The type of the current working token
+     */
+    private int iToken;
+
+    /**
+     * local copy of the corresponding database sql_enforce_size property value
+     */
+    private static boolean sql_enforce_size;
+
+    /**
+     * A list of references to all parsed PARAMETER type expressions encountered
+     * durring the current parse, in parse order
+     */
+    private Vector vParameters = new Vector();
+
+    /**
+     * command value corresponding to token "CALL".
+     */
+    private static final int CALL = 1;
+
+    /**
+     * Command value corresponding to token "DELETE".
+     */
+    private static final int DELETE = 6;
+
+    /**
+     * Command value corresponding to token "INSERT".
+     */
+    private static final int INSERT = 10;
+
+    /**
+     * Command value corresponding to token "SELECT".
+     */
+    private static final int SELECT = 15;
+
+    /**
+     * Command value corresponding to token "UPDATE".
+     */
+    private static final int UPDATE = 18;
+
+    /**
+     * Command value corresponding to token ";".
+     */
+    private static final int SEMICOLON = 19;
+
+    /**
+     * Token to Command value map
+     */
+    private static final Hashtable hCommands =
+        new Hashtable(13 /* first prime > 2*command count*/);
+
+    static {
+        hCommands.put("CALL", new Integer(CALL));
+        hCommands.put("DELETE", new Integer(DELETE));
+        hCommands.put("INSERT", new Integer(INSERT));
+        hCommands.put("SELECT", new Integer(SELECT));
+        hCommands.put("UPDATE", new Integer(UPDATE));
+        hCommands.put(";", new Integer(SEMICOLON));
+    }
+
+    /**
+     *  Constructs a new ParameterizableStatementParser
+     */
+    ParameterizableStatementParser() {}
+
+    /**
+     *  Sets the enforceSize attribute of the Parser class
+     *
+     * @param  value  The new enforceSize value
+     */
+    static void setEnforceSize(boolean value) {
+        sql_enforce_size = value;
+    }
+
+    /**
+     *  Constructs a <code>ParameterizableCall</code> object using the current parse context.
+     *
+     * @return the parsed <code>ParameterizableCall</code> object
+     * @throws SQLException if there is a problem parsing out a CALL statement
+     */
+    private ParameterizableCall parseCall() throws SQLException {
+        return new ParameterizableCall(dDatabase, parseExpression());
+    }
+
+    // fredt@users 20020130 - patch 491987 by jimbag@users - modified
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableSelect parseSelect() throws SQLException {
+
+        ParameterizableSelect select = new ParameterizableSelect(dDatabase);
+
+        // fredt@users 20011010 - patch 471710 by fredt - LIMIT rewritten
+        // SELECT LIMIT n m DISTINCT ... queries and error message
+        // "SELECT LIMIT n m ..." creates the result set for the SELECT statement then
+        // discards the first n rows and returns m rows of the remaining result set
+        // "SELECT LIMIT 0 m" is equivalent to "SELECT TOP m" or "SELECT FIRST m"
+        // in other RDBMS's
+        // "SELECT LIMIT n 0" discards the first n rows and returns the remaining rows
+        // fredt@users 20020225 - patch 456679 by hiep256 - TOP keyword
+        String token = tTokenizer.getString();
+
+        if (token.equals("LIMIT")) {
+            String limStart = tTokenizer.getString();
+            String limEnd   = tTokenizer.getString();
+
+            try {
+                select.limitStart = new Integer(limStart).intValue();
+                select.limitCount = new Integer(limEnd).intValue();
+            } catch (NumberFormatException ex) {
+
+                // todo: add appropriate error type and message to Trace.java
+                throw Trace.error(Trace.WRONG_DATA_TYPE, "LIMIT n m");
+            }
+
+            token = tTokenizer.getString();
+        } else if (token.equals("TOP")) {
+            String limEnd = tTokenizer.getString();
+
+            try {
+                select.limitStart = 0;
+                select.limitCount = new Integer(limEnd).intValue();
+            } catch (NumberFormatException ex) {
+
+                // todo: add appropriate error type and message to Trace.java
+                throw Trace.error(Trace.WRONG_DATA_TYPE, "TOP m");
+            }
+
+            token = tTokenizer.getString();
+        }
+
+        if (token.equals("DISTINCT")) {
+            select.isDistinctSelect = true;
+        } else {
+            tTokenizer.back();
+        }
+
+        // parse column list
+        Vector vcolumn = new Vector();
+
+        do {
+            ParameterizableExpression e = parseExpression();
+
+            token = tTokenizer.getString();
+
+            if (token.equals("AS")) {
+                e.setAlias(tTokenizer.getName(),
+                           tTokenizer.wasQuotedIdentifier());
+
+                token = tTokenizer.getString();
+            } else if (tTokenizer.wasName()) {
+                e.setAlias(token, tTokenizer.wasQuotedIdentifier());
+
+                token = tTokenizer.getString();
+            }
+
+            vcolumn.addElement(e);
+        } while (token.equals(","));
+
+        if (token.equals("INTO")) {
+
+            // fredt@users 20020221 - patch 513005 by sqlbob@users (RMP)
+            token = tTokenizer.getString();
+
+            if (token.equals("CACHED")) {
+                select.intoType = Table.CACHED_TABLE;
+                select.sIntoTable =
+                    new HsqlName(tTokenizer.getString(),
+                                 tTokenizer.wasQuotedIdentifier());
+            } else if (token.equals("TEMP")) {
+                select.intoType = Table.TEMP_TABLE;
+                select.sIntoTable =
+                    new HsqlName(tTokenizer.getString(),
+                                 tTokenizer.wasQuotedIdentifier());
+            } else if (token.equals("TEXT")) {
+                select.intoType = Table.TEXT_TABLE;
+                select.sIntoTable =
+                    new HsqlName(tTokenizer.getString(),
+                                 tTokenizer.wasQuotedIdentifier());
+            } else {
+                select.sIntoTable =
+                    new HsqlName(token, tTokenizer.wasQuotedIdentifier());
+            }
+
+            token = tTokenizer.getString();
+        }
+
+        if (!token.equals("FROM")) {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, token);
+        }
+
+        ParameterizableExpression condition = null;
+
+        // parse table list
+        Vector vfilter = new Vector();
+
+        vfilter.addElement(parseTableFilter(false));
+
+        while (true) {
+            token = tTokenizer.getString();
+
+            if (token.equals("LEFT")) {
+                token = tTokenizer.getString();
+
+                if (token.equals("OUTER")) {
+                    token = tTokenizer.getString();
+                }
+
+                Trace.check(token.equals("JOIN"), Trace.UNEXPECTED_TOKEN,
+                            token);
+                vfilter.addElement(parseTableFilter(true));
+                tTokenizer.getThis("ON");
+
+                // thertz@users 20020320 - patch 473613 - outer join condition bug
+                // we now call parseJoinCondition() because a limitation of HSQLDB results
+                // in incorrect results for OUTER JOINS that have anything other than
+                // tableA.colA=tableB.colB type expressions
+                //condition = addCondition(condition, parseExpression());
+                condition = addCondition(condition,
+                                         parseOuterJoinCondition());
+            } else if (token.equals("INNER")) {
+                tTokenizer.getThis("JOIN");
+                vfilter.addElement(parseTableFilter(false));
+                tTokenizer.getThis("ON");
+
+                condition = addCondition(condition, parseExpression());
+            } else if (token.equals(",")) {
+                vfilter.addElement(parseTableFilter(false));
+            } else {
+                break;
+            }
+        }
+
+        tTokenizer.back();
+
+        int len = vfilter.size();
+        ParameterizableTableFilter filter[] =
+            new ParameterizableTableFilter[len];
+
+        vfilter.copyInto(filter);
+
+        select.tFilter = filter;
+
+        // expand [table.]* columns
+        len = vcolumn.size();
+
+        for (int i = 0; i < len; i++) {
+            ParameterizableExpression e =
+                (ParameterizableExpression) (vcolumn.elementAt(i));
+
+            if (e.getType() == ParameterizableExpression.ASTERIX) {
+                int    current = i;
+                Table  table   = null;
+                String n       = e.getTableName();
+
+                for (int t = 0; t < filter.length; t++) {
+                    ParameterizableTableFilter f = filter[t];
+
+                    e.resolve(f);
+
+                    if (n != null &&!n.equals(f.getName())) {
+                        continue;
+                    }
+
+                    table = f.getTable();
+
+                    int col = table.getColumnCount();
+
+                    for (int c = 0; c < col; c++) {
+                        ParameterizableExpression ins =
+                            new ParameterizableExpression(
+                                f.getName(),
+                                table.getColumn(c).columnName.name,
+                                table.getColumn(c).columnName.isNameQuoted);
+
+                        vcolumn.insertElementAt(ins, current++);
+
+                        // now there is one element more to parse
+                        len++;
+                    }
+                }
+
+                Trace.check(table != null, Trace.TABLE_NOT_FOUND, n);
+
+                // minus the asterix element
+                len--;
+
+                vcolumn.removeElementAt(current);
+            } else if (e.getType() == ParameterizableExpression.COLUMN) {
+                if (e.getTableName() == null) {
+                    for (int filterIndex = 0; filterIndex < filter.length;
+                            filterIndex++) {
+                        e.resolve(filter[filterIndex]);
+                    }
+                }
+            }
+        }
+
+        select.iResultLen = len;
+
+        // where
+        token = tTokenizer.getString();
+
+        if (token.equals("WHERE")) {
+            condition = addCondition(condition, parseExpression());
+            token     = tTokenizer.getString();
+        }
+
+        select.eCondition = condition;
+
+        // fredt@users 20020215 - patch 1.7.0 by fredt
+        // to support GROUP BY with more than one column
+        if (token.equals("GROUP")) {
+            tTokenizer.getThis("BY");
+
+            len = 0;
+
+            do {
+                ParameterizableExpression e = parseExpression();
+
+                e = doOrderGroup(e, vcolumn);
+
+                vcolumn.addElement(e);
+
+                token = tTokenizer.getString();
+
+                len++;
+            } while (token.equals(","));
+
+            select.iGroupLen = len;
+        }
+
+        if (token.equals("HAVING")) {
+
+            //fredt - not yet!
+            ParameterizableExpression hcondition = null;
+
+            addCondition(hcondition, parseExpression());
+
+            select.havingCondition = hcondition;
+            token                  = tTokenizer.getString();
+
+            throw Trace.error(Trace.FUNCTION_NOT_SUPPORTED);
+        }
+
+        if (token.equals("ORDER")) {
+            tTokenizer.getThis("BY");
+
+            len = 0;
+
+            do {
+                ParameterizableExpression e = parseExpression();
+
+                e     = doOrderGroup(e, vcolumn);
+                token = tTokenizer.getString();
+
+                if (token.equals("DESC")) {
+                    e.setDescending();
+
+                    token = tTokenizer.getString();
+                } else if (token.equals("ASC")) {
+                    token = tTokenizer.getString();
+                }
+
+                vcolumn.addElement(e);
+
+                len++;
+            } while (token.equals(","));
+
+            select.iOrderLen = len;
+        }
+
+        len            = vcolumn.size();
+        select.eColumn = new ParameterizableExpression[len];
+
+        vcolumn.copyInto(select.eColumn);
+
+        if (token.equals("UNION")) {
+            token = tTokenizer.getString();
+
+            if (token.equals("ALL")) {
+                select.iUnionType = ParameterizableSelect.UNIONALL;
+            } else {
+                select.iUnionType = ParameterizableSelect.UNION;
+
+                tTokenizer.back();
+            }
+
+            tTokenizer.getThis("SELECT");
+
+            select.sUnion = parseSelect();
+        } else if (token.equals("INTERSECT")) {
+            tTokenizer.getThis("SELECT");
+
+            select.iUnionType = ParameterizableSelect.INTERSECT;
+            select.sUnion     = parseSelect();
+        } else if (token.equals("EXCEPT") || token.equals("MINUS")) {
+            tTokenizer.getThis("SELECT");
+
+            select.iUnionType = ParameterizableSelect.EXCEPT;
+            select.sUnion     = parseSelect();
+        } else {
+            tTokenizer.back();
+        }
+
+        return select;
+    }
+
+    /**
+     *  Description of the Method
+     *
+     * @param  e                          Description of the Parameter
+     * @param  vcolumn                    Description of the Parameter
+     * @return                            Description of the Return Value
+     * @exception  java.sql.SQLException  Description of the Exception
+     */
+    private ParameterizableExpression doOrderGroup(
+            ParameterizableExpression e,
+            Vector vcolumn) throws java.sql.SQLException {
+
+        if (e.getType() == ParameterizableExpression.VALUE) {
+
+            // order by 1,2,3
+            if (e.getDataType() == Types.INTEGER) {
+                int i = ((Integer) e.getValue()).intValue();
+
+                e = (ParameterizableExpression) vcolumn.elementAt(i - 1);
+            }
+        } else if (e.getType() == ParameterizableExpression.COLUMN
+                   && e.getTableName() == null) {
+
+            // this could be an alias column
+            String s = e.getColumnName();
+
+            for (int i = 0, vSize = vcolumn.size(); i < vSize; i++) {
+                ParameterizableExpression ec =
+                    (ParameterizableExpression) vcolumn.elementAt(i);
+
+                if (s.equals(ec.getAlias())) {
+                    e = ec;
+
+                    break;
+                }
+            }
+        }
+
+        return e;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @param  outerjoin
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableTableFilter parseTableFilter(boolean outerjoin)
+    throws SQLException {
+
+        String token = tTokenizer.getString();
+        Table  t     = null;
+
+        if (token.equals("(")) {
+            tTokenizer.getThis("SELECT");
+
+            ParameterizableSelect s = parseSelect();
+            Result                r = s.getResult(0);
+
+            // it's not a problem that this table has not a unique name
+            t = new Table(dDatabase, new HsqlName("SYSTEM_SUBQUERY", false),
+                          Table.SYSTEM_TABLE, null);
+
+            tTokenizer.getThis(")");
+            t.addColumns(r);
+            t.createPrimaryKey();
+
+            // subquery creation can't fail because constraint violation
+            t.insert(r, cSession);
+        } else {
+            if ("?".equals(token)) {
+                throw Trace.error(
+                    Trace.FUNCTION_NOT_SUPPORTED,
+                    "cannot use PARAMETER expressions for table specifications");
+            }
+
+            cSession.check(token, UserManager.SELECT);
+
+            t = dDatabase.getTable(token, cSession);
+
+            // fredt@users 20020420 - patch523880 by leptipre@users - VIEW support
+            if (t.isView()) {
+                String Viewname    = token;
+                int    CurrentPos  = tTokenizer.getPosition();
+                int    sLength     = tTokenizer.getLength();
+                int    TokenLength = token.length();
+                int    NewCurPos   = CurrentPos;
+
+                token = tTokenizer.getString();
+
+                if (token.equals("AS")) {
+                    Viewname  = tTokenizer.getName();
+                    NewCurPos = tTokenizer.getPosition();
+                } else if (tTokenizer.wasName()) {
+                    Viewname  = token;
+                    NewCurPos = tTokenizer.getPosition();
+                } else {
+                    tTokenizer.back();
+                }
+
+                String sLeft = tTokenizer.getPart(0, CurrentPos
+                                                  - TokenLength);
+                String       sRight = tTokenizer.getPart(NewCurPos, sLength);
+                View         v         = (View) t;
+                String       sView     = v.getStatement();
+                StringBuffer sFromView = new StringBuffer(128);
+
+                sFromView.append(sLeft);
+                sFromView.append('(');
+                sFromView.append(sView);
+                sFromView.append(") ");
+                sFromView.append(Viewname);
+                sFromView.append(sRight);
+                tTokenizer.setString(sFromView.toString(),
+                                     CurrentPos - TokenLength + 1);
+                tTokenizer.getThis("SELECT");
+
+                ParameterizableSelect s = parseSelect();
+                Result                r = s.getResult(0);
+
+                // it's not a problem that this table has not a unique name
+                t = new Table(dDatabase,
+                              new HsqlName("SYSTEM_SUBQUERY", false),
+                              Table.SYSTEM_TABLE, null);
+
+                tTokenizer.getThis(")");
+                t.addColumns(r);
+                t.createPrimaryKey();
+
+                // subquery creation can't fail because constraint violation
+                t.insert(r, cSession);
+            }
+        }
+
+        String sAlias = null;
+
+        token = tTokenizer.getString();
+
+        if (token.equals("AS")) {
+            sAlias = tTokenizer.getName();
+        } else if (tTokenizer.wasName()) {
+            sAlias = token;
+        } else {
+            tTokenizer.back();
+        }
+
+        return new ParameterizableTableFilter(t, sAlias, outerjoin);
+    }
+
+    /**
+     *  Construct a new condition expression from the supplied expressions
+     *
+     * @param  e1 the first expression
+     * @param  e2 the second expression
+     * @return a condition expression composed of e1 and e2
+     */
+    private ParameterizableExpression addCondition(
+            ParameterizableExpression e1, ParameterizableExpression e2) {
+
+        if (e1 == null) {
+            return e2;
+        } else if (e2 == null) {
+            return e1;
+        } else {
+            return new ParameterizableExpression(
+                ParameterizableExpression.AND, e1, e2);
+        }
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @param  type
+     * @return
+     * @throws  SQLException
+     */
+    private Object getValue(int type) throws SQLException {
+
+        ParameterizableExpression r = parseExpression();
+
+        r.resolve(null);
+
+        return r.getValue(type);
+    }
+
+    // thertz@users 20020320 - patch 473613 - outer join condition bug
+
+    /**
+     * Parses the expression that can be used behind a
+     * [..] JOIN table ON (exp).
+     * This expression should always be in the form "tab.col=tab2.col"
+     * with optional brackets (to support automated query tools).<br>
+     * this method is used from the parseSelect method
+     *
+     * @return the expression
+     * @throws SQLException if the syntax was not correct
+     */
+    private ParameterizableExpression parseOuterJoinCondition()
+    throws SQLException {
+
+        boolean parens = false;
+
+        read();
+
+        if (iToken == ParameterizableExpression.OPEN) {
+            parens = true;
+
+            read();
+        }
+
+        Trace.check(iToken == ParameterizableExpression.COLUMN,
+                    Trace.OUTER_JOIN_CONDITION);
+
+        ParameterizableExpression left = new ParameterizableExpression(sTable,
+            sToken);
+
+        read();
+        Trace.check(iToken == ParameterizableExpression.EQUAL,
+                    Trace.OUTER_JOIN_CONDITION);
+        read();
+        Trace.check(iToken == ParameterizableExpression.COLUMN,
+                    Trace.OUTER_JOIN_CONDITION);
+
+        ParameterizableExpression right =
+            new ParameterizableExpression(sTable, sToken);
+
+        if (parens) {
+            read();
+            Trace.check(iToken == ParameterizableExpression.CLOSE,
+                        Trace.OUTER_JOIN_CONDITION);
+        }
+
+        return new ParameterizableExpression(ParameterizableExpression.EQUAL,
+                                             left, right);
+    }
+
+    /**
+     *
+     */
+    private void clearParameters() {
+        this.vParameters = new Vector();
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Vector getParameters() {
+        return vParameters;
+    }
+
+    /**
+     *
+     * @throws SQLException
+     * @return
+     */
+    ParameterizablePreparedStatement parse(Database db, Session session,
+                                           String sql) throws SQLException {
+
+        dDatabase  = db;
+        tTokenizer = new ParameterizableStatementTokenizer(sql);
+        cSession   = session;
+
+        Vector                           statements = new Vector();
+        AbstractParameterizableStatement statement;
+        String                           token;
+        Integer                          command;
+
+        clearParameters();
+
+        while (true) {
+            token = tTokenizer.getString();
+
+            if (token.length() == 0) {
+
+                //System.out.println("Done");
+                break;
+            }
+
+            command = (Integer) hCommands.get(token);
+
+            if (command == null) {
+                throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+            }
+
+            switch (command.intValue()) {
+
+                case SELECT :
+                    statement = parseSelect();
+
+                    statements.addElement(statement);
+
+                    //System.out.println("added SELECT");
+                    break;
+
+                case INSERT :
+                    statement = parseInsert();
+
+                    statements.addElement(statement);
+
+                    //System.out.println("added INSERT");
+                    break;
+
+                case UPDATE :
+                    statement = parseUpdate();
+
+                    statements.addElement(statement);
+
+                    //System.out.println("added UPDATE");
+                    break;
+
+                case DELETE :
+                    statement = parseDelete();
+
+                    statements.addElement(statement);
+
+                    //System.out.println("added DELETE");
+                    break;
+
+                case CALL :
+                    statement = parseCall();
+
+                    statements.addElement(statement);
+
+                    //System.out.println("added CALL");
+                    break;
+
+                case SEMICOLON :
+                    break;
+            }
+        }
+
+        return new ParameterizablePreparedStatement(dDatabase, statements,
+                getParameters());
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression parseExpression() throws SQLException {
+
+        read();
+
+        // todo: really this should be in readTerm
+        // but then grouping is much more complex
+        if (ParameterizableExpression.isAggregate(iToken)) {
+            boolean distinct = false;
+            int     type     = iToken;
+
+            read();
+
+            if (tTokenizer.getString().equals("DISTINCT")) {
+                distinct = true;
+            } else {
+                tTokenizer.back();
+            }
+
+            ParameterizableExpression r = new ParameterizableExpression(type,
+                readOr(), null);
+
+            r.setDistinctAggregate(distinct);
+            tTokenizer.back();
+
+            return r;
+        }
+
+        ParameterizableExpression r = readOr();
+
+        tTokenizer.back();
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readOr() throws SQLException {
+
+        ParameterizableExpression r = readAnd();
+
+        while (iToken == ParameterizableExpression.OR) {
+            int                       type = iToken;
+            ParameterizableExpression a    = r;
+
+            read();
+
+            r = new ParameterizableExpression(type, a, readAnd());
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readAnd() throws SQLException {
+
+        ParameterizableExpression r = readCondition();
+
+        while (iToken == ParameterizableExpression.AND) {
+            int                       type = iToken;
+            ParameterizableExpression a    = r;
+
+            read();
+
+            r = new ParameterizableExpression(type, a, readCondition());
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readCondition() throws SQLException {
+
+        if (iToken == ParameterizableExpression.NOT) {
+            int type = iToken;
+
+            read();
+
+            return new ParameterizableExpression(type, readCondition(), null);
+        } else if (iToken == ParameterizableExpression.EXISTS) {
+            int type = iToken;
+
+            read();
+            readThis(ParameterizableExpression.OPEN);
+            Trace.check(iToken == ParameterizableExpression.SELECT,
+                        Trace.UNEXPECTED_TOKEN);
+
+            ParameterizableExpression s =
+                new ParameterizableExpression(parseSelect());
+
+            read();
+            readThis(ParameterizableExpression.CLOSE);
+
+            return new ParameterizableExpression(type, s, null);
+        } else {
+            ParameterizableExpression a   = readConcat();
+            boolean                   not = false;
+
+            if (iToken == ParameterizableExpression.NOT) {
+                not = true;
+
+                read();
+            }
+
+            if (iToken == ParameterizableExpression.LIKE) {
+                read();
+
+                ParameterizableExpression b      = readConcat();
+                char                      escape = 0;
+
+                if (sToken.equals("ESCAPE")) {
+                    read();
+
+                    ParameterizableExpression c = readTerm();
+
+                    Trace.check(
+                        c.getType() == ParameterizableExpression.VALUE,
+                        Trace.INVALID_ESCAPE);
+
+                    String s = (String) c.getValue(Types.VARCHAR);
+
+                    if (s == null || s.length() < 1) {
+                        throw Trace.error(Trace.INVALID_ESCAPE, s);
+                    }
+
+                    escape = s.charAt(0);
+                }
+
+                a = new ParameterizableExpression(
+                    ParameterizableExpression.LIKE, a, b);
+
+                a.setLikeEscape(escape);
+            } else if (iToken == ParameterizableExpression.BETWEEN) {
+                read();
+
+                ParameterizableExpression l = new ParameterizableExpression(
+                    ParameterizableExpression.BIGGER_EQUAL, a, readConcat());
+
+                readThis(ParameterizableExpression.AND);
+
+                ParameterizableExpression h = new ParameterizableExpression(
+                    ParameterizableExpression.SMALLER_EQUAL, a, readConcat());
+
+                a = new ParameterizableExpression(
+                    ParameterizableExpression.AND, l, h);
+            } else if (iToken == ParameterizableExpression.IN) {
+                int type = iToken;
+
+                read();
+                readThis(ParameterizableExpression.OPEN);
+
+                ParameterizableExpression b = null;
+
+                if (iToken == ParameterizableExpression.SELECT) {
+                    b = new ParameterizableExpression(parseSelect());
+
+                    read();
+                } else {
+                    tTokenizer.back();
+
+                    Vector v = new Vector();
+
+                    while (true) {
+                        Trace.check(
+                            iToken != ParameterizableExpression.PARAMETER,
+                            Trace.FUNCTION_NOT_SUPPORTED,
+                            " IN list may not contain PARAMETER expressions");
+                        v.addElement(getValue(Types.VARCHAR));
+                        read();
+
+                        if (iToken != ParameterizableExpression.COMMA) {
+                            break;
+                        }
+                    }
+
+                    b = new ParameterizableExpression(v);
+                }
+
+                readThis(ParameterizableExpression.CLOSE);
+
+                a = new ParameterizableExpression(type, a, b);
+            } else {
+                Trace.check(!not, Trace.UNEXPECTED_TOKEN);
+
+                if (ParameterizableExpression.isCompare(iToken)) {
+                    int type = iToken;
+
+                    read();
+
+                    return new ParameterizableExpression(type, a,
+                                                         readConcat());
+                }
+
+                return a;
+            }
+
+            if (not) {
+                a = new ParameterizableExpression(
+                    ParameterizableExpression.NOT, a, null);
+            }
+
+            return a;
+        }
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @param  type
+     * @throws  SQLException
+     */
+    private void readThis(int type) throws SQLException {
+        Trace.check(iToken == type, Trace.UNEXPECTED_TOKEN);
+        read();
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readConcat() throws SQLException {
+
+        ParameterizableExpression r = readSum();
+
+        while (iToken == ParameterizableExpression.STRINGCONCAT) {
+            int                       type = ParameterizableExpression.CONCAT;
+            ParameterizableExpression a    = r;
+
+            read();
+
+            r = new ParameterizableExpression(type, a, readSum());
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readSum() throws SQLException {
+
+        ParameterizableExpression r = readFactor();
+
+        while (true) {
+            int type;
+
+            if (iToken == ParameterizableExpression.PLUS) {
+                type = ParameterizableExpression.ADD;
+            } else if (iToken == ParameterizableExpression.NEGATE) {
+                type = ParameterizableExpression.SUBTRACT;
+            } else {
+                break;
+            }
+
+            ParameterizableExpression a = r;
+
+            read();
+
+            r = new ParameterizableExpression(type, a, readFactor());
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readFactor() throws SQLException {
+
+        ParameterizableExpression r = readTerm();
+
+        while (iToken == ParameterizableExpression.MULTIPLY
+                || iToken == ParameterizableExpression.DIVIDE) {
+            int                       type = iToken;
+            ParameterizableExpression a    = r;
+
+            read();
+
+            r = new ParameterizableExpression(type, a, readTerm());
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @return
+     * @throws  SQLException
+     */
+    private ParameterizableExpression readTerm() throws SQLException {
+
+        ParameterizableExpression r = null;
+
+        if (iToken == ParameterizableExpression.COLUMN) {
+            String name = sToken;
+
+            r = new ParameterizableExpression(sTable, sToken);
+
+            read();
+
+            if (iToken == ParameterizableExpression.OPEN) {
+                ParameterizableFunction f =
+                    new ParameterizableFunction(dDatabase.getAlias(name),
+                                                cSession);
+                int len = f.getArgCount();
+                int i   = 0;
+
+                read();
+
+                if (iToken != ParameterizableExpression.CLOSE) {
+                    while (true) {
+                        f.setArgument(i++, readOr());
+
+                        if (iToken != ParameterizableExpression.COMMA) {
+                            break;
+                        }
+
+                        read();
+                    }
+                }
+
+                readThis(ParameterizableExpression.CLOSE);
+
+                r = new ParameterizableExpression(f);
+            }
+        } else if (iToken == ParameterizableExpression.NEGATE) {
+            int type = iToken;
+
+            read();
+
+            r = new ParameterizableExpression(type, readTerm(), null);
+        } else if (iToken == ParameterizableExpression.PLUS) {
+            read();
+
+            r = readTerm();
+        } else if (iToken == ParameterizableExpression.OPEN) {
+            read();
+
+            r = readOr();
+
+            if (iToken != ParameterizableExpression.CLOSE) {
+                throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+            }
+
+            read();
+        } else if (iToken == ParameterizableExpression.VALUE) {
+            r = new ParameterizableExpression(iType, oData);
+
+            read();
+        } else if (iToken == ParameterizableExpression.PARAMETER) {
+            r = new ParameterizableExpression(iType);
+
+            if (vParameters != null) {
+                vParameters.addElement(r);
+            }
+
+            read();
+        } else if (iToken == ParameterizableExpression.SELECT) {
+            r = new ParameterizableExpression(parseSelect());
+
+            read();
+        } else if (iToken == ParameterizableExpression.MULTIPLY) {
+            r = new ParameterizableExpression(sTable, null);
+
+            read();
+        } else if (iToken == ParameterizableExpression.IFNULL
+                   || iToken == ParameterizableExpression.CONCAT) {
+            int type = iToken;
+
+            read();
+            readThis(ParameterizableExpression.OPEN);
+
+            r = readOr();
+
+            readThis(ParameterizableExpression.COMMA);
+
+            r = new ParameterizableExpression(type, r, readOr());
+
+            readThis(ParameterizableExpression.CLOSE);
+        } else if (iToken == ParameterizableExpression.CASEWHEN) {
+            int type = iToken;
+
+            read();
+            readThis(ParameterizableExpression.OPEN);
+
+            r = readOr();
+
+            readThis(ParameterizableExpression.COMMA);
+
+            ParameterizableExpression thenelse = readOr();
+
+            readThis(ParameterizableExpression.COMMA);
+
+            // thenelse part is never evaluated; only init
+            thenelse = new ParameterizableExpression(type, thenelse,
+                    readOr());
+            r = new ParameterizableExpression(type, r, thenelse);
+
+            readThis(ParameterizableExpression.CLOSE);
+        } else if (iToken == ParameterizableExpression.CONVERT) {
+            int type = iToken;
+
+            read();
+            readThis(ParameterizableExpression.OPEN);
+
+            r = readOr();
+
+            readThis(ParameterizableExpression.COMMA);
+
+            int t = Column.getTypeNr(sToken);
+
+            r = new ParameterizableExpression(type, r, null);
+
+            r.setDataType(t);
+            read();
+            readThis(ParameterizableExpression.CLOSE);
+        } else if (iToken == ParameterizableExpression.CAST) {
+            read();
+            readThis(ParameterizableExpression.OPEN);
+
+            r = readOr();
+
+            Trace.check(sToken.equals("AS"), Trace.UNEXPECTED_TOKEN, sToken);
+            read();
+
+            int t = Column.getTypeNr(sToken);
+
+            r = new ParameterizableExpression(
+                ParameterizableExpression.CONVERT, r, null);
+
+            r.setDataType(t);
+            read();
+            readThis(ParameterizableExpression.CLOSE);
+        } else {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, sToken);
+        }
+
+        return r;
+    }
+
+    /**
+     *  Method declaration
+     *
+     * @throws  SQLException
+     */
+
+    // fredt@users 20020130 - patch 497872 by Nitin Chauhan
+    // reordering for speed
+    private void read() throws SQLException {
+
+        sToken = tTokenizer.getString();
+
+        if (tTokenizer.wasValue()) {
+            iToken = ParameterizableExpression.VALUE;
+            oData  = tTokenizer.getAsValue();
+            iType  = tTokenizer.getType();
+        } else if (tTokenizer.wasName()) {
+            iToken = ParameterizableExpression.COLUMN;
+            sTable = null;
+        } else if (tTokenizer.wasLongName()) {
+            sTable = tTokenizer.getLongNameFirst();
+            sToken = tTokenizer.getLongNameLast();
+
+            if (sToken.equals("*")) {
+                iToken = ParameterizableExpression.MULTIPLY;
+            } else {
+                iToken = ParameterizableExpression.COLUMN;
+            }
+        } else if (sToken.length() == 0) {
+            iToken = ParameterizableExpression.END;
+        } else if (sToken.equals("?")) {
+            iToken = ParameterizableExpression.PARAMETER;
+        } else if (sToken.equals(",")) {
+            iToken = ParameterizableExpression.COMMA;
+        } else if (sToken.equals("=")) {
+            iToken = ParameterizableExpression.EQUAL;
+        } else if (sToken.equals("<>") || sToken.equals("!=")) {
+            iToken = ParameterizableExpression.NOT_EQUAL;
+        } else if (sToken.equals("<")) {
+            iToken = ParameterizableExpression.SMALLER;
+        } else if (sToken.equals(">")) {
+            iToken = ParameterizableExpression.BIGGER;
+        } else if (sToken.equals("<=")) {
+            iToken = ParameterizableExpression.SMALLER_EQUAL;
+        } else if (sToken.equals(">=")) {
+            iToken = ParameterizableExpression.BIGGER_EQUAL;
+        } else if (sToken.equals("AND")) {
+            iToken = ParameterizableExpression.AND;
+        } else if (sToken.equals("OR")) {
+            iToken = ParameterizableExpression.OR;
+        } else if (sToken.equals("NOT")) {
+            iToken = ParameterizableExpression.NOT;
+        } else if (sToken.equals("IN")) {
+            iToken = ParameterizableExpression.IN;
+        } else if (sToken.equals("EXISTS")) {
+            iToken = ParameterizableExpression.EXISTS;
+        } else if (sToken.equals("BETWEEN")) {
+            iToken = ParameterizableExpression.BETWEEN;
+        } else if (sToken.equals("+")) {
+            iToken = ParameterizableExpression.PLUS;
+        } else if (sToken.equals("-")) {
+            iToken = ParameterizableExpression.NEGATE;
+        } else if (sToken.equals("*")) {
+            iToken = ParameterizableExpression.MULTIPLY;
+            sTable = null;    // in case of ASTERIX
+        } else if (sToken.equals("/")) {
+            iToken = ParameterizableExpression.DIVIDE;
+        } else if (sToken.equals("||")) {
+            iToken = ParameterizableExpression.STRINGCONCAT;
+        } else if (sToken.equals("(")) {
+            iToken = ParameterizableExpression.OPEN;
+        } else if (sToken.equals(")")) {
+            iToken = ParameterizableExpression.CLOSE;
+        } else if (sToken.equals("SELECT")) {
+            iToken = ParameterizableExpression.SELECT;
+        } else if (sToken.equals("IS")) {
+            sToken = tTokenizer.getString();
+
+            if (sToken.equals("NOT")) {
+                iToken = ParameterizableExpression.NOT_EQUAL;
+            } else {
+                iToken = ParameterizableExpression.EQUAL;
+
+                tTokenizer.back();
+            }
+        } else if (sToken.equals("LIKE")) {
+            iToken = ParameterizableExpression.LIKE;
+        } else if (sToken.equals("COUNT")) {
+            iToken = ParameterizableExpression.COUNT;
+        } else if (sToken.equals("SUM")) {
+            iToken = ParameterizableExpression.SUM;
+        } else if (sToken.equals("MIN")) {
+            iToken = ParameterizableExpression.MIN;
+        } else if (sToken.equals("MAX")) {
+            iToken = ParameterizableExpression.MAX;
+        } else if (sToken.equals("AVG")) {
+            iToken = ParameterizableExpression.AVG;
+        } else if (sToken.equals("IFNULL")) {
+            iToken = ParameterizableExpression.IFNULL;
+        } else if (sToken.equals("CONVERT")) {
+            iToken = ParameterizableExpression.CONVERT;
+        } else if (sToken.equals("CAST")) {
+            iToken = ParameterizableExpression.CAST;
+        } else if (sToken.equals("CASEWHEN")) {
+            iToken = ParameterizableExpression.CASEWHEN;
+
+            // fredt@users 20020215 - patch 514111 by fredt
+        } else if (sToken.equals("CONCAT")) {
+            iToken = ParameterizableExpression.CONCAT;
+        } else {
+            iToken = ParameterizableExpression.END;
+        }
+    }
+
+    /**
+     *
+     * @throws SQLException
+     * @return
+     */
+    private ParameterizableDelete parseDelete() throws SQLException {
+
+        Table                      table;
+        String                     token;
+        ParameterizableTableFilter filter;
+        ParameterizableExpression  condition;
+
+        tTokenizer.getThis("FROM");
+
+        token = tTokenizer.getString();
+
+        cSession.check(token, UserManager.DELETE);
+
+        table     = dDatabase.getTable(token, cSession);
+        filter    = new ParameterizableTableFilter(table, null, false);
+        token     = tTokenizer.getString();
+        condition = null;
+
+        if ("WHERE".equals(token)) {
+            condition = parseExpression();
+        } else {
+            tTokenizer.back();
+        }
+
+        return new ParameterizableDelete(dDatabase, table, condition);
+    }
+
+    /**
+     *
+     * @throws SQLException
+     * @return
+     */
+    private ParameterizableInsert parseInsert() throws SQLException {
+
+        String                token;
+        Table                 table;
+        Vector                columns;
+        Vector                values;
+        ParameterizableSelect select;
+        int                   columnCount;
+
+        tTokenizer.getThis("INTO");
+
+        token = tTokenizer.getString();
+
+        tTokenizer.checkUnexpectedParameterToken(
+            "bind PARAMETER expression not allowed as table specifier");
+        cSession.check(token, UserManager.INSERT);
+
+        table   = dDatabase.getTable(token, cSession);
+        columns = parseInsertColumns(table);
+        token   = tTokenizer.getString();
+
+        if (token.equals("VALUES")) {
+            values = parseInsertValues();
+
+            return new ParameterizableInsert(dDatabase, table, columns,
+                                             values);
+        } else if (token.equals("SELECT")) {
+            select = parseSelect();
+
+            return new ParameterizableInsert(dDatabase, table, columns,
+                                             select);
+        } else {
+            throw Trace.error(Trace.UNEXPECTED_TOKEN, token);
+        }
+    }
+
+    /**
+     *
+     * @param table
+     * @throws SQLException
+     * @return
+     */
+    private Vector parseInsertColumns(Table table) throws SQLException {
+
+        // PRE: list at start point in tokenizer must be of 
+        // the form "(name, name, ... , name)"
+        // POST:  vector out contains string elements repn' of names in list         
+        String token;
+        Vector columns;
+
+        token = tTokenizer.getString();
+
+        if (!token.equals("(")) {
+            tTokenizer.back();
+
+            return null;
+        }
+
+        columns = new Vector();
+
+        while (true) {
+            token = tTokenizer.getString();
+
+            tTokenizer.checkUnexpectedParameterToken(
+                "bind PARAMETER expression not allowed in insert column list");
+            table.getColumnNr(token);
+            columns.addElement(token);
+
+            token = tTokenizer.getString();
+
+            if (token.equals(")")) {
+                break;
+            }
+
+            if (!token.equals(",")) {
+                throw Trace.error(Trace.UNEXPECTED_TOKEN, token);
+            }
+        }
+
+        return columns;
+    }
+
+    /**
+     *
+     * @throws SQLException
+     * @return
+     */
+    private Vector parseInsertValues() throws SQLException {
+
+        // PRE:   list must be of the form "(expr, expr, ... , expr)"
+        // POST:  vector out contains resolved expressions 
+        tTokenizer.getThis("(");
+
+        Vector                    values;
+        ParameterizableExpression expression;
+        String                    token;
+
+        values = new Vector();
+
+        while (true) {
+            expression = parseExpression();
+
+            values.addElement(expression);
+
+            token = tTokenizer.getString();
+
+            if (token.equals(")")) {     // then we are finished
+                break;
+            }
+
+            if (!token.equals(",")) {    // then this is not a CSV list
+                throw Trace.error(Trace.UNEXPECTED_TOKEN, token);
+            }
+        }
+
+        return values;
+    }
+
+    /**
+     *
+     * @throws SQLException
+     * @return
+     */
+    private ParameterizableUpdate parseUpdate() throws SQLException {
+
+        String                     token;
+        Table                      table;
+        ParameterizableTableFilter filter;
+        Vector                     columnNames;
+        Vector                     columnValues;
+        ParameterizableExpression  currentValue;
+        ParameterizableExpression  condition;
+
+        cSession.checkReadWrite();
+
+        token = tTokenizer.getString();
+
+        cSession.check(token, UserManager.UPDATE);
+
+        table = dDatabase.getTable(token, cSession);
+
+        if (table.isView()) {
+            throw Trace.error(Trace.NOT_A_TABLE, token);
+        }
+
+        tTokenizer.getThis("SET");
+
+        columnNames  = new Vector();
+        columnValues = new Vector();
+
+        do {
+            token = tTokenizer.getString();
+
+            // check exists
+            table.getColumnNr(token);
+            columnNames.addElement(token);
+            tTokenizer.getThis("=");
+
+            currentValue = parseExpression();
+
+            columnValues.addElement(currentValue);
+
+            token = tTokenizer.getString();
+        } while (token.equals(","));
+
+        condition = null;
+
+        if (token.equals("WHERE")) {
+            condition = parseExpression();
+        } else {
+            tTokenizer.back();
+        }
+
+        return new ParameterizableUpdate(dDatabase, table, columnNames,
+                                         columnValues, condition);
+    }
+}

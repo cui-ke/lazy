@@ -1,0 +1,5 @@
+#! /bin/sh
+java -classpath $LAZY_HOME/classes:\
+$TOMCAT_HOME/webapps/lazy/WEB-INF/lib/cryptix32.jar:\
+$TOMCAT_HOME/webapps/lazy/WEB-INF/classes \
+gpwd $1

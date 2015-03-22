@@ -1,0 +1,255 @@
+// MUSEUM NODES
+
+define
+
+project MW [ nodetype = html ]
+
+ 
+node mw_Home
+   <h1 align="center">("Mini Virtual Museum") ,
+   <blockquote>(
+      <p>(href mw_Artist_index("Artists") ),
+      <p>(href mw_Work_index("Works") ),
+      <p>(href mw_Exhibition_index("Exhibitions") ) ,
+	  <hr>(),
+	  <p>("To make changes you must log in as ADMIN (password=x) ",  href ADMIN.login["MW.mw_Home"]("[login]"))
+	)
+	
+/* Nodes based on Artist */
+
+/*
+ * The artist index
+ *
+ */
+node mw_Artist_index
+
+  <h2>("Artist Index") ,
+  <dl>(
+      {
+        <dd>(href mw_Artist[ano](<b>(name))," (",birthdate,"-",deathdate , ") " ,
+            href mw_Works_by_artist[ano] ("[works]"), " (id=",ano,") "
+        )
+      }
+  ) ,
+  <p>(href mw_new_Artist("[New Artist]")) ,
+  include mw_To_index
+from artist
+  selected by name <> "unknown"
+
+/*
+ * Information about an artist
+ *
+ */
+node mw_Artist[id]
+  {
+    <p>("id = ", ano),
+    <h2>(name, " (", birthdate, "-", deathdate, ") "),
+    include mw_Countries[id],
+
+    <hr>(),
+    <h4>("Works in the virtual museum") ,
+    <blockquote>(include mw_Works_by_artist_list[id] ),
+	<p>(href mw_add_work_by_artist[ano, name]("[add work]")) ,
+  
+    <hr>(),
+    <h4>("Contemporary with: "),
+    <blockquote>(include mw_Contemporary[ano, birthdate, deathdate])
+  } ,
+  include mw_To_index
+
+  from artist
+  selected by ano = id
+
+
+node mw_Countries[a]
+  { <p>(type," ",country) }
+  from art_cnty
+  selected by artist = a
+  order by 1
+
+node mw_Contemporary[a, b,d]
+  {
+    href mw_Artist[ano] (name)," "
+  }
+  from artist
+  selected by ano <> a and (birthdate+20) < d and   (deathdate-20) > b   
+  order by birthdate
+
+
+node mw_Artist_name[id] { name }from artist selected by ano = id
+
+
+/* Footer node */
+
+node mw_To_index
+  <hr>(),
+  href mw_Work_index ("[Work index]") , " " , 
+  href mw_Artist_index("[Artist index]") ,  " " ,
+  href mw_Exhibition_index("[Exhibition index]") , " ", 
+  href ADMIN.login["MW.mw_Home"]("[Change user]")
+
+
+
+
+
+/* Nodes on Work */
+
+node mw_Work_index
+  <h2>("Work Index") ,
+  <dl>(
+  {
+    <dd>(<b>(href mw_Work[wno](title))," (",c_date, ") by ", 
+         href mw_Artist[author] (include mw_Artist_name[author]) //  , " (id=",wno,") " 
+       )
+  }) ,
+  include mw_To_index
+
+  from work
+     order by wno
+
+node mw_Work[id]
+  {
+  <table>(
+    <tr>(
+      <td>(
+        <h2>(title), <p>(c_date),
+        <p>(href mw_Artist[author] (include mw_Artist_name[author])), 
+        <p>(support," ",height," x ",width),
+        //<p>(include mw_Owned[wno], ", " , acquired ) ,
+        <p>(href mw_Works_by_artist[author] ("Works") , " by " , include mw_Artist_name[author])
+      ),
+      <td>(
+        <p>(<img width="200" src=picture>())
+      )
+    )
+  ) ,
+  include mw_To_index ,
+  "<hr/>" ,
+  href mw_upd_Work[id]("Update") , " this description"
+  }
+  from work
+    selected by wno = id  
+
+
+
+node mw_Works_by_artist_list[artist]
+  {
+    <p>(<b>(title)," ",c_date, 
+       " ", expand href mw_Work_image[wno] ("[open image]") , " " ,
+       href mw_Work[wno] ("[details]")
+    )
+  } 
+  from work
+  selected by author = artist order by c_date
+
+node mw_Works_by_artist[id]
+   { 
+     <h2>("Works by " , href mw_Artist[id] (name) ) ,
+     include mw_Works_by_artist_list[id] 
+   } ,
+   <p>(href mw_add_work_by_artist[ano, name]("[add work]")) ,
+   include mw_To_index
+   from artist selected by ano = id
+
+node mw_Work_image[id]
+   { <p>(<img width="200" src=picture>()) }
+   from work selected by wno=id
+
+
+
+/** Exhibitions **/
+
+node mw_Exhibition_index
+  <H1>("Exhibition Index"),
+  <table border="0" cellspacing="3" cellpadding="4" width="100%">( 
+  {
+  <tr>( <td width="30%" bgcolor="#999999" valign="top">(
+             <h2>(title) ,    
+             // <h4>("Description"), 
+             <BLOCKQUOTE>(description) , 
+             // <h4>("Organizer") ,
+             <BLOCKQUOTE>("Organized by " , organizer)
+        ) ,
+        <td width="70%" aligh="center" bgcolor="#BBBB00">(expand href mw_Content_of_exh[exno] ("View Content") ,
+             <P>(href mw_select_work[exno] ("[Add a Work]")) 
+        )
+      )
+  } 
+  ) ,
+  include mw_To_index ,
+  <hr>(),
+  href mw_new_Exhibition ("[Create an Exhibition]")
+
+  from exhibition
+  order by exno
+
+
+node mw_Exhibition[ex]
+  <CENTER>(<H1>(" * ",title, " * ")),
+    <H3>("Description") , 
+       <BLOCKQUOTE>(description) , 
+    <H3>("Content") ,
+       include mw_Content_of_exh[exno] ,
+    <H4>("Organized by") ,
+       <BLOCKQUOTE>(organizer) ,
+    "<hr/>" ,
+    <P>(href mw_select_work[ex] ("[Add a Work]") , " to this exhibition") ,
+    include mw_To_index 
+  from exhibition
+  selected by ex = exno
+
+
+node mw_Content_of_exh[ex] // list of all works in a exhibition
+  <table border = "0" cellspacing="2" width="100%">(
+    {<tr>(
+      <td width="30%" align="right" bgcolor="DDDD77">(name , <br>() , title),
+      <td width="50%" align="center" bgcolor="DDDD77">(<img width="100" src=picture>()),
+      <td width="20%" align="center" bgcolor="DDDD77">( href mw_Work[wno]("(Jump)"))
+    )}
+  )
+  from ex_content, work, artist
+  selected by ex_content.work = work.wno and work.author = artist.ano and ex = exhibition
+  order by name
+
+
+/*
+ * Node to create a new exhibition
+ *
+ */
+node mw_new_Exhibition
+   {<h2>("Creating a new exhibition") ,
+   active href mw_Exhibition_index (
+     // Take a new no. from the mw_seq sequence (Oracle) 
+     // <p>("Unique identifier: " , set exno = mw_seq.nextval , mw_seq.currval) , 
+     <p>("Title: " , set title = textfield(60) ) ,
+     <p>("Organizer: " , set organizer = textfield(30)) ,
+     <p>("Description: " , set description = textarea(10, 50)) ,
+
+     on "Create" do insert exhibition
+   )}
+
+      
+node mw_add_work_exh[e, w]
+   <h3>("Add " , work.title , " to " , exhibition.title) ,
+   active href mw_Exhibition[e] (
+      set work = w , set exhibition = e ,
+      <p>("Comment: " , set org_comment = textarea(10, 30)) ,     
+      on "Add" do insert ex_content
+   )
+   from exhibition, work
+     selected by exno = e and wno = w
+
+
+node mw_select_work[e]
+   <h3>("Select a work to include in the exhibition") ,
+   <dl>(
+      {<dd>( href mw_add_work_exh[e, wno]("[Add]") ,
+            " ", title, " " , expand href mw_Work[wno]("[Details]" ) 
+             
+       )
+      }
+   )
+   from work 
+
+end
+

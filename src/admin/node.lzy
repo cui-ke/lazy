@@ -1,0 +1,167 @@
+define
+
+project NODE [ nodetype = html ]
+
+node lazy_compileProject[p, text] 
+/* SPECIAL SYSTEM NODE
+ * compiles text in project p and clear all caches in the server 
+ */
+  {include project[p]} 
+
+// node lazydiag
+//   {<HR>(<APPLET code="Figure.class" width="550" height="350" >(""))}
+
+
+node getDynamicInfo[project,node,type]
+{"is executed by the node server"}
+
+
+node project[selectid]
+   include ADMIN.top ,
+   <h1>("Nodes of project ", href ADMIN.project_details[selectid](selectid) ) , 
+   <p>(href new_node[selectid] (include ICON.new,  "New Node") , " || ", href in new project_showtxt[selectid]("Dump sources")),
+   include project_node_list[selectid]
+   
+      
+node project_node_list[selectid]
+   <table width="100%">(
+     {
+      <tr>(<td class="CELL_BG1">(
+                   expand href del_node[projectid,name] (include ICON.del),
+                   <img alt ="compilation state" src="img/",status,".gif">(),
+                   href maj_node[projectid,name] (include ICON.maj),
+                   name, " " , href instantiate[projectid,name] ("[Instantiate]")
+                   /*  ":<pre><![","CDATA[",plaintxt,"]","]></pre>", */
+                   ) 
+           )
+        })
+from lazy_nodes selected by projectid = selectid
+
+	  
+node new_node[selectprojectid]
+   include ADMIN.top ,
+   <h2>("Project " , href project[selectprojectid](selectprojectid)) ,
+   <table class="CELL_BG2">({active href lazy_compileProject (
+           set parameter_encoding="CDATA", /* don't translate &amp; &lt; */   
+           //set status="INVALID",
+           set parameter = selectprojectid,
+      <tr>(<td class="CELL_BG2">(on "Compile" do display node)),
+      <tr>(<td class="CELL_BG2">(set parameter = textarea(25, 80, "node\n {}" )))
+      )})
+
+
+node maj_node[selectprojectid,selectname]
+/* !CAUTION : this node uses the REPLACE function -- may not exist in some dbmss */
+   include ADMIN.top ,
+   <h2>("Node " , href project[selectprojectid](selectprojectid) , ".", selectname) ,
+   <TABLE class="BG2">({active href lazy_compileProject (
+           set parameter_encoding="CDATA", /* don't translate &amp; &lt; */ 
+           // set status="INVALID",
+        <tr>(<td class="CELL_BG2">(on "Compile" do display node)),
+          set parameter = selectprojectid,
+	   <tr>(<td class="CELL_BG2">(set parameter = textarea(25, 80, replace(plaintxt,"&","&amp;")))),
+       <tr>(<td class="CELL_WARNING">(<b textcolor="red">(error)))
+      )}) 
+   from lazy_nodes selected by projectid = selectprojectid and name=selectname
+
+node del_node[selectprojectid,selectname]
+   <TABLE>(<ROW>(<CELL_WARNING>(
+   {active href project[selectprojectid] ( on "Confirm delete" do delete lazy_nodes[projectid,name],<b>("Delete ",name))}))) 
+   from lazy_nodes selected by projectid = selectprojectid and name=selectname
+
+
+node project_showtxt[selectid]
+   href ADMIN.menu("Admin")," | ",
+   href project[selectid]("&lt;&lt;&lt;")," | ",
+   "<hr/>",
+   {<pre>(include project_gettxt[selectid])}
+
+node project_gettxt[selectid]
+  "define project ", selectid, "\n",
+    {plaintxt, "\n\n"},
+  "\nend"
+from lazy_nodes selected by projectid = selectid
+order by name 
+
+node node_gettxt[selectprojectid,selectname]
+    {<pre>("<![","CDATA[",plaintxt,"]","]>")}
+from lazy_nodes
+selected by 
+     projectid = selectprojectid
+     and name=selectname         
+
+
+node instantiate[pro,n]
+   { <p>( 
+       <form method="get" action="ns"> (
+           <b>( n ), " [ " , <input name="a" type="hidden" value=pro,".",n>() ,
+                             include  inputParameter [nbparam] , " ] " ,
+           <input  name="open" type="submit" value="Open" align="absmiddle">()
+       )
+      )
+    }
+from lazy_nodes selected by projectid =pro and name = n
+
+/* This one is for Oracle and systems that accept numerical operations on
+ * strings (with implicit conversion)
+ */
+/*
+node inputParameter  [ nb ]
+   { <input name="u" type="text" size="10">() , include inputParameter[nb - 1]}
+ from dual selected by nb > 0
+*/
+
+/* HsqlDB does not automatically convert strings to intergers in arithmetic expressions
+   So an explicit conversion has to be used 
+ */
+//node inputParameter  [ nb ]
+//  { <input name="u" type="text" size="10">() , include inputParameter[convert(nb,integer) - 1]}
+//from dual selected by convert(nb,integer) > 0
+
+/* This one should work everywhere - but it require a table LAZY_NATURALS(val) */
+/* nb must be <= 10 */
+node inputParameter  [ nb ]
+  { <input name="u" type="text" size="10">() }
+ from lazy_naturals selected by val < nb
+
+
+/******* STATS ************/
+
+node statistic[selectid]
+   {href project[selectid]("&lt;&lt;&lt;")," | ",
+   "<hr/>",
+   include statistic_global,"<hr/>",
+   include statistic_def,"<hr/>",
+   include statistic_project[selectid],"<hr/>"
+   }
+
+node statistic_header[Title]
+        {<CAPTION>(Title),
+        <CELL_TITLE>("Object"),
+        <CELL_TITLE>("Cache size"),
+        <CELL_TITLE>("Nb. Put"),
+        <CELL_TITLE>("PutSize"),
+        <CELL_TITLE>("Nb. Get"),
+        <CELL_TITLE>("Nb. Found"),
+        <CELL_TITLE>("Query Time"),
+        <CELL_TITLE>("Save Time")}
+
+node statistic_global
+   <TABLE_BG2>(include statistic_header["Global Statistic"],
+     {<ROW>(<CELL>("Total"), include getDynamicInfo["dummy","dummy","GLOBAL"])})
+
+node statistic_def
+   <TABLE_BG2>(include statistic_header["Definition Statistic"],
+     {<ROW>(<CELL>("Definition Cache"), include getDynamicInfo["dummy","dummy","DEF"])})
+
+node statistic_project[selectid]
+   <TABLE_BG2>(include statistic_header[concat("project Statistic: ",selectid)],
+     {<ROW>(<CELL>(name), include getDynamicInfo[projectid,name,"PROJECT"])})
+from lazy_nodes selected by projectid = selectid
+order by name 
+node test
+  {<P_small>(name)}
+from  lazy_nodes
+order by 1 
+
+end

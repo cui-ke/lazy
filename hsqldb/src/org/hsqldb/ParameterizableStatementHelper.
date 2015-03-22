@@ -1,0 +1,177 @@
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group. 
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved. 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: 
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer. 
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution. 
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL." 
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group. 
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL." 
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage. 
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG, 
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/*
+ * ParameterizableStatementHelper.java
+ *
+ * Created on June 25, 2002, 7:37 PM
+ */
+package org.hsqldb;
+
+import java.sql.Types;
+import java.sql.SQLException;
+
+/**
+ *
+ * @author  Campbell Boucher-Burnet, Camco & Associates Consulting
+ */
+public class ParameterizableStatementHelper {
+
+    /**
+     * ParameterizableStatementHelper is a utility class and should not be constructed
+     */
+    private ParameterizableStatementHelper() {}
+
+    /**
+     * Pad or truncate a string to len size
+     *
+     * @param  s    the string to pad to truncate
+     * @param  len  the len to make the string
+     * @param pad   pad the string
+     * @return      the string of size len
+     */
+    static String padOrTrunc(String s, int len, boolean pad) {
+
+        if (s.length() >= len) {
+            return s.substring(0, len);
+        }
+
+        StringBuffer b = new StringBuffer(len);
+
+        b.append(s);
+
+        if (pad) {
+            for (int i = s.length(); i < len; i++) {
+                b.append(' ');
+            }
+        }
+
+        return b.toString();
+    }
+
+    /**
+     * Check an object for type CHAR and VARCHAR and truncate/pad based on
+     * the  size
+     *
+     * @param  obj   object to check
+     * @param  type  the object type
+     * @param  size  size to enforce
+     * @param  pad   pad strings
+     * @return       the altered object if the right type, else the object
+     *     passed in unaltered
+     */
+    static Object enforceSize(Object obj, int type, int size, boolean pad) {
+
+        // todo: need to handle BINARY like this as well
+        if (size == 0 || obj == null) {
+            return obj;
+        }
+
+        switch (type) {
+
+            case Types.CHAR :
+                return padOrTrunc((String) obj, size, pad);
+
+            case Types.VARCHAR :
+                if (((String) obj).length() > size) {
+
+                    // Just truncate for VARCHAR type
+                    return ((String) obj).substring(0, size);
+                }
+            default :
+                return obj;
+        }
+    }
+
+    /**
+     * Logs the DDL for a table created with INTO.
+     * Uses two dummy arguments for getTableDDL() as the new table has no
+     * FK constraints.
+     *
+     * @param t
+     * @throws SQLException   
+     */
+    static void logTableDDL(Database database, Table table,
+                            Session session) throws SQLException {
+
+        if (table.isTemp()) {
+            return;
+        }
+
+        StringBuffer tableDDL = new StringBuffer();
+
+        DatabaseScript.getTableDDL(database, table, 0, null, null, tableDDL);
+
+        String sourceDDL = DatabaseScript.getDataSource(table);
+
+        database.logger.writeToLog(session, tableDDL.toString());
+
+        if (sourceDDL != null) {
+            database.logger.writeToLog(session, sourceDDL);
+        }
+    }
+}

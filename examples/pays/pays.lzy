@@ -1,0 +1,389 @@
+define 
+
+project PAYS
+
+node pays1 
+ {<P>(<b>(nom),
+      "Surface: ",surface,
+      "Population: ", population
+      )} 
+from pays
+
+node pays2 
+ {<P>(<b>(nom),
+      "Surface: ",surface,
+      "Population: ", population
+      )} 
+from pays
+order by nom
+
+node pays3 
+ {<P>(<b>(nom),
+      "Surface: ",surface,
+      "Population: ", population
+      )} 
+from pays
+order by surface
+
+node pays4 
+  <TABLE>({<ROW>(
+                 <CELL>(nom),
+                 <CELL>(surface),
+                 <CELL>(population)
+      )}) 
+from pays
+order by nom
+
+node pays5 
+  <TABLE>(<CAPTION>("Les pays de ma base"),
+          <ROW>(<CELL_TITLE>("Pays"),
+                <CELL_TITLE>("Surface"),
+                <CELL_TITLE>("Population")
+                ),
+          {<ROW>(
+                 <CELL>(nom),
+                 <CELL>(surface),
+                 <CELL>(population)
+                 )
+          }) 
+from pays
+order by nom
+
+node pays6 
+  <atlas>({<pays>(
+                 <nom>(nom),
+                 <surface>(surface),
+                 <population>(population)
+      )}) 
+from pays
+order by nom
+
+node pays7 
+ {<P>(<b>(nom),
+      "Surface: ",surface,
+      "Population: ", population
+      )} 
+from pays
+selected by population < 12
+order by nom
+
+
+node pays8
+  <h3>("Atlas ISI"),
+     {<P>(<b>(nom),
+          "Surface: ",surface,
+          "Population: ", population
+      )}, 
+  <h3 fontcolor="red">("Informations complémentaires:")    
+from pays
+selected by population < 12
+order by nom
+
+node chanson
+  {<h3>(<font color="red">("Une petite chanson")),
+   <P>("Au clair de la lune"),
+   <P>("Mon ami Pierrot,"),
+   <P>("Prête-moi ta plume"),
+   <P>("Pour écrire un mot."),
+   <P>("Ma chandelle est morte,"),
+   <P>("Je n'ai plus de feu."),
+   <P>("Ouvre-moi ta porte"),
+   <P>("Pour l'amour de Dieu!")
+  }
+
+node calcul
+  {<h3>(<font color="red">("Des calculs")),
+   <P>("Une minute = ", 60," secondes"),
+   <P>("Une heure = ", 60*60," secondes"),
+   <P>("Un jour = ", 60*60*24," secondes"),
+   <P>("Un mois = ", 60*60*24*30," secondes"),
+   <P>("Une année = ", 60*60*24*365," secondes")
+  }
+
+node fact[n]
+   {n,"*",include fact[n-1]}
+   ,include fact1[n-1]
+from dual
+selected by n>1
+
+node fact1[n]
+   {1}
+from dual
+selected by n=1
+
+node between[n,m]
+  {<h3>(n,"!=",include factoriel[n,1]),
+  include between[n+1,m]}
+from dual selected by n<=m
+
+node factoriel[n,res]
+   {include factoriel[n-1,res*n]},
+   include return_res[n,res]
+from dual selected by n>=1
+
+node return_res[n,res]
+   {res}
+from dual selected by n=1
+
+
+node pays9
+  <h3>("Atlas ISI"),
+   <P>("nbr pays: ", count(nom)),
+   <P>("Surface(1000Km2): ",sum(surface)),
+   <P>("Habitants (Mio.): ",sum(population)),
+   <P>("moyenne des surfaces: ", avg(surface))
+from pays
+
+node pays10
+  <h3>("Atlas ISI calculé le: ", sysdate),
+   <P>("nbr pays: ", count(nom)),
+      <P>("[",{nom, " "},"]"),
+   <P>("Surface(1000Km2): ",sum(surface)),
+   <P>("Habitants (Mio.): ",sum(population)),
+   <P>("moyenne des surfaces: ", avg(surface))
+from pays
+
+node unPays[selectnom]
+     { <image>(drapeau), " - ", <b>(nom) ,
+      <P>("Capitale: ",<b>(capitale)),
+      <P>("Population(Mio.): ", <b>(population)),
+      <P>("Surface(1000Km2): ",<b>(surface))
+      }
+from pays
+selected by nom=selectnom
+
+node liste1
+  <h3>("Atlas ISI"),
+     {<P>(href unPays[nom](nom))
+      }
+from pays
+order by nom
+
+node liste2
+  <h3>("Atlas ISI"),
+     {<P>(expand href unPays[nom](nom))
+      }
+from pays
+order by nom
+
+node liste3
+  <h3>("Atlas ISI"),
+     {<HR>(include unPays[nom])
+      }
+from pays
+order by nom
+
+node getpays1
+ <h3>("Atlas ISI - avec un champ de sélection"),
+ {active href unPays (set parameter = textfield(32, "Autriche"),
+                      on "Afficher le pays" do display node)
+ }                
+
+node getpays2
+ <h3>("Atlas ISI - avec un champ de sélection"),
+ {active href unPays (set parameter = select("Suisse","France", "Autriche"),
+                      on "Chercher" do display node)
+ }                
+
+node getpays3
+ <h3>("Atlas ISI - avec un champ de sélection"),
+ {active href unPays (set parameter = select(include listeChoixPays),
+                      on "Chercher" do display node)
+ }                
+
+node listeChoixPays
+     {<option>(nom)}
+from pays
+order by nom
+
+node liste4
+  <h3>("Atlas ISI"),
+     {<P>(href in detail unPays[nom](nom))
+      }
+from pays
+order by nom
+
+node exemple1
+     {    
+     <P>(<b>("Pays")),
+     <P_small>(href in detail pays1 ("Le plus simple")),
+     <P_small>(href in detail pays2 ("Trier par nom")),
+     <P_small>(href in detail pays3 ("Trier par surface")),
+     <P_small>(href in detail pays4 ("Dans un tableau")),
+     <P_small>(href in detail pays5 ("Avec des titres")),
+     <P_small>(href in detail pays6 ("En XML")),
+     <P_small>(href in detail pays7 ("Avec une condition")),
+     <P_small>(href in detail pays8 ("Entête et pieds")),
+     <P_small>(href in detail pays9 ("Des agrégations")),
+     <P_small>(href in detail pays10 ("Un mixte")),
+     <P>(<b>("Liens")),
+     <P_small>(href in detail unPays["Italie"] ("paramètre: Italie")),
+     <P_small>(href in detail liste1 ("liste: href")),
+     <P_small>(href in detail liste2 ("liste: expand")),
+     <P_small>(href in detail liste3 ("liste: include")),
+     <P>(<b>("Champ de sélection")),
+     <P_small>(href in detail getpays1 ("champ texte")),
+     <P_small>(href in detail getpays2 ("liste explicite")),
+     <P_small>(href in detail getpays3 ("liste calculée")),
+     <P>(<b>("Frame")),
+     <P_small>("<a target=\"_blank\" href=\"http://jg2:8080/frame/paysframe1.html\">","frame1","</a>"),
+     <P_small>(<URL target="_blank" href="http://jg2:8080/frame/paysframe1.html">("frame2")),
+     <P_small>(<URL target="detail" href="http://www.w3c.org">("externe url")),
+     <P>(<b>("Divers")),
+     <P_small>(href in detail chanson ("Une chanson")),
+     <P_small>(href in detail calcul ("Des calculs"))
+      }
+
+node nodeSource[nodename]
+   {<h3>(nodename),include NODE.node_gettxt["PAYS",nodename]} 
+
+node lienNode[nodename]
+   {  href in detail nodeSource[nodename]
+      (<ICON>(<COMMENT>("voir les définitions de cet élément"),<IMG>("adm")))
+   }
+
+node exemple2
+     {    
+     <P>(<b>("Pays")),
+     <P_small>(href in detail pays1 ("Le plus simple"),include lienNode["pays1"]),
+     <P_small>(href in detail pays2 ("Trier par nom"),include lienNode["pays2"]),
+     <P_small>(href in detail pays3 ("Trier par surface"),include lienNode["pays3"]),
+     <P_small>(href in detail pays4 ("Dans un tableau"),include lienNode["pays4"]),
+     <P_small>(href in detail pays5 ("Avec des titres"),include lienNode["pays5"]),
+     <P_small>(href in detail pays6 ("En XML"),include lienNode["pays6"]),
+     <P_small>(href in detail pays7 ("Avec une condition"),include lienNode["pays7"]),
+     <P_small>(href in detail pays8 ("Entête et pieds"),include lienNode["pays8"]),
+     <P_small>(href in detail pays9 ("Des agrégations"),include lienNode["pays9"]),
+     <P_small>(href in detail pays10 ("Un mixte"),include lienNode["pays10"]),
+     <P>(<b>("Liens")),
+     <P_small>(href in detail unPays["Italie"] ("paramètre: Italie"),include lienNode["unPays"]),
+     <P_small>(href in detail liste1 ("liste: href"),include lienNode["liste1"]),
+     <P_small>(href in detail liste2 ("liste: expand"),include lienNode["liste2"]),
+     <P_small>(href in detail liste3 ("liste: include"),include lienNode["liste3"]),
+     <P>(<b>("Champ de sélection")),
+     <P_small>(href in detail getpays1 ("champ texte"),include lienNode["getpays1"]),
+     <P_small>(href in detail getpays2 ("liste explicite"),include lienNode["getpays2"]),
+     <P_small>(href in detail getpays3 ("liste calculée"),include lienNode["getpays3"]),
+     <P>(<b>("Frame")),
+     <P_small>("<a target=\"_blank\" href=\"http://jg2:8080/frame/paysframe1.html\">","frame1","</a>"),
+     <P_small>(<URL target="_blank" href="http://jg2:8080/frame/paysframe1.html">("frame2")),
+     <P_small>(<URL target="detail" href="http://www.w3c.org">("externe url")),
+     <P>(<b>("Divers")),
+     <P_small>(href in detail chanson ("Une chanson"),include lienNode["chanson"]),
+     <P_small>(href in detail calcul ("Des calculs"),include lienNode["calcul"])
+      }
+
+
+node loadapplet
+   {<h3>("Diagrammes syntaxiques de Lazy"),
+    <APPLET code="Figure.class" width="400" height="300" >(""),
+    <h3>("graphe en 3D"),    
+    <APPLET code="Graph.class" width="400" height="300" >(
+       <PARAM name="edges">("f1-f2,f2-f3,f3-f4,f4-f1,b1-b2,b2-b3,b3-b4,b4-b1,f1-b1,f2-b2,f3-b3,f4-b4"))
+    }
+
+node allpays
+     <atlas>(<titre-col>("Nom"),
+             <titre-col>("Capitale"),
+             <titre-col>("Villes"),
+             <titre-col>("Surface(1000Km2) ",sum(surface)),
+             <titre-col>("Habitants (Mio.) ",sum(population)),
+             {<pays>(
+                <nom> ( expand href drapeau[nom] (upper(nom)) ),
+                <capitale> ( capitale ),
+                <ville> ( expand href villesparpays[nom] ("?") ),
+                <surface> ( surface ),
+                <population> ( population )
+               )
+              }),
+       <post>("moyenne des surfaces: ", avg(surface)),
+       <post>( expand href graphpays ("GRAPHIQUE") )
+  from pays
+  order by nom
+
+node drapeau[selecteurpays]
+  {<image> (drapeau)}
+from pays
+selected by nom=selecteurpays
+
+node villesparpays[selecteurpays]
+  <atlas>(<titre-col>("Villes"),
+          <titre-col>("Hab.(Mio.)"),
+          {<villes>(
+               <ville> ( expand href photoville[ville] (ville),
+                         expand href museesparville[ville] (" Musée ?")),
+               <population> ( populationville )
+               )
+          })    
+from villes
+selected by danspays=selecteurpays
+order by ville
+
+node photoville[selecteurville]
+  {<image> (photoville)}
+from villes
+selected by ville=selecteurville
+
+node museesparville[selecteurville]
+  <atlas>(<titre-col>("Musées"),
+          <titre-col>("Oeuvres"),
+          {<musees>(
+               <musee>(expand href photomusee[musee] (musee) ),
+               <musee>(expand href oeuvreparmusee[musee] ("?"))
+               )
+          })
+  from musees
+  selected by dansville=selecteurville
+  order by musee
+
+node photomusee[selecteurmusee]
+  {<image> (photomusee)}
+from musees
+selected by musee=selecteurmusee
+
+node oeuvreparmusee[selecteurmusee]
+  <atlas>(<titre-col>("Artistes"),
+          <titre-col>("Oeuvres"),
+          {<oeuvres>(
+               <artiste> (artiste),
+               <nomoeuvre> (expand href photooeuvre[nomoeuvre] (nomoeuvre) )
+               )
+           })
+from oeuvres
+selected by dansmusee=selecteurmusee
+order by artiste
+
+node photooeuvre[selecteurnomoeuvre]
+  {<image> (photooeuvre)}
+from oeuvres
+selected by nomoeuvre=selecteurnomoeuvre
+
+
+node graphpays
+  "<graphic>",
+    "<type nom=\"barre\" largeur=\"500\" hauteur=\"150\"/>",
+    "<titre>Analyse des pays</titre>",
+    "<series nbr=\"2\" echantillon=\"",count(nom),
+    "\" libelle=\"population,surface\">",
+        <echantillon>(include listenompays),
+        <echantillon1>(include listepopulationpays),
+        <echantillon2>(include listesurfacepays),
+  {""},
+    "</series>",
+    "<style nom=\"defautbarre\"/>",      
+    "</graphic>"
+  from pays
+
+node listenompays
+   {<echantillon>(nom, ",")}
+  from pays order by nom
+
+node listepopulationpays
+   {<echantillon1>(to_char(population,"999999"), ",")}
+  from pays order by nom
+
+node listesurfacepays
+   {<echantillon2>(to_char(surface,"999999"), ",")}
+  from pays order by nom
+  
+end

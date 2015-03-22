@@ -1,0 +1,41 @@
+--
+-- TestSelfCreate.txt
+--
+
+-- TestSelfCreate.txt is used by TestSelf.java to test the database
+--
+-- This is part of a three part suite of scripts to test persistence in the same DB 
+--
+-- Comment lines must start with -- and are ignored
+-- Lines starting with spaces belongs to last line
+-- Checked lines start with /*<tag>*/ where <tag> is:
+--   c <rows>     ResultSet expects a with <row> columns
+--   r <string>   ResultSet expected with <string> result in first row/column
+--   u <count>    Update count <count> expected
+--   e            Exception must occur
+
+-- TEST 1
+-- Correct handling of index creation for foreign keys
+
+create cached table VEREIN 
+  ( 
+  VCODE CHAR(10) not null, 
+  primary key (VCODE) 
+  ); 
+  create unique index VEREIN_PK on VEREIN (VCODE); 
+  create cached table BEWERB 
+  ( 
+  VCODE CHAR(10) 
+  not null, 
+  ID SMALLINT not null , 
+  primary key (ID) 
+  ); 
+  create unique index BEWERB_FK2 on BEWERB(ID); 
+  create unique index BEWERB_FK1 on BEWERB(VCODE); 
+  alter table BEWERB 
+  add constraint bv foreign key (VCODE) references VEREIN 
+  (VCODE); 
+
+-- SHUTDOWN is necessary for test1
+SHUTDOWN;
+

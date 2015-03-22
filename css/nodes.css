@@ -1,0 +1,51 @@
+.TABLE { border: 1  solid #888800 ;background-color: #FFFFFF; width=100%}
+.TABLE_BG1 {border: 1 solid #000000 ;background-color: #C0C0C0}
+.TABLE_BG2 { border: 0 solid #880000 ;background-color: white}
+.TABLE_BG3 { border: 1 solid #888800 ;background-color: #191919}
+
+.CAPTION {cellspacing: 0; border: 1 solid #888800 ;background-color: #BBBBFF;
+          font-size: 12 pt; font-family:Trebuchet MS;
+          color: #000000;
+          font-style: bold; font-weight: bold}
+
+.CELL_TITLE {cellspacing: 0; border: 0 solid #888800 ;background-color: #BBBBFF;
+          font-size: 10 pt; font-family:Trebuchet MS;
+          color: #000000;
+          font-style: normal; font-weight: bold}
+.CELL_TITLE_R {cellspacing: 0; border: 0 solid #888800 ;background-color: #BBBBFF;
+          color: #000000;
+          font-style: normal; font-weight: bold ; text-align: right;}
+
+.ROW {}
+.CELL { background-color: #EEFFFF; padding-left: 2pt; padding-right: 2 pt }
+.CELL_BG1 { background-color: #BBBBFF ; padding-left: 5pt; padding-right: 5 pt  }
+.CELL_BG2 { background-color: white}
+.CELL_R { background-color: #EEFFFF; text-align: right; }
+.CELL_FIX { background-color: #EEFFFF; font-family: Courier }
+.CELL_WARNING { background-color: #FFDDDD;  }
+.CELL_print { background-color: white; font-size: 7pt ; padding-left: 5pt; padding-right: 5 pt}
+
+.ICON {height: 19px ; border: 0 ;}
+
+.TITLE_PAGE { text-indent: 0; background-color: #FFFFFF; font-size: 18 pt; font-family: 
+               Trebuchet MS; line-height: 100%; text-align: center ; color: #000000;
+               font-style: normal; font-weight: bold }
+.TITLE2 { text-indent: 0; background-color: #FFFFFF; font-size: 14 pt; font-family: 
+               Trebuchet MS; line-height: 100%; text-align: left; color: #000000;
+               font-style: normal; font-weight: bold }
+.TITLE3 { text-indent: 30; background-color: #FFFFFF; font-size: 13 pt; font-family: 
+               Trebuchet MS; line-height: 100%; text-align: left; color: #000000;
+               font-style: italic}
+               
+.P { text-indent: 0; background-color: #FFFFFF; font-size: 10 pt; font-family: 
+               Trebuchet MS; line-height: 100%; text-align: justify ; color: #000000 }
+.P_small    { text-align: justify; line-height: 100%; text-indent: 0; font-size: 9 pt; font-family: 
+               Trebuchet MS; color: #000000; margin-top: 3; margin-bottom: 0 }
+
+.zzz_closeit {background-image : url(/lazy/icon/contact.gif) }
+
+.closeit {background-color: #AA0000; text-color=white}
+
+TEXTAREA { 	font-family: Courier, Monaco }
+
+

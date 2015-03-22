@@ -1,0 +1,28 @@
+define
+
+project MYSITE
+
+node DDD[para]
+ { name }
+from artist
+selected by 
+not exists( work w1, work w2 : w1.author=artist.ano and not(w1.c_date > 
+1940)) 
+//ano < 10 and not (ano > 5)    
+
+on open {
+  insert mytable[a:45, b:"haha--hop"] ,
+  delete mytable(a>para) ,
+  update mytable(b=para) set [a:a+3]
+} 
+
+node EEE
+{ ano }
+from artist
+
+node FFF
+"voila"
+from work
+
+end
+

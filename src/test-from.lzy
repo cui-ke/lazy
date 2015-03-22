@@ -1,0 +1,21 @@
+/* test empty table name error
+*/
+
+define
+
+project TEST
+
+node test_from
+{ a }
+from 
+
+node test_from_2
+{ a}
+from t1,
+
+node test_from_3
+{ a}
+from t1 a1, t2,
+
+end
+

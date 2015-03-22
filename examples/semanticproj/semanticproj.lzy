@@ -1,0 +1,162 @@
+define
+
+node semantic_all
+<titre1>( "GESTION DE DOCUMENTATIONS"),
+{<table1>(
+     <ligne>(<cellule>(include semantic_all_obj)) ,
+     <ligne>(<cellule>(include semantic_all_semantic)) 
+               )}
+from dual
+
+
+
+node semantic_all_obj
+<table1>(
+     <tabTitre>( href semantic_new_obj(<icon>("new")), "<b>OBJETS</b>"),
+     {<ligne>(include semantic_obj[id]),
+      <ligne>(<cellule>(expand href semantic_new_link[id](<icon>("new")), "Liens"
+                       ,include semantic_link[id]   ))
+               })
+from obj
+order by id
+
+
+node semantic_obj[selectid]
+              {<cellule3>(expand href semantic_del_obj[id] (<icon>("del")),id),                        
+              <cellule>(expand href semantic_maj_lib_obj[id] (<icon>("maj")), lib),
+              <cellule>(expand href semantic_maj_com_obj[id] (<icon>("maj")), com)
+              }
+from obj 
+selected by id = selectid
+
+node semantic_list_id_obj
+     {<option>(id)}
+from obj
+order by id
+
+
+node semantic_link[selectidX]
+  <table2>(
+          {<ligne>( <cellule3>(expand href semantic_del_link[selectidX,idSens,idY] (<icon>("del"))),
+                    <cellule1>(expand href semantic_maj_idSens_link[selectidX,idSens,idY] (<icon>("maj"))),
+                    <cellule1>(idSens),
+                    <cellule1>(expand href semantic_maj_idY_link[selectidX,idSens,idY] (<icon>("maj"))),
+                    <cellule1>(expand href semantic_obj[idY](idY)),
+                    <cellule1>(expand href semantic_maj_com_link[selectidX,idSens,idY] (<icon>("maj"))),
+                    <cellule1>(com)
+                   )
+           })
+from link 
+selected by idX=selectidX 
+order by idSens,idY
+
+node semantic_new_link[selectid]
+ {active href semantic_all (
+   "X: ", selectid , set idX = selectid ,
+   "type de lien :", set idSens = select(include semantic_list_id_semantic) ,
+   "Y: ", set idY = select(include semantic_list_id_obj) ,
+   "commentaire  : ", set com = textarea(5,40, "") ,
+   on "insert" do insert link
+ )}
+from dual
+
+node semantic_del_link[selectidX,selectidSens,selectidY]
+   {active href semantic_all ( on "confirm delete" do delete link[idX,idSens,idY])} 
+from link 
+  selected by idX=selectidX and idSens=selectidSens and idY=selectidY 
+  order by idX
+
+
+node semantic_maj_idY_link[selectidX,selectidSens,selectidY]
+   {active href semantic_all ( on "maj" do update link[idX,idSens,idY],
+                                        set idY = select(include semantic_list_id_obj)) }
+from link 
+  selected by idX=selectidX and idSens=selectidSens and idY=selectidY 
+  order by idX
+
+node semantic_maj_idSens_link[selectidX,selectidSens,selectidY]
+   {active href semantic_all ( on "maj" do update link[idX,idSens,idY],
+                                        set idSens = select(include semantic_list_id_semantic))}
+from link 
+  selected by idX=selectidX and idSens=selectidSens and idY=selectidY 
+  order by idX
+
+  
+node semantic_maj_com_link[selectidX,selectidSens,selectidY]
+   {active href semantic_all ( on "maj" do update link[idX,idSens,idY],
+                                        set com = textarea(5,50, com))} 
+from link 
+  selected by idX=selectidX and idSens=selectidSens and idY=selectidY 
+  order by idX
+  
+  
+
+
+node semantic_new_obj
+ {active href semantic_all (
+   "id_obj: ", set id = textfield(12, "1212") ,
+   "libellé  : ", set lib = textfield(32, "") ,
+   "commentaire  : ", set com = textarea(5,80, "") ,
+   on "insert" do insert obj
+ )}
+from dual
+
+node semantic_del_obj[selectid]
+   {active href semantic_all ( on "confirm delete" do delete obj[id])} 
+   from obj selected by id = selectid
+
+node semantic_maj_lib_obj[selectid]
+   {active href semantic_all ( on "maj" do update obj[id],set lib = textfield(32, lib))} 
+   from obj selected by id = selectid
+
+node semantic_maj_com_obj[selectid]
+   {active href semantic_all ( on "maj" do update obj[id],set com = textarea(5,50, com))} 
+   from obj selected by id = selectid
+
+/* les noeuds sémantique */
+
+node semantic_all_semantic
+<table1>(
+     <tabTitre>(expand href semantic_new_semantic(<icon>("new")), "Type des liens"),
+     {<ligne>(include semantic_semantic[id])
+               })
+from semantic
+order by id
+
+
+node semantic_semantic[selectid]
+              {<cellule>(expand href semantic_del_semantic[id] (<icon>("del"))),
+              <cellule>(id),                        
+              <cellule>(expand href semantic_maj_name_semantic[id] (<icon>("maj")), name),
+              <cellule>(expand href semantic_maj_com_semantic[id] (<icon>("maj")), com)}
+from semantic selected by id = selectid
+
+node semantic_new_semantic
+ {active href semantic_all (
+   "id_user: ", set id = textfield(12, "1212") ,
+   "prénom nom  : ", set name = textfield(32, "") ,
+   "commentaire  : ", set com = textarea(5,80, "") ,
+   on "insert" do insert semantic
+ )}
+from dual
+
+node semantic_del_semantic[selectid]
+   {active href semantic_all ( on "confirm delete" do delete semantic[id])} 
+   from semantic selected by id = selectid
+
+node semantic_maj_name_semantic[selectid]
+   {active href semantic_all ( on "maj" do update semantic[id],set name = textfield(32, name))} 
+   from semantic selected by id = selectid
+
+node semantic_maj_com_semantic[selectid]
+   {active href semantic_all ( on "maj" do update semantic[id],set com = textarea(5,50, com))} 
+   from semantic selected by id = selectid
+
+node semantic_list_id_semantic
+     {<option>(id)}
+   from semantic order by id
+
+
+end
+                     
+ 

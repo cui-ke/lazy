@@ -1,0 +1,185 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html">
+<title>Text Tables as a Standard Feature</title>
+</head>
+<body>
+
+<h2>Text Tables as a Standard Feature of HSQLDB </h2>
+<p>Text Table support for HSQLDB was originally developed by Bob Preston independently from the Project. Subsequently Bob joined the Project and incorporated this feature into version 1.7.0, with a number of enhancements, especially the use of conventional SQL commands for specifying the files used for Text Tables. </p>
+<p>In a nutshell, Text Tables are CSV or other delimited files treated as SQL tables. Any ordinary CSV or other delimited file can be used. The full range of SQL queries can be performed on these files, including SELECT, UPDATE and DELETE. Indexes and unique constraints can be set up, and foreign key constraints can be used to enforce referential integrity between Text Tables themselves or with conventional tables. </p>
+<p>HSQLDB with Text Table support is the only comprehensive solution that employs the power of SQL and the universal reach of JDBC to handle data stored in text files and will have wide ranging use way beyond the currently established Java realm of HSQLDB. </p>
+<h3>Goals of the Implementation </h3>
+<ol>
+
+<li>We aimed to finalise the DDL for Text Tables so that future releases of HSQLDB use the same DDL scripts.</li>
+  <li>We aimed to support Text Tables as GLOBAL TEMPORARY or GLOBAL BASE tables 
+    in the SQL domain.</li>
+</ol>
+
+<h4>The Implementation </h4>
+<ol>
+
+   <li>
+      <h4>Definition of Tables</h4>
+   </li>
+<p>Text Tables are defined similarly to conventional tables with the added TEXT keyword: </p>
+   <pre>CREATE [TEMP] TEXT TABLE &lt;tablename&gt; (&lt;column definition&gt;… [&lt;constraint definition&gt;…]) </pre>
+<p>In addition, a SET command specifies the file and the separator character that the Text table uses: </p>
+   <pre>SET TABLE &lt;tablename&gt; SOURCE &lt;quoted_filename_and_options&gt; [DESC] </pre>
+<p>Text Tables cannot be created in memory-only databases (databases that have no script file).<br>
+&nbsp; <br>
+&nbsp; </p>
+   <li>
+      <h4>Scope and Reassignment </h4>
+   </li>
+</ol>
+
+
+<ul>
+
+<ul>
+<li>A Text table without a file assigned to it is READ ONLY and EMPTY. </li>
+<li>A Temporary Text table has the scope and the lifetime of the Session. </li>
+<li>Reassigning a Text Table definition to a new file has implications in the following areas: </li></ul>
+</ul>
+
+<ol>
+<ol>
+<ol>
+
+<li>The user is required to be an administrator.</li>
+<li>Existing transactions are committed at this point.</li>
+<li>Constraints, including foreign keys referencing this table, are kept intact. It is the responsibility of the administrator to ensure their integrity.</li></ol>
+</ol>
+</ol>
+
+<ol start=3>
+
+   <li>
+      <h4>Null Values in Columns of Text Tables.</h4>
+   </li>
+</ol>
+
+
+<ul>
+
+<ul>
+<li>Empty columns not of type CHARACTER and its variants are treated as NULL. </li>
+<li>Empty columns of type CHARACTER and its variants are treated in two different ways according to the setting of the database property textdb.&lt;tablename&gt;.empty_is_null. The default value of empty_is_null is true: </li>
+
+<ul>
+<li>false: Columns of type CHARACTER and its variants are always NOT NULL. Empty columns are treated as zero-length strings. </li>
+<li>true: Columns of type CHARACTER and its variations cannot hold an empty string. Empty columns are treated as NULL. </li></ul>
+</ul>
+</ul>
+
+<ol start=4>
+
+   <li>
+      <h4>Configuration</h4>
+   </li>
+</ol>
+   <p>The default field separator is a comma (,). A different field separator can be specified in either the &lt;databasename&gt;.properties file or within the SET TABLE SOURCE statement. For example, to change the field separator for the table mytable to a vertical bar, either place the following in the &lt;databasename&gt;.properties file: <br>
+      &nbsp; </p>
+   <pre>textdb.mytable.fs=|</pre>
+   <p><br>
+Or, within the SET TABLE SOURCE statement, for example: <br>
+      &nbsp; </p>
+   <pre>SET TABLE mytable SOURCE "myfile;fs=|"</pre>
+   <p><br>
+Since HSQLDB treats CHAR’s, VARCHAR’s, and LONGVARCHAR’s the same, the ability to assign different separators to the latter two is provided. When a different separator is assigned to a VARCHAR or LONGVARCHAR field, it will terminate any CSV field of that type. For example, if the first field is CHAR, and the second field LONGVARCHAR, and the separator fs has been defined as the pipe (|) and vs as the period (.) then the data in the CSV file for a row will look like:</p>
+   <p>First field data|Second field data.Third field data</p>
+   <p>The following example shows how to change the default separator to the pipe (|), VARCHAR separator to the period (.) and the LONGVARCHAR separator to the tilde (~). Either place the following in the .properties file: <br>
+      &nbsp; </p>
+   <pre>textdb.mytable.fs=| 
+textdb.mytable.vs=. 
+textdb.mytable.lvs=~
+
+</pre>
+   <p>
+      Or, within the SET TABLE SOURCE statement, for example: <br>
+             &nbsp; </p>
+   <pre>SET TABLE mytable SOURCE "myfile;fs=|;vs=.;lvs=~"</pre>
+   <p><br>
+HSQLDB also recognises the following special indicators for separators: <br>
+      &nbsp; </p>
+   <p>\semi - semicolon <br>
+\quote - quote <br>
+\space - space character <br>
+\apos - apostrophe <br>
+\n - newline - Used as an end anchor (like $ in regular expressions) <br>
+\r - carriage return <br>
+\t - tab <br>
+\\ - backslash <br>
+\u#### - a Unicode character specified in hexadecimal</p>
+   <p>&nbsp; <br>
+Furthermore, HSQLDB provides csv file support with two additional boolean options: ignore_first and quoted. The ignore_first option (default false) tells HSQLDB to ignore the first line in a file, and the quoted option (default true) tells it that some fields may be quoted. These also may be specified in the .properties file: <br>
+      &nbsp; </p>
+   <pre>textdb.mytable.ignore_first=true 
+textdb.mytable.quoted=false</pre>
+   <p><br>
+Or, within the SET TABLE SOURCE statement: <br>
+      &nbsp; </p>
+   <p>SET TABLE mytable SOURCE "myfile;ignore_first=true;quoted=false"</p>
+   <p>When the default quoted option is in force, fields that are written to a line of the csv file will be quoted only if they contain the separator character.</p>
+   <p><br>
+Finally, HSQLDB provides the ability to read a text file from the bottom up, by placing the keyword "DESC" at the end of the SET TABLE SOURCE statement: <br>
+      &nbsp; </p>
+   <pre>SET TABLE mytable SOURCE "myfile" DESC
+
+</pre>
+   <p>
+      This feature provides functionality similar to the Unix tail command, by re-reading the file each time a select is executed. Using this feature sets the table to read-only mode. Afterwards, it will no longer be possible to change the read-only status with SET TABLE &lt;tablename&gt; READONLY TRUE. [Does this feature allow a different program to modify the csv file from time to time while it is being used by HSQLDB?]&nbsp; </p>
+   <li>
+      <h4>Text File Issues</h4>
+   </li>
+<ul>
+
+<ul>
+<li>By default, file locations are restricted to below the directory that contains the database. This can be overridden by the&nbsp; database property: </li></ul>
+</ul>
+<dir>
+   <dir>
+      <dir>
+         <dir>
+
+            <pre>textdb.&lt;tablename&gt;.allow_full_path=true. </pre>
+         </dir>
+</dir>
+</dir>
+</dir>
+
+
+<ul>
+
+<ul>
+<li>The file location for a text table created with </li></ul>
+</ul>
+<dir>
+   <dir>
+      <dir>
+         <dir>
+
+            <pre>SELECT &lt;select list&gt; INTO TEXT &lt;tablename&gt; FROM …</pre>
+<p>is the directory that contains the database and the file name is based on the table name. The table name is converted into the file name by replacing all the non-alphanumeric characters with the underscore character, conversion into lowercase, and adding the ".csv" suffix.</p></dir>
+</dir>
+</dir>
+</dir>
+
+
+<ul>
+
+   <ul>
+      <li>Each text table has a system-defined primary key that refers to the file offset of the row and cannot be changed.&nbsp; This prevents use of IDENTITY columns with text tables, as an IDENTITY column is implicitly defined as a PRIMARY KEY. You can, however, use the UNIQUE constraint with text tables. Hence, to acheive the functional equivalent of an IDENTITY column, you can set up your own counter, using an ordinary table with only one row and one integer column. You can then increment this value each time and read the result value to use in a text table INTEGER column with the UNIQUE constraint. 
+Secondary indexes and UNIQUE constraints can be used on any column of a text table. </li>
+   </ul>
+</ul>
+
+<dl>
+<dt>Authors: Bob Preston and Fred Toussi - 29 May 2002</dt>
+</dl>
+<p>Copyright 2002 Bob Preston and Fred Toussi. Permission is granted to distribute this document without any alteration under the terms of the HSQLDB license. Additional permission is granted to the HSQLDB Development Group to distribute this document with or without alterations under the terms of the HSQLDB license.</p>
+<p><a href="http://hsqldb.sourceforge.net">http://hsqldb.sourceforge.net&nbsp;</a></p>
+</body>
+</html>

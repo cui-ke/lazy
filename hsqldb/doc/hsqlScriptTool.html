@@ -1,0 +1,182 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="Generator" content="Microsoft Word 97">
+<title>Command Line Usage: </title>
+</head>
+<body>
+
+
+<h3>ScriptTool</h3>
+<p>The new Script Tool class allows executing an SQL script. A script file is read into a string buffer and executed against the database. Results and update counts are written to system out.</p>
+<p>In the default &quot;batch&quot; mode, lines containing &quot;go&quot; (and no other characters or white space) are used to delimit batches of sql statements to execute. Additionally, a line beginning with &quot;print &quot; can be supplied to write comments to system out.</p>
+<p>Script processing is terminated if any errors are encountered.</p>
+<p>Note: there is no checking that the statements executed against the database are valid sql. Nor is there any checking that a &quot;batch&quot; is correct. So if your sql/data contains new lines in combination with the words &quot;go&quot; or &quot;print&quot; be careful. The class uses readline and appends a new line at the end of the file.</p>
+<p>&nbsp;</p>
+<h4>Command Line Usage: </h4>
+<pre>  java [jvm options] org.hsqldb.util.ScriptTool [-options] </pre>
+<h4>options are:</h4>
+<p>  -driver &lt;classname&gt;     name of the JDBC driver class<br>
+  -url &lt;name&gt;             first part of the jdbc url<br>
+  -database &lt;name&gt;        second part of the jdbc url<br>
+  -user &lt;name&gt;            username used for connection<br>
+  -password &lt;name&gt;        password for this user<br>
+  -log &lt;true/false&gt;       write log to system out<br>
+  -batch &lt;true/false&gt;     allow go/print pseudo statements<br>
+  -script &lt;script file&gt;   reads from script file</p>
+<p>&nbsp;</p>
+<h4>Invocation from a class:</h4>
+<pre>  import org.hsqldb.ScriptTool;</pre>
+<pre>  …</pre>
+<pre>  dbparms = <b>new String</b> [] { "-database",
+                             "//localhost",
+                             "-url", "jdbc:hsqldb:hsql:",
+                             "-log", "true" };</pre>
+<pre>  …</pre>
+<pre>  st = <b>new</b> ScriptTool()</pre>
+<pre>  st.execute( dbparms );
+    
+   ..
+    </pre>
+<h4><br>
+    Option Defaults<br>
+       <br>
+</h4>
+<pre>   driver   = "org.hsqldb.jdbcDriver"<b>
+  </b> url      = "jdbc:hsqldb: "<b>
+  </b> database = "test"
+   user     = "sa"<b>
+  </b> password = ""<b>
+  </b> script   = "st.sql"<b>
+  </b> log      = "false"<b>
+   </b>batch<b> </b>   = "true"</pre>
+<p>&nbsp;</p>
+<h4><b>Samples</b></h4>
+<p>&nbsp;</p>
+<h4><b>BeanShell script</b></h4>
+<pre>//</pre>
+<pre>print( "\nStarting ..." );</pre>
+<pre>import org.hsqldb.util.ScriptTool;</pre>
+<pre>//</pre>
+<pre>dbparms = new String [] { "-database", "//localhost", "-url", "jdbc:hsqldb:hsql:", "-log", "true" };</pre>
+<pre>st = new ScriptTool();</pre>
+<pre>st.execute( dbparms );</pre>
+<pre>//</pre>
+<pre>print( "Console avaliable for commands ...\n" );</pre>
+<p>&nbsp;</p>
+<p><b>where st.sql is:</b></p>
+<p>&nbsp;    </p>
+<pre>select * from hold3</pre>
+<p>&nbsp;</p>
+<p><b>produces something like:</b></p>
+<pre><b>CA      CB      CC      CD      CE      CF      CG      CH      CI      CJ      CK</b></pre>
+<pre>0523563 R       2       A       7       7       001     42728   WILKINSON, DANNY R</pre>
+<pre>0504588 R       2       A       4       4       002     42133   PEDIGO, ALBERT</pre>
+<pre>0024617 R       2       A       9       0       006     40360   COYLE, MARSHALL</pre>
+<pre>0347521 R       2       A       6       8       011     40422   GILBERT, TERRY R</pre>
+<pre>0082243 R       2       A       4       3       016     42261   MOORE, SAM</pre>
+<pre>0092239 R       2       A       1       2       017     42445   WILLIAMS, SAMMY K</pre>
+<pre>0390731 R       2       A       1       1       018     42025   BURCHETT, MICHAEL</pre>
+<pre>0203927 R       2       A       9       0       022     41143   MCGLONE, DAVID</pre>
+<pre>0428239 R       2       A       2       2       024     42266   BOLINGER, STEVE L</pre>
+<pre>1047318 R       2       A       6       9       025     40391   HENDRICKS, JOHN</pre>
+<pre>0132766 R       2       A       6       1       026     40962   HENSLEY, BIGE</pre>
+<pre>1005094 R       2       A       7       7       027     42602   RYAN, WAYNE</pre>
+<pre>0136007 R       2       A       4       7       029     42717   MORGAN, RANDALL</pre>
+<pre>0034998 R       2       A       5       5       034     40583   MAHAN, JAMES R</pre>
+<pre>0035623 R       2       A       5       5       034     40511   ELAM, ROBERT B</pre>
+<pre>1001299 A       2       A       5       5       034     40546   SMITH, M SCOTT</pre>
+<pre>0046274 R       2       A       0       9       035     41041   MCCORMACK, GLEN R</pre>
+<pre>0302050 R       2       A       1       1       042     42051   HEATH, RANDALL W</pre>
+<pre>0481707 A       2       A       3       3       047     42701   PATTERSON, TERRY N</pre>
+<pre>0628678 R       2       A       3       3       047     42701   THOMAS, JOSEPH L</pre>
+<pre>0342885 R       2       A       4       3       050     42749   GIESECKE, JOHN F</pre>
+<pre>0111906 R       2       A       5       6       052     40011   BUSH, ROBERT R</pre>
+<pre>0037503 R       2       A       7       1       063     40741   BENGE, CHARLIE</pre>
+<pre>0033466 R       2       A       6       8       069     40484   CAMPBELL, DAVID</pre>
+<pre>0139598 R       2       A       6       8       069     40484   GRIGSON, DANNY J</pre>
+<pre>0087984 R       2       A       2       2       075     42352   THURMAN, COLLEEN J</pre>
+<pre>0060462 R       2       A       8       0       077     41465   ARNETT, OLLIE J</pre>
+<pre>0670710 R       2       A       4       4       086     42167   LYONS, KERRY</pre>
+<pre>0086899 R       2       A       2       3       092     42347   MILLIGAN, DANE</pre>
+<pre>0110918 R       2       A       5       6       094     40359   CHAPPELL, DAVID</pre>
+<pre>0583985 R       2       A       7       7       100     42544   HANEY, MARK E</pre>
+<pre>0725630 A       2       A       5       6       105     40601   KELLY, RODNEY D</pre>
+<pre>0369541 R       2       A       5       5       106     40065   HORNBACK, PAUL</pre>
+<pre>0092999 R       2       A       2       2       113     42459   SPRAGUE, WILLIAM R</pre>
+<pre>0432752 R       2       A       2       2       117     42455   MELTON, EDDIE A</pre>
+<p>&nbsp;</p>
+<h4>Command Line execution:</h4>
+<p>The same script may be executed from the command line(NT) with something like:</p>
+<pre><b>@java -classpath .;hsqldb.jar;%CLASSPATH% org.hsqldb.util.ScriptTool</b></pre>
+<p>&nbsp;</p>
+<p>A typical script might look something like:</p>
+<pre>&nbsp;</pre>
+<pre>drop table ddl01 if exists;</pre>
+<pre>create temp table ddl01( tab varchar, seq int, l int, cmd varchar );</pre>
+<pre><b>go</b></pre>
+<pre>insert into ddl01</pre>
+<pre>select "SET", -2, 0, 'drop table z' + "SET" + ' if exists;'</pre>
+<pre>  from sets</pre>
+<pre> where seq = 1</pre>
+<pre>   and settype = 'T'</pre>
+<pre>   and "SET" &lt;&gt; 'Audits'</pre>
+<pre>   and ucase("SET") in (select table_name from system_tables)</pre>
+<pre>union</pre>
+<pre>select "SET", -1, 0, 'alter table ' + "SET" + ' rename to z' + "SET" + ';'</pre>
+<pre>  from sets</pre>
+<pre> where seq = 1</pre>
+<pre>   and settype = 'T'</pre>
+<pre>   and "SET" &lt;&gt; 'Audits'</pre>
+<pre>   and ucase("SET") in (select table_name from system_tables)</pre>
+<pre>union</pre>
+<pre>select "SET", 0, 0, 'create table ' + "SET" + ' ( '</pre>
+<pre> from sets</pre>
+<pre>where seq = 1</pre>
+<pre>  and settype = 'T'</pre>
+<pre>  and "SET" &lt;&gt; 'Audits'</pre>
+<pre>union</pre>
+<pre>select "SET", seq, 0, '    ' + DBName + ' ' + DBType + casewhen(DBATTRIB = 'identity', ' identity', '') + casewhen(DBATTRIB like 'not%', ' not null', '') + ','</pre>
+<pre>  from sets</pre>
+<pre> where "SET" &lt;&gt; 'Audits'</pre>
+<pre>   and settype = 'T'</pre>
+<pre>   and Attribute &lt;&gt; 'PK'</pre>
+<pre>union</pre>
+<pre>select "SET", 8000 + seq, 0, '    primary key( ' + DBName + ' )'</pre>
+<pre>  from sets</pre>
+<pre> where "SET" &lt;&gt; 'Audits'</pre>
+<pre>   and settype = 'T'</pre>
+<pre>   and Attribute = 'PK'</pre>
+<pre>   and "SET" not in (select distinct x."SET" from sets x where x.DBAttrib = 'identity')</pre>
+<pre>union</pre>
+<pre>select "SET", 9999, 0, ');'</pre>
+<pre>  from sets</pre>
+<pre> where seq = 1</pre>
+<pre>   and settype = 'T'</pre>
+<pre>   and "SET" &lt;&gt; 'Audits'</pre>
+<pre> order by 1, 2;</pre>
+<pre><b>go</b></pre>
+<pre>drop table ddl00 if exists;</pre>
+<pre>create temp table ddl00 ( tab varchar, seq int );</pre>
+<pre>insert into ddl00</pre>
+<pre>select tab, max(seq)</pre>
+<pre>  from ddl01</pre>
+<pre> where seq &lt; 8000</pre>
+<pre>   and tab in (select distinct x."SET" from sets x where x.DBAttrib = 'identity')</pre>
+<pre> group by tab;</pre>
+<pre><b>go</b></pre>
+<pre>update ddl01</pre>
+<pre>   set cmd = replace(cmd, ',', ' ')</pre>
+<pre> where ddl01.tab + ddl01.seq in ( select x.tab + x.seq from ddl00 x );</pre>
+<pre><b>go</b></pre>
+<pre>select cmd</pre>
+<pre>  from ddl01</pre>
+<pre> order by tab, seq;</pre>
+<pre><b>go
+
+</b></pre>
+<p>Author: Joe Maher - 14 July 2002</p>
+<p>Copyright 2002 Joe Maher. Permission is granted to distribute this document without any alteration under the terms of the HSQLDB license. Additional permission is granted to the HSQLDB Development Group to distribute this document with or without alterations under the terms of the HSQLDB license.</p>
+<p><a href="http://hsqldb.sourceforge.net">http://hsqldb.sourceforge.net&nbsp;</a></p>
+</body>
+</html>

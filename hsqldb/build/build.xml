@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<!-- author fredt@users.sourceforge.net 2001 - 2002 -->
+
+
+<project name="hsqldb" default="help" basedir="../">
+   <property name="src" value="${basedir}/src"/>
+   <target name="init">
+   </target>
+
+   <target name="help">
+      <echo>
+usage:
+   ant -help          display ant help screen
+   ant help           display this message
+   ant jar            build the hsqldb.jar file in the /lib directory
+   ant jarmain        build the hsqldbmain.jar file in the /lib directory
+   ant jartest        build the hsqldbtest.jar file in the /lib directory
+   ant clean          delete the /classes directory created by other ant tasks
+   ant cleanall       same as clean but delete the jar files as well
+   ant javadoc        create javadoc for the distribution package
+
+   hsqldb.jar     : dirstibution jar      hsqldbmain.jar  : no util classes
+   hsqldbtest.jar : all including tests
+
+   the script detects the JDK in use and builds compatible jars
+   no Swing based util classes are generated with JDK 1.1.x
+   ant jartest requires the junit.jar in the /lib directory
+
+example:
+   ant jar
+   ant clean
+      </echo>      
+   </target>
+
+   <target name="javaversion">
+      <available classname="java.util.Set" property="ant.java.iscjava12"/>
+      <available classname="java.nio.Buffer" property="ant.java.iscjava14"/>
+   </target>
+
+   <target name="prepare" depends="init,javaversion">
+	   <mkdir dir="classes" />
+   </target>
+
+   <target name="preparedoc" depends="init">
+	   <mkdir dir="doc/src" />
+   </target>
+
+   <target name="clean" >
+		<delete dir="classes" />
+   </target>
+
+   <target name="cleanall" depends="clean">
+      <delete>
+         <fileset dir="lib" includes="hsql*.jar"/>
+      </delete>
+   </target>
+
+	<target name="codeswitcher" depends="prepare">
+      <javac destdir="classes">
+         <src path="${src}"/>
+         <include name="org/hsqldb/util/CodeSwitcher.java"/>
+	   </javac>
+	</target>
+
+
+	<target name="switchtojdk11" depends="codeswitcher" unless="ant.java.iscjava12">
+      <java classname="org.hsqldb.util.CodeSwitcher" classpath= "classes" >
+         <arg line="${src}/org/hsqldb/util/jdbcSystem.java
+                    ${src}/org/hsqldb/jdbcSystem.java 
+                    ${src}/org/hsqldb/jdbcConnection.java 
+                    ${src}/org/hsqldb/jdbcDatabaseMetaData.java
+                    ${src}/org/hsqldb/jdbcPreparedStatement.java
+                    ${src}/org/hsqldb/jdbcResultSet.java
+                    ${src}/org/hsqldb/jdbcStatement.java
+                    ${src}/org/hsqldb/HsqlProperties.java
+                    ${src}/org/hsqldb/BinaryServerRowOutput.java
+                    ${src}/org/hsqldb/util/TransferDb.java
+                    ${src}/org/hsqldb/util/TransferHelper.java
+                    ${src}/org/hsqldb/util/TransferSQLText.java
+                    ${src}/org/hsqldb/util/TransferTable.java -JAVA2 -JDBC3"/>
+	   </java>
+	</target>
+
+	<target name="switchtojdk12" depends="codeswitcher" if="ant.java.iscjava12">
+      <java classname="org.hsqldb.util.CodeSwitcher" classpath= "classes" >
+         <arg line="${src}/org/hsqldb/util/jdbcSystem.java
+                    ${src}/org/hsqldb/jdbcSystem.java 
+                    ${src}/org/hsqldb/jdbcConnection.java 
+                    ${src}/org/hsqldb/jdbcDatabaseMetaData.java
+                    ${src}/org/hsqldb/jdbcPreparedStatement.java
+                    ${src}/org/hsqldb/jdbcResultSet.java
+                    ${src}/org/hsqldb/jdbcStatement.java
+                    ${src}/org/hsqldb/HsqlProperties.java
+                    ${src}/org/hsqldb/BinaryServerRowOutput.java
+                    ${src}/org/hsqldb/util/TransferDb.java
+                    ${src}/org/hsqldb/util/TransferHelper.java
+                    ${src}/org/hsqldb/util/TransferSQLText.java
+                    ${src}/org/hsqldb/util/TransferTable.java +JAVA2 -JDBC3"/>
+	   </java>
+	</target>
+
+	<target name="switchtojdk14" depends="codeswitcher" if="ant.java.iscjava14">
+      <java classname="org.hsqldb.util.CodeSwitcher" classpath= "classes" >
+         <arg line="${src}/org/hsqldb/util/jdbcSystem.java
+                    ${src}/org/hsqldb/jdbcSystem.java 
+                    ${src}/org/hsqldb/jdbcConnection.java 
+                    ${src}/org/hsqldb/jdbcDatabaseMetaData.java
+                    ${src}/org/hsqldb/jdbcPreparedStatement.java
+                    ${src}/org/hsqldb/jdbcResultSet.java
+                    ${src}/org/hsqldb/jdbcStatement.java
+                    ${src}/org/hsqldb/HsqlProperties.java
+                    ${src}/org/hsqldb/BinaryServerRowOutput.java
+                    ${src}/org/hsqldb/util/TransferDb.java
+                    ${src}/org/hsqldb/util/TransferHelper.java
+                    ${src}/org/hsqldb/util/TransferSQLText.java
+                    ${src}/org/hsqldb/util/TransferTable.java +JAVA2 +JDBC3"/>
+	   </java>
+	</target>
+
+
+	<target name="lib" depends="codeswitcher">
+      <javac srcdir="${src}/org/hsqldb/lib"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+	   >
+         <exclude name="HsqlDateTime.java"/>
+      </javac>
+	</target>
+
+	<target name="util" depends="lib">
+      <javac srcdir="${src}/org/hsqldb/util"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+	   >
+         <classpath>
+            <pathelement location="lib"/>
+         </classpath>
+         <exclude name="*Swing.java"/>
+      </javac>
+      <copy todir="classes/org/hsqldb/util">
+      <fileset dir="${src}/org/hsqldb/util">
+         <include name="hsqldb.gif"/>
+      </fileset>
+    </copy>
+	</target>
+
+   <target name="classes12" depends="lib" if="ant.java.iscjava12">
+      <javac srcdir="${src}"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+	   >
+         <classpath>
+            <pathelement location="lib"/>
+         </classpath>
+      <include name="org/hsqldb/util/*Swing.java"/>            
+      </javac>
+   </target>
+
+   <target name="classes14" depends="lib" if="ant.java.iscjava14">
+      <javac srcdir="${src}"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+	   >
+         <classpath>
+            <pathelement location="lib"/>
+         </classpath>
+      <include name="org/hsqldb/jdbcDataSource*.java"/>
+      </javac>
+   </target>
+
+	<target name="classes" depends="switchtojdk11,switchtojdk12,switchtojdk14,util,classes12,classes14">
+      <javac srcdir="${src}"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+	   >
+         <classpath>
+            <pathelement location="lib/servlet.jar"/>
+         </classpath>
+         <include name="*.java"/>
+         <include name="org/hsqldb/*.java"/>
+         <exclude name="org/hsqldb/jdbcDataSource*.java"/>
+         <include name="org/hsqldb/lib/*.java"/>
+         <exclude name="org/hsqldb/test/*.java"/>
+         <exclude name="org/hsqldb/sample/*.java"/>
+         <exclude name="org/hsqldb/util/*.java"/>
+      </javac>
+	</target>
+
+   <target name="test" depends="classes">
+      <javac srcdir="${src}"
+             destdir="classes"
+				 debug="${build.debug}"
+				 optimize="${build.optimize}"
+         >
+         <classpath>
+            <pathelement location="lib/junit.jar"/>
+            <pathelement location="lib/dbunit.jar"/>
+         </classpath>
+         <include name="org/hsqldb/test/*.java"/>
+         <exclude name="org/hsqldb/sample/*.java"/>
+      </javac>
+   </target>
+
+	<target name="jartest" depends="test,util">
+		<jar jarfile="lib/hsqldbtest.jar"
+             basedir="classes"
+         >
+         <exclude name="org/hsqldb/sample/*.class"/>
+      </jar>
+	</target>
+
+	<target name="jarmain" depends="classes">
+		<jar jarfile="lib/hsqldbmain.jar"
+             basedir="classes"
+         >
+         <exclude name="org/hsqldb/util/*.class"/>
+         <exclude name="org/hsqldb/test/*.class"/>
+         <exclude name="org/hsqldb/sample/*.class"/>
+      </jar>
+	</target>
+
+	<target name="jar" depends="classes,util">
+		<jar jarfile="lib/hsqldb.jar"
+             basedir="classes"
+         >
+         <exclude name="org/hsqldb/test/*.class"/>
+         <exclude name="org/hsqldb/sample/*.class"/>
+      </jar>
+	</target>
+
+	<target name="javadoc" depends="preparedoc">
+      <javadoc packagenames="org.hsqldb.*,org.hsqldb.lib.*,org.hsqldb.util.*"
+           sourcepath="${src}"
+           destdir="${basedir}/doc/src"
+           classpath="${basedir}/lib/servlet.jar;${basedir}/lib/junit.jar"
+           author="true"
+           version="false"
+           use="true"
+           public="true"
+           stylesheetfile="${basedir}/doc/src/hsqldbstylesheet.css"
+           windowtitle="HSQLDB 1.7.0 API"
+           doctitle="HSQLDB 1.7.0"
+           bottom="&lt;i&gt;Copyright &#169; 2001 - 2002 HSQL Development Group. All Rights Reserved.&lt;/i&gt;">
+     </javadoc>
+   </target>
+</project>

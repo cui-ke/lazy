@@ -1,0 +1,694 @@
+/* Lazy system administration */
+
+/* to do : optimise initText() */
+define
+
+  project ADMIN [ nodetype = html ]
+  
+node top
+   href all("Admin"), " ||| " , href all_projects("Projects") , " | " , href all_users ("Users") , " | " , 
+   href all_data("Data Groups") , " | " , href all_roles("Roles") , " | " , href all_connects("DB Connections") ,
+   <hr>() 
+
+
+node all
+<h2>("Lazy administration by <font color=\"red\">[[USER]]</font> in Data group [[GRP]]") ,
+// (<td class="CELL_BG1">(expand href maj_pwd_users["[[USER]]"] (include ICON.pwd)),
+//            )), /* (include gprid_askmodify ))), */
+<blockquote>(
+<h3>("Objects"),
+<table width="70%"> (
+   <tr>(<td class="cell_bg3" width="50%">(href all_projects("Projects")), <td class="cell_bg3">(href all_users ("Users")) ),
+   <tr>(<td class="cell_bg3">(href all_connects("Database connections")), <td class="cell_bg3">(href all_data("Data Groups"))),
+   <tr>(<td class="cell_bg3">(href all_roles("Roles")), <td class="cell_bg3">(href all_categories("Codes")) )
+   // <tr>(<td class="CELL_BG1">(href gprid_askmodify("Select Data Group")))
+ )
+,
+<h3>("Operations") ,
+<table width="30%"> (
+   <tr>(<td class="CELL_WARNING">(href lazy_admin_clearAllNodes("Clear node cache"))), 
+   <tr>(<td class="CELL_WARNING"> (href ADMIN.login["ADMIN.all", "x"]("Login (change user/group)")))
+)
+)
+
+/* --------------- Project nodes ---------------- */
+
+node all_projects
+	include top ,
+	<h2>("Projects"),
+	<p>( expand href new_projects(include ICON.new, " New Project")) ,
+    <table width="100%">(
+	     {<tr>(include projects[projectid])
+	               })
+from lazy_projects
+order by projectid
+
+node projects[selectid]
+        {<td bgcolor="#DDDDDD"> (href del_projects[projectid] (include ICON.del), 
+		                         href maj_projects[projectid] (include ICON.maj), 
+								 href project_details[projectid] (include ICON.definition)
+								 ) ,
+		 <td class="CELL_BG1">(projectid) ,
+		 <td class="CELL_BG1">(href NODE.project[projectid]("Nodes")) ,
+		 <td class="CELL_BG1">(com) ,
+		 <td class="CELL_BG1">(href all_txt[selectid]("Strings")) ,
+		 <td bgcolor="#DDDDDD">(href roles_on_project[projectid]("Access rights"))
+		 
+		}
+
+from lazy_projects selected by projectid = selectid
+
+
+node project_details[p]
+  href all("Admin") , <tt>(" -&gt; "), href all_projects ("Projects"), <hr>(),
+  <h2>("Project ", p) ,
+  <p>(href maj_projects[projectid] (include ICON.maj), expand href del_projects[projectid] (include ICON.del) ),
+  {<table align="center">(
+       <tr>(<td class="CELL_BG1" align="RIGHT" width="27%">("Node type"), <td class="CELL_BG1">( nodetype )),
+       <tr>(<td class="CELL_BG1" align="RIGHT">("Database connection"), <td class="CELL_BG1">(  dbconnection )),
+       <tr>(<td class="CELL_BG1" align="RIGHT">("XSLT file"), <td class="CELL_BG1">(   xslurl )),
+       <tr>(<td class="CELL_BG1" align="RIGHT">("CSS file"), <td class="CELL_BG1">(   cssurl )),
+       <tr>(<td class="CELL_BG1" align="RIGHT">("Background image"), <td class="CELL_BG1">(   bkgndurl )),
+       <tr>(<td class="CELL_BG1" align="RIGHT">("Background image"), <td class="CELL_BG1">(   bkgndurl )),
+	   <tr>(<td class="CELL_WARNING" >("&nbsp;"), <td class="CELL_WARNING" >(href NODE.project[p]("Nodes"))),
+       <tr>(<td class="CELL_WARNING" >("&nbsp;"), <td class="CELL_WARNING" >(href roles_on_project[p] ("Access rights"))),
+       <tr>(<td class="CELL_WARNING" >("&nbsp;"), <td class="CELL_WARNING" >(href all_txt[p]("Strings")))   
+  ) 
+  }
+from lazy_projects selected by projectid = p
+
+
+node new_projects
+ href all("Admin") , <tt>(" -&gt; "), href all_projects ("Projects"), <hr>(),
+ <table width="100%">({active href all_projects (
+   <tr>(<td class="CELL_WARNING">("Project_id   : ", set projectid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Description      : ", set com = textfield(40, ""))),
+	  <tr>(<td class="CELL_WARNING">("Node type : ", set nodetype = textfield(10, "html"))),
+       <tr>(<td class="CELL_WARNING">("Database connection     : ", set dbconnection = textfield(12, "DICTLAZY"))),
+      <tr>(<td class="CELL_WARNING">("URL of XSLT file   : ", set xslurl = textfield(30, "xsl/lazy.xsl"))),
+      <tr>(<td class="CELL_WARNING">("URL of CSS file : ", set cssurl = textfield(30, "css/lazy.css"))),
+      <tr>(<td class="CELL_WARNING">("URL of background image : ", set bkgndurl = textfield(30, "bckgnd/neutral.jpg"))),
+    <tr>(<td class="CELL_WARNING">(on "Create" do insert lazy_projects))
+ )})
+
+node del_projects[selectid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href all_projects ( on "Delete" do delete lazy_projects[projectid],<b>(" project ",selectid))}))) 
+   from lazy_projects selected by projectid = selectid
+
+node maj_projects[selectid]
+  href all("Admin") , <tt>(" -&gt; "), href all_projects ("Projects"), <hr>(),
+   <h3>("Project ", projectid) ,
+   <table width="100%">(
+    {active href all_projects (
+      <tr>(<td class="CELL_WARNING">("Description     : ", set com = textfield(40, com))),
+	  <tr>(<td class="CELL_WARNING">("Node type : ", set nodetype = textfield(10, nodetype))),
+       <tr>(<td class="CELL_WARNING">("Database connection     : ", set dbconnection = textfield(12, dbconnection))),
+      <tr>(<td class="CELL_WARNING">("URL of XSLT file   : ", set xslurl = textfield(30, xslurl))),
+      <tr>(<td class="CELL_WARNING">("URL of CSS file : ", set cssurl = textfield(30, cssurl))),
+      <tr>(<td class="CELL_WARNING">("URL of background image : ", set bkgndurl = textfield(30, bkgndurl))),
+     <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_projects[projectid],<b>("  ",selectid)))
+      )}) 
+   from lazy_projects selected by projectid = selectid
+
+
+/* ------------------ Users ------------------ */
+
+node all_users
+include top,
+   <h1>("Users"),
+
+   <table width="100%">(
+      <th class="CELL_WARNING">(href new_users(include ICON.new)," ",href new_users("[New]")), 
+	  <th class="CELL_WARNING">("User"), 
+	  <th class="CELL_WARNING">("Admin?"), 
+	  <th class="CELL_WARNING">("Default<br>Datagroup"), 
+	  <th class="CELL_WARNING">("Remark"), 
+	  <th class="CELL_WARNING">("Roles in Datagroups"),
+	  {<tr>(include users[UserId])
+      } //,
+	  //<tr>(<td class="CELL_WARNING">( href new_users(include ICON.new, " [New]")))
+   )
+from lazy_users
+order by UserId
+
+
+node users[selectid]
+            { <td bgcolor="#DDDDDD"> (href del_users[Userid] (include ICON.del), href maj_users[Userid] (include ICON.maj)),
+			  <td class="CELL_BG1">(href user[userid](userid)),
+              <td class="CELL_BG1">(admin),
+              <td class="CELL_BG1">(defaultgrpid),
+              <td class="CELL_BG1">(com) ,
+			  <td  bgcolor="#DDDDDD" align="center">(href grants_of_user[userid]("[Roles]"))
+            }
+from lazy_users selected by Userid = selectid
+  
+
+node user[uid]
+   include top ,
+   <h2>("User ", uid) ,
+   <blockquote>(com),
+   <blockquote>(
+     <table cellspacing="5">(
+       <tr>(<td align="right">("Admin: "), <td>(<b>(admin))),
+	   <tr>(<td align="right">("Default Data Group: "), <td>(href data_grp[defaultgrpid](defaultgrpid))),
+	   <tr>(<td align="right">("Language: "), <td>(lang)),
+	   <tr>(<td align="right">("Grants: "), <td>(href grants_of_user[userid]("Roles in Datagroups")))
+	 )
+   ),
+   <hr>(),
+   <p>(href del_users[Userid] (include ICON.del, "[Delete]"), "&nbsp;&nbsp;" ,
+       href maj_users[Userid] (include ICON.maj, "[Update]"))
+   
+from lazy_users selected by userid = uid
+
+  
+
+node new_users
+ href all("Admin") , <tt>(" -&gt; "), href all_users ("Users"), <hr>(),
+ <table width="100%">({active href all_users (
+   <tr>(<td class="CELL_WARNING">("User_id      : ", set userid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Password     : ", set encoded(pwd) = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Admin        : ", set admin = select(include list_codeid["ADMI","NO"] ))),
+   <tr>(<td class="CELL_WARNING">("Defaut Data group   : ", set defaultgrpid = select(include list_grpid["PUBLIC"]))),
+   <tr>(<td class="CELL_WARNING">("Language         : ", set lang = select(include list_codeid["LANG","eo"]))),
+   set style="TABLE", // Deprecated
+   //<tr>(<td class="CELL_WARNING">("Style        : ", set style = select(include list_codeid["STYLE","TABLE"]))),
+   <tr>(<td class="CELL_WARNING">("User Info    : ", set infouser = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">("Comment      : ", set com = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_users, <b>(" New user")))
+ )})
+
+node maj_users[selectid]
+ href all("Admin") , <tt>(" -&gt; "), href all_users ("Users"), <hr>(),
+ <h2>("Update user ", selectid),
+ <table width="100%">({active href user[selectid](
+   <tr>(<td class="CELL_WARNING">("Admin        : ", set admin = select(include list_codeid["ADMI",admin] ))),
+   <tr>(<td class="CELL_WARNING">("Defaut Data Group   : ", set defaultgrpid = select(include list_grpid[defaultgrpid]))),
+   <tr>(<td class="CELL_WARNING">("Language        : ", set lang = select(include list_codeid["LANG",lang]))),
+   set style="TABLE", // Deprecated
+   //   <tr>(<td class="CELL_WARNING">("Style        : ", set style = select(include list_codeid["STYLE",style]))),
+   <tr>(<td class="CELL_WARNING">("User Info    : ", set infouser = textarea(3,40,infouser))),
+   <tr>(<td class="CELL_WARNING">("Comment      : ", set com = textarea(3,40, com))),
+   <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_users[userid],<b>(" user ",selectid)))
+   ),
+   <tr>(<td class="CELL_BG1">(expand href maj_pwd_users[selectid] ("Change Password")))
+   }
+ )
+   from lazy_users selected by Userid = selectid
+
+node del_users[selectid]
+   <table width="100%">(<tr>(<td class="CELL_WARNING">(
+   {active href all_users ( on "Delete" do delete lazy_users[userid],<b>(" user ",selectid))}))) 
+   from lazy_users selected by userid = selectid
+
+node maj_pwd_users[user]
+   <table width="100%">({active href maj_users[user] (
+      <tr>(<td class="CELL_WARNING">("New Password     : ", set encoded(pwd) = textfield(12, "*****"))),
+      <tr>(<td class="CELL_WARNING">(on "Confirm update" do update lazy_users[userid],<b>("for user: ", user)))
+      )}) 
+   from lazy_users selected by userid = user
+
+
+/* -------------- Data Groups --------------- */
+
+node all_data
+include top ,
+<h2>("Data Groups"),
+<table width="100%">(
+    include data_grps ,
+    <tr>(<td>(expand href new_data(include ICON.new, "New")))
+)
+
+
+node data_grps
+   {<tr>(
+      <td class="CELL_BG1">(expand href del_data[grpid] (include ICON.del),
+                            expand href maj_data[grpid] (include ICON.maj)),
+	  <td class="CELL_BG1">( href data_grp[grpid](grpid) ),                        
+      <td class="CELL_BG1">( com ) ,
+	  <td class="CELL_BG1">( href grants_of_group[grpid] ("Users/Roles"))
+	)
+   }
+from lazy_data selected by grpid != "*" order by grpid
+
+node data_grp[g]
+  include top,
+  <h2>("Data Group ", g) ,
+  <p>(com),
+  <blockquote>(
+    <p>(href grants_of_group[grpid] ("Users and Roles"), " on this data group")
+  ) ,
+  <hr>(),
+  <p>(expand href maj_data[grpid] (include ICON.maj, "[Update]"), "&nbsp;&nbsp;&nbsp;",
+      expand href del_data[grpid] (include ICON.del, "[Delete]"))
+from lazy_data selected by grpid = g
+
+
+node new_data
+ <table width="100%">({active href all_data (
+   <tr>(<td class="CELL_WARNING">("Data Group Name       : ", set grpid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Comment      : ", set com = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_data))
+ )})
+
+node del_data[selectid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href all_data ( on "Delete" do delete lazy_data[grpid],<b>(" " , selectid))}))) 
+   from lazy_data selected by grpid = selectid
+
+node maj_data[selectid]
+   <table width="100%">({active href data_grp[selectid] (
+      <tr>(<td class="CELL_WARNING">("Comment     : ", set com = textarea(3,40, com))),
+      <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_data[grpid],<b>(" ",selectid)))
+      )}) 
+   from lazy_data selected by grpid = selectid
+
+
+/* --------------- Roles ----------------- */
+
+node all_roles
+include top ,
+<h2>("Roles"),
+<table width="100%">(
+     {<tr>(include roles[roleid])
+     }
+),
+<p>(expand href new_roles(include ICON.new, " New Role")	)
+from lazy_roles
+order by roleid
+
+node roles[selectid]
+            {<td  bgcolor="#DDDDDD">(
+			            expand href del_roles[roleid] (include ICON.del),
+                        expand href maj_roles[roleid] (include ICON.maj)),
+			 <td class="CELL_BG1">(href role[roleid](roleid) ),           
+             <td class="CELL_BG1">(com) //,
+			 //<td  bgcolor="#DDDDDD">( href all_rolenode[roleid]("Access rights"), <br>(), href grants_of_role[roleid] ("Users/Data" )) 
+            }
+from lazy_roles selected by roleid = selectid
+
+node role[rid]
+   include top ,
+   <h2>("Role ", rid) ,
+      <p>(com) ,
+      <blockquote>(
+         <p>(href all_rolenode[rid]("Access rights")),
+         <p>(href grants_of_role[rid]("Users and Datagroups"))
+      ) ,
+   <hr>(),
+   <p>(expand href del_roles[roleid] (include ICON.del,"[Delete]"), "&nbsp;&nbsp;&nbsp;" ,
+       expand href maj_roles[roleid] (include ICON.maj,"[Update]")) 
+from lazy_roles selected by roleid = rid
+
+
+node new_roles
+ <table width="100%">({active href all (
+   <tr>(<td class="CELL_WARNING">("Role_id      : ", set roleid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Comment      : ", set com = textarea(3,40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Create" do insert lazy_roles,<b>(" new role")))
+ )})
+
+node del_roles[selectid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href all ( on "Delete" do delete lazy_roles[roleid],<b>("  ", selectid))}))) 
+   from lazy_roles selected by roleid = selectid
+
+node maj_roles[selectid]
+   <table width="100%">({active href all (
+      <tr>(<td class="CELL_WARNING">("Comment     : ", set com = textarea(3,40, com))),
+      <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_roles[roleid],<b>("  ",selectid)))
+      )}) 
+   from lazy_roles selected by roleid = selectid
+
+/* ------------- Roles <---> Nodes --------------------*/
+
+node all_rolenode[r]
+  include top ,
+  <h2>("Access rights of role ", href role[r](r)),
+  <table align="center" width="70%">(
+    include rolenode[r]
+  ) ,
+  <p>(href grants_of_role[r]("Users and Data groups"), " with role ", r)
+  
+
+node rolenode[rl]
+    <th class="CELL_WARNING">(href new_rolenode[rl](include ICON.new, "New")),
+    <th class="CELL_BG3">("Node(s) or Table"),
+    <th class="CELL_BG3">("Access Type"),
+	
+    { <tr>(
+	    <td bgcolor="#DDDDDD">(
+				expand href del_rolenode[roleid, nodeid] (include ICON.del),
+                expand href maj_rolenode[roleid, nodeid] (include ICON.maj)) ,
+	    // <td class="CELL_BG1" width="35%">(roleid) , */   
+		<td class="CELL_BG1" width="70%">(nodeid),
+        <td class="CELL_BG1">(typeid)
+     )
+    }
+from lazy_rolenode 
+selected by roleid=rl
+
+node roles_on_project[p]
+  include top,
+  <h2>("Access rights on project ", href project_details[p](p)),
+  <table width="70%" align="center">(  
+       <tr>(
+	   <td class="CELL_WARNING">(href new_rolenode_for_proj[p](include ICON.new, "New")), 
+	   <td class="CELL_BG3">("Role"), 
+	   <td class="CELL_BG3">("Node(s) or Table"), 
+	   <td class="CELL_BG3">("Access Type")
+	   ),
+       include roleproj[p] //,
+	   //<tr>(<td bgcolor="#FFFFAA" valign="center" align="center">(href new_rolenode["(role)"](include ICON.new, "New")))
+  )
+ 
+node roleproj[p]
+    { <tr>(
+	    <td bgcolor="#DDDDDD">(
+				expand href del_rolenode_for_proj[roleid,nodeid, p] (include ICON.del),
+        		expand href maj_rolenode_for_proj[roleid,nodeid, p] (include ICON.maj)) ,
+	    <td class="CELL_BG1" >(roleid) ,   
+		<td class="CELL_BG1" >(nodeid),
+        <td class="CELL_BG1">(typeid)
+     )
+    }
+from lazy_rolenode 
+selected by nodeid like concat(p, ".%")
+
+
+node new_rolenode[r]
+  href all("Admin") , <tt>(" --&gt; "),  href all_roles("Roles"), <tt>(" --&gt; "), 
+  href all_rolenode[r](r) , <hr>(),
+  <h2>("New Access Right for ", r) ,
+  <table width="100%">({active href all_rolenode[ !roleid ] (
+   <tr>(<td class="CELL_WARNING">("Role      : ", set roleid = textfield(20, r))),
+   <tr>(<td class="CELL_WARNING">("Node(s)/Table Id      : " ,set nodeid = textfield(40, ""))),
+   <tr>(<td class="CELL_WARNING">("Object Type         : ", set typeid = select(include list_codeid["NODETYPE","LAZY"]))),
+   <tr>(<td class="CELL_WARNING">("Text      : " ,set lib     = textfield(40, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_rolenode))
+ )})
+
+node new_rolenode_for_proj[p]
+  href all("Admin") , <tt>(" --&gt; "),  href all_projects("Projects"), <tt>(" --&gt; "), href project_details[p](p), <hr>(),
+  <h2>("New Access Right on project ", p),
+  <table width="100%">(
+     active href roles_on_project[ p ] (
+	   <tr>(<td class="CELL_WARNING">("Role : ", set roleid = select(include list_roleid["PUBLIC"]))),
+	   <tr>(<td class="CELL_WARNING">("Node(s)/Table Id : " ,set nodeid = textfield(40, concat(p,".")))),
+	   <tr>(<td class="CELL_WARNING">("Object Type : ", set typeid = select(include list_codeid["NODETYPE","LAZY"]))),
+	   <tr>(<td class="CELL_WARNING">("Text : " ,set lib     = textfield(40, ""))),
+	   <tr>(<td class="CELL_WARNING">(on "Insert" do insert lazy_rolenode))
+    ))
+ 
+node del_rolenode[selectroleid,selectnodeid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+       {active href all_rolenode[selectroleid] ( on "Delete" do delete lazy_rolenode[roleid,nodeid])}
+	))) 
+from lazy_rolenode 
+selected by roleid=selectroleid and nodeid=selectnodeid
+
+node del_rolenode_for_proj[selectroleid,selectnodeid, selectprojid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+       {active href roles_on_project[selectprojid] ( on "Delete" do delete lazy_rolenode[roleid,nodeid])}
+	))) 
+from lazy_rolenode 
+selected by roleid=selectroleid and nodeid=selectnodeid
+
+node maj_rolenode[selectroleid,selectnodeid]
+   <table width="100%">({active href all_rolenode[selectroleid] (
+   set roleid = selectroleid,
+   set nodeid = selectnodeid,
+   <tr>(<td class="CELL_WARNING">("Object Type         : ", set typeid = select(include list_codeid["NODETYPE",typeid]))),
+   <tr>(<td class="CELL_WARNING">("Text      : " ,set lib     = textfield(40, lib))),
+   <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_rolenode[roleid,nodeid]))
+      )}) 
+from lazy_rolenode 
+selected by roleid=selectroleid and nodeid=selectnodeid
+
+node maj_rolenode_for_proj[selectroleid,selectnodeid,p]
+   <table width="100%">({active href roles_on_project[p] (
+   set roleid = selectroleid,
+   set nodeid = selectnodeid,
+   <tr>(<td class="CELL_WARNING">("Object Type         : ", set typeid = select(include list_codeid["NODETYPE",typeid]))),
+   <tr>(<td class="CELL_WARNING">("Text      : " ,set lib     = textfield(40, lib))),
+   <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_rolenode[roleid,nodeid]))
+      )}) 
+from lazy_rolenode 
+selected by roleid=selectroleid and nodeid=selectnodeid
+
+/* ---------- Grants (User, Data, Role) -------------- */
+
+
+node grants_header
+   	 
+	 <th bgcolor="#FFFFBB">("User"), 
+	 <th bgcolor="#FFFFBB">("has Role") ,
+	 <th bgcolor="#FFFFBB">("in Data Group")
+
+
+node s_grants[title, u, g, r]
+            { <tr>(
+			    <td bgcolor="#DDDDDD">(expand href del_s_grant[title, u, g, r, userid, grpid, roleid] (include ICON.del)),
+                <td class="CELL_BG1"> (href user[userid](userid)),
+                <td class="CELL_BG1"> (href role[roleid](roleid)),
+                <td class="CELL_BG1"> (href data_grp[grpid](grpid))
+			  )
+            }
+from lazy_grants 
+selected by (userid=u or u=" ") and (roleid=r or r=" ") and (grpid=g or grpid = "*" or g=" ")
+
+node ss_grants[title, u, g, r]
+    include top,
+    <h2>(title, <font color="red">(u, g, r)),
+    <table width="100%">(
+        <th class="CELL_WARNING">(href new_s_grant[title, u, g, r](include ICON.new , "[New]")), include grants_header ,
+        include s_grants[title, u, g, r]
+    )
+  
+node grants_of_user[u]
+   include ss_grants["Roles granted to user ", u, " ", " "]
+   
+node grants_of_group[g]
+   include ss_grants["Users and roles in datagroup ", " ", g, " "]
+
+node grants_of_role[r]
+   include ss_grants["Users and datagroups with role ", " ", " ", r]
+
+
+node new_s_grant[t, u, g, r]
+// t, u, g, and r parameters are used to return to the grants node we came from 
+include top,
+ <table width="100%">(
+  {active href ss_grants[t, u, g, r] (
+   <tr>(<td class="CELL_WARNING">("Grant Role          : ", set roleid = select(include list_roleid[r]))),
+   <tr>(<td class="CELL_WARNING">("to User ", set userid = textfield(20, u))) ,
+   <tr>(<td class="CELL_WARNING">("in Data Group   : ", set grpid = select(include list_grpid[g]))),
+   
+   <tr>(<td class="CELL_WARNING">(on "Grant" do insert lazy_grants)))
+   }
+   )
+   
+node del_s_grant[t, u ,g ,r, deluid, delgid, delrid ]
+// t, u, g, and r parameters are used to return to the grants node we came from 
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href ss_grants[t, u, g, r] ( on "Confirm Delete" do delete lazy_grants[userid,grpid,roleid])}))) 
+from lazy_grants 
+selected by userid=deluid and roleid=delrid and grpid=delgid
+   
+
+
+
+node grants_role[r]
+  include top,
+  <h2>("Users with Role ", r, " in Datagroups"),
+  <table width="100%">(
+     <th class="CELL_WARNING">(href new_grants("New")), include grants_header ,
+     { <tr>( include grants[userid,grpid,roleid])
+     } 
+   )
+from lazy_grants   selected by roleid = r
+
+node new_grants
+include top,
+ <table width="100%">(
+  {active href grants_on_datagroup["[[!userid]]"] (
+   <tr>(<td class="CELL_WARNING">("Grant Role          : ", set roleid = select(include list_roleid["PUBLIC"]))),
+   <tr>(<td class="CELL_WARNING">("to User ", set userid = textfield(20))) ,
+   <tr>(<td class="CELL_WARNING">("in Data Group   : ", set grpid = select(include list_grpid["NONE"]))),
+   
+   <tr>(<td class="CELL_WARNING">(on "Grant" do insert lazy_grants)))
+   }
+   )
+
+node del_grants[selectuserid,selectgrpid,selectroleid]
+    <table width="100%">(<tr>(<td class="CELL_WARNING">(
+    {active href grants_of_user[selectuserid] ( on "Delete" do delete lazy_grants[userid,grpid,roleid])}))) 
+from lazy_grants 
+selected by userid=selectuserid and roleid=selectroleid and grpid=selectgrpid
+
+
+
+/***** Lists ****/
+
+node list_admin_YN[selectedvalue]
+   {<option>(decode("Y",selectedvalue,"<selected_option/>",""),"Y"),
+    <option>(decode("N",selectedvalue,"<selected_option/>",""),"N")}    
+
+node list_grpid[selectedvalue]
+     include list_grpid_selected[selectedvalue],
+     {<option>(grpid)}
+   from lazy_data
+   selected by  grpid!=selectedvalue
+   order by grpid
+   
+node list_grpid_selected[selectedvalue]
+     {<option selected="selected">(grpid)}
+   from lazy_data
+   selected by  grpid=selectedvalue
+   order by grpid
+
+
+node list_roleid[s]
+   include list_selected_roleid[s], include list_not_selected_roleid[s]
+   
+node list_selected_roleid[s]
+   { <option selected="true">(roleid) } 
+from lazy_roles
+selected by roleid =s
+order by roleid
+
+ node list_not_selected_roleid[s]
+   { <option>(roleid) } 
+from lazy_roles
+selected by roleid != s
+order by roleid
+
+node list_codeid[selectcatid,selectedvalue]
+    include list_codeid_selected[selectcatid,selectedvalue] ,
+	include list_codeid_not_selected[selectcatid,selectedvalue]
+	
+node list_codeid_selected[selectcatid,selectedvalue] 
+     {<option selected="true" value=codeid>(abr)}
+   from lazy_codes
+   selected by catid=selectcatid and codeid=selectedvalue
+   order by abr
+
+node list_codeid_not_selected[selectcatid,selectedvalue] 
+      {<option value=codeid>(abr)}
+   from lazy_codes
+   selected by catid=selectcatid and codeid != selectedvalue
+   order by abr
+
+node list_superlang[selectedvalue]
+     include list_codeid["LANG",selectedvalue],
+     include list_codeid["STYLE",selectedvalue]
+     
+/* ------------- Database connections --------------- */
+
+node all_connects
+include top,
+<h2>("Database Connections") ,
+<table width="100%">(
+     <tr>(<td withd="25%">( expand href new_connects(include ICON.new, <b>("[New]")))),  //null</b>"
+     {<tr>(include connects[connectId])
+     }
+),
+<p>(href re_all_connects("Re-initialize all connections"))
+from lazy_connects
+order by connectId
+
+node connects[selectid]
+            {<td class="CELL_BG1">(expand href del_connects[connectid] (include ICON.del),
+                        expand href maj_connects[connectid] (include ICON.maj),
+                        href connection[connectid](connectid)),                        
+              // <td class="CELL_BG1">(driver),
+              // <td class="CELL_BG1">(url),
+              // <td class="CELL_BG1">(userdb),
+              // <td class="CELL_BG1">(expand href maj_pwd_connects[connectid] (include ICON.maj),"pwd"),
+              <td class="CELL_BG1">(com),
+              <td class="CELL_BG1">(include __DBServices.isOK[selectid])
+              }
+from lazy_connects selected by connectid = selectid
+
+
+node connection[cid]
+  include top ,
+  <h2>("Connection ", connectid) ,
+  <p>(com) ,
+  <blockquote>(
+    <p>("Driver: ", <b>(driver)) ,
+	<p>("URL: ", <b>(url)) ,
+	<p>("User: ", <b>(userdb)) ,
+	<p>("Password: ", "*****") ,
+	<p>("Connection state: ", <b>(include __DBServices.isOK[cid]))
+  ) ,
+  <hr>() ,
+  expand href del_connects[connectid] (include ICON.del, "[Delete]"), "&nbsp;&nbsp;&nbsp;" ,
+  expand href maj_connects[connectid] (include ICON.maj, "[Update]")
+from lazy_connects selected by connectid = cid
+
+
+node new_connects
+ <h2>("Create a new db connection") ,
+ <table width="100%">({active href all_connects (
+   <tr>(<td class="CELL_WARNING">("Connectiom id  : ", set connectid = textfield(12, ""))),
+   <tr>(<td class="CELL_WARNING">("Description   : ", set com = textarea(3,65, ""))),
+   <tr>(<td class="CELL_WARNING">("Driver      : ", set driver = textfield(65, ""))),
+   <tr>(<td class="CELL_WARNING">("URL         : ", set url = textfield(65, ""))),
+   <tr>(<td class="CELL_WARNING">("User      : ", set userdb = textfield(20, ""))),
+   <tr>(<td class="CELL_WARNING">("Password         : ", set encoded(pwddb) = textfield(15, ""))),
+   <tr>(<td class="CELL_WARNING">(on "Create" do insert lazy_connects))
+ )})
+
+node maj_connects[selectid]
+ <h2>("Update connection ", connectid) ,
+ <table width="100%">({active href connection[selectid] (
+   <tr>(<td class="CELL_WARNING">("Description : ", set com = textarea(3,65, com))),
+   <tr>(<td class="CELL_WARNING">("Driver      : ", set driver = textfield(65, driver))),
+   <tr>(<td class="CELL_WARNING">("URL         : ", set url = textfield(65,url))),
+   <tr>(<td class="CELL_WARNING">("User      : ", set userdb = textfield(20, userdb))),
+   <tr>(<td class="CELL_WARNING">("Password         : ", set encoded(pwddb) = textfield(15, "******"))),   
+   <tr>(<td class="CELL_WARNING">(on "Update" do update lazy_connects[connectid],<b>(" ",connectid)))
+ )})
+   from lazy_connects selected by connectid = selectid
+
+node del_connects[selectid]
+   <table width="100%">(<tr>(<td class="CELL_WARNING">(
+   {active href all_connects ( on "Delete" do delete lazy_connects[connectid] , <b>(" ",connectid))}))) 
+   from lazy_connects selected by connectid = selectid
+
+
+node re_all_connects
+  include __DBServices.reInit ,
+  <hr>(),
+  include all_connects
+ 
+
+node lazy_admin_clearAllNodes {
+  <p>("Cache cleared") , <hr>(),
+  include all
+}
+
+node list_usergrpid
+     // include list_usergrpid_selected,
+	 <option selected="true">([GRP]),
+     { <option>(grpid) }
+   from  lazy_grants 
+   distinct
+   selected by userid=[USER]
+   order by grpid
+   
+node list_usergrpid_selected
+     {<option>("<selected_option/>",grpid)}
+   from  lazy_grants 
+   distinct
+   selected by userid=[USER] and grpid=[GRP]
+   order by grpid
+
+
+   
+end
+                     
+
+    

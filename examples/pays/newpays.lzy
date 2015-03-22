@@ -1,0 +1,29 @@
+define 
+
+
+node allpays
+     <atlas>(<tabletitrecol>(<col>("Nom"),
+                              <col>("Capitale"),
+                              <col>("Villes"),
+                              <col>("Surface(1000Km2)",sum(surface)),
+                              <col>("Habitants (Mio.)",sum(population))
+                             ),
+             {<pays>(
+               <nom> ( active href allpays (on "delete" do delete pays[nom]),
+                       expand href getdrapeau [nom] (upper(nom)) ),
+               <capitale> ( capitale ),
+               <ville> ( expand href villesparpays[nom] ("?") ),
+               <surface> ( surface ),
+               <population> ( population )
+               )
+              }),
+       <post>("moyenne des surfaces: ", avg(surface)),
+       <post>( expand href graphpays ("GRAPHIQUE") )
+  from pays
+  selected by 1=1
+  order by nom
+
+
+
+  
+end

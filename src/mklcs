@@ -1,0 +1,10 @@
+#!/bin/sh
+CLASSPATH=.:$TOMCAT_HOME/lib/servlet.jar:\
+$TOMCAT_HOME/common/lib/servlet.jar:\
+$TOMCAT_HOME/webapps/lazy/WEB-INF/classes
+# ADD Jena lib
+for j in ${JENA_LIB}/* ; do
+    CLASSPATH=${CLASSPATH}:$j
+done
+javac CompilerSparql.java lcs.java -d $TOMCAT_HOME/webapps/lazy/WEB-INF/classes
+

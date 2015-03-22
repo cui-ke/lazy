@@ -1,0 +1,50 @@
+
+Lazy 4.3 distribution
+
+The Lazy documentation, including the installation instructions, is
+in the doc directory
+
+This distribution includes a version of theTomcat server developed
+by the Apache Software Foundation (http://www.apache.org),
+read the license in tomcat/LICENSE.
+
+Lazy is known to work with more recent versions of Tomcat that
+can be freely downloaded from the Apache site.
+
+This distribution also includes a version of the HSQL database
+engine (http://hsqldb.sourceforge.net), read the licence in hsqldb/hsqldb_lic.txt
+
+Although Lazy is distributed with HSQLDB, which is a small and nice
+100% Java database engine, it has been tested with Oracle, Access, and
+Postgres. It should work with any relational database system accessible
+through a JDBC driver.
+
+Content of this distribution
+
+admin      Lazy source code of the interactive development and administration
+           hyperspace
+           
+bin        scripts to start and manage the Lazy system
+
+doc        documentation, including the installation guide
+
+examples   example hyperspaces
+
+hsqldbthe  hsql database engine (http://hsqldb.sourceforge.net/ ), 
+           with a demo directorythat contains the data of the example Web site. 
+           
+src        the Lazy source code
+
+tomcat     (part of) the tomcat servlet container from the Apache Jakarta
+           project(http://jakarta.apache.org/) 
+           
+           webapps/lazy    contains the lazy web application 
+                           (including the lazy node server servlet) 
+            
+           NOTE. If you already have a tomcat server on your machine, copy 
+           tomcat/webapps/lazy tothe webapps directory of your tomcat server 
+           and restart tomcat (if required). 
+
+
+
+G. Falquet, 18.03.2005

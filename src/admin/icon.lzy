@@ -1,0 +1,17 @@
+define
+
+project ICON
+
+node readme
+/***** ICON and Comment ****/
+/* no access to table ! */
+{"dummy"}
+
+node del {<img alt="Delete" border="0" src="icon/del.gif">()}    
+node maj {<img alt="Edit" border="0" src="icon/maj.gif">()}    
+node new {<img alt="New" border="0" src="icon/new.gif">()}
+node pwd {<img alt="Change password" border="0" src="icon/pwd.gif">()}    
+node definition {<img alt="View inside" border="0" src="icon/adm.gif">()}    
+node users {<img alt="User(s)" border="0" src="icon/user.gif">()}    
+
+end

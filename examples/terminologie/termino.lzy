@@ -1,0 +1,265 @@
+/* prbl avec les dates de modif */
+
+
+
+
+
+define
+
+project TERMINO
+
+node unicode
+  expand href unicode_new("ajouter"),
+  {<P>(i,"/",x,"/")}
+  from unicode
+  order by i
+
+node unicode_new
+ {active href unicode (
+   set i=0,
+   "definition   : ", set x = textarea(3,40, ""),
+   on "confirm insert" do insert unicode,<b>("Création d'un terme")
+ )}
+  
+  
+  
+  
+node all
+<titre1>( "TERMINOLOGY MANAGEMENT"),
+include search
+
+
+node search
+   include menu,"<hr/>",
+   {active href IDX.searchIndexDBPP (on "display" do display node,
+                                         "search for word", set parameter = textfield(32, "abandon"),
+                                         "mode", set parameter = "include",
+                                         set parameter="<<??include a=TERMINO.pre_i&amp;u=//??>>&lt;TABLE>",  /*pre .... */
+                                         set parameter="&lt;/TABLE><<??include a=TERMINO.post_i&amp;u=//??>>"  /*post .... */
+                               ),
+   active href search_abbr (on "display" do display node,
+                                         "search for abbreviation", set parameter = textfield(32, "BIT"))
+   }                               
+
+
+
+node search_abbr[selecteurabbr]
+    <TABLE>({include i[termid]})
+from term_terms
+selected by abbr=upper(selecteurabbr)
+order by lang, term
+
+node i[selecteurid]
+  {<ROW>(<CELL>(
+       expand href conceptdef[term_conceptdef.conceptid] (include ICON.definition),
+       "(",termid,")", 
+       ": <![","CDATA[",(term),"]","]>"
+     ,"<b><![","CDATA[",term_conceptdef.def,"]","]></b>"
+     ))}
+  from term_terms, term_conceptdef 
+  selected by termid=selecteurid and term_terms.conceptid=term_conceptdef.conceptid
+  and term_terms.grpid="[[GRP]]"
+
+node conceptdef[selecteurconceptid]
+  <TABLE>(
+     {<ROW>(<CELL>(
+       <b>("Conceptid: ",Conceptid),
+       <P_small>("Définition: ",def),
+       <P_small>("Contexte  : ",context),
+       <P_small>("Notes     : ",notes),
+       <P_small>("RecSource : ",recsource),
+       <P_small>("Origine   : ",origin),
+       include termlang[conceptid,"ENG"],
+       include termlang[conceptid,"FRE"],
+       include termlang[conceptid,"SPA"],
+       include termlang[conceptid,"GER"]
+     ))})
+  from term_conceptdef 
+  selected by conceptid=selecteurconceptid
+  
+node termlang[selecteurconceptid,selecteurlang]
+  <TABLE>(
+    <CAPTION>(<IMAGE>("http://jg2:8080/img/",selecteurlang,".gif")),
+     {<ROW>(<CELL>(
+       <b>("Termid: ",Termid),
+       <P_small>("Terme     : ",Term ,
+                 "(",<b>(abbr),")"),
+       <P_small>("Source    : ",source),
+       <P_small>("Usage     : ",usage),
+       <P_small>("Origine   : ",origin)
+            ))})
+  from term_terms 
+  selected by conceptid=selecteurconceptid and lang=selecteurlang
+  order by ranking
+ 
+
+/* problème avec le """""" &quote ...
+
+node pre_i 
+   "&lt;a href=&quote;ns?a=menu&amp;u=>menu principal&lt;/a>"
+   
+   
+*/    
+
+node pre_i 
+   "pre-node"
+
+
+node post_i "post-node"
+
+node menu href SECURE.menu("menu_principal")
+
+/* modification et insertion */
+
+/* set conceptid=term_seqid.nextval, FOR ORACLE */
+
+node new_conceptdef
+ include menu,
+ <TABLE>({active href get_usersubmit (
+         set grpid="[[GRP]]",
+         set authorid="[[USER]]",
+         set status="PRIVATE",
+         /*set authormodif=SYSDATE,*/
+   <ROW>(<CELL_WARNING>("definition   : ", set def = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("contexte     : ", set context = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("notes        : ", set notes = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("source-rec   : ", set recsource = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("origine      : ", set origin = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>(on "confirm insert" do insert term_conceptdef,<b>("Création d'une fiche")))
+ )})
+
+node maj_conceptdef[selecteurconceptid]
+ include menu,
+ <TABLE>({active href get_usersubmit (
+         /*set authormodif=SYSDATE,*/
+   <ROW>(<CELL_WARNING>("definition   : ", set def = textarea(3,40,def))),
+   <ROW>(<CELL_WARNING>("contexte     : ", set context = textarea(3,40, context))),
+   <ROW>(<CELL_WARNING>("notes        : ", set notes = textarea(3,40, notes))),
+   <ROW>(<CELL_WARNING>("source-rec   : ", set recsource = textarea(3,40, recsource))),
+   <ROW>(<CELL_WARNING>("origine      : ", set origin = textarea(3,40, origin))),
+   <ROW>(<CELL_WARNING>(on "confirm update" do update term_conceptdef[conceptid],<b>("modification de la fiche:", conceptid)))
+ )})
+  from term_conceptdef 
+  selected by conceptid=selecteurconceptid
+
+node del_conceptdef[selecteurconceptid]
+   <TABLE>(<ROW>(<CELL_WARNING>(
+   {active href get_usersubmit ( on "confirm delete" do delete term_conceptdef[conceptid],<b>("suppression de la fiche: ",conceptid))}))) 
+  from term_conceptdef 
+  selected by conceptid=selecteurconceptid
+
+node new_terms[selecteurconceptid,selecteurlang]
+ include menu,
+ <TABLE>({active href get_usersubmit (
+         set grpid="[[GRP]]",
+         set conceptid=selecteurconceptid,
+         /* set termid=term_seqid.nextval,  FOR ORACLE */
+         set authorid="[[USER]]",
+         set status="PRIVATE",
+         set lang=selecteurlang,
+         /*set authormodif=SYSDATE,*/
+   <ROW>(<CELL_WARNING>("term         : ", set term = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("abréviation  : ", set abbr = textfield(20, ""))),
+   <ROW>(<CELL_WARNING>("source       : ", set source = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("usage        : ", set usage = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>("origine      : ", set origin = textarea(3,40, ""))),
+   <ROW>(<CELL_WARNING>(on "confirm insert" do insert term_terms,<b>("Création d'un terme pour la fiche: ", selecteurconceptid)))
+ )})
+
+node maj_terms[selecteurtermid]
+ include menu,
+ <TABLE>({active href get_usersubmit (
+         /*set authormodif=SYSDATE,*/
+   <ROW>(<CELL_WARNING>("term         : ", set term = textarea(3,40, term))),
+   <ROW>(<CELL_WARNING>("abréviation  : ", set abbr = textfield(20, abbr))),
+   <ROW>(<CELL_WARNING>("source       : ", set source = textarea(3,40, source))),
+   <ROW>(<CELL_WARNING>("usage        : ", set usage = textarea(3,40, usage))),
+   <ROW>(<CELL_WARNING>("origine      : ", set origin = textarea(3,40, origin))),
+   <ROW>(<CELL_WARNING>(on "confirm update" do update term_terms[termid],<b>("modification d'un terme: ", termid)))
+ )})
+from term_terms
+selected by termid=selecteurtermid
+
+node get_usersubmit
+ {include menu,
+  ", ",href new_conceptdef("ajouter une fiche"),
+  include get_user_private,
+  include get_user_submit
+ }
+node get_user_submit
+ <H2>("Fiches en attente d'être soumises"),
+  <TABLE>({include get_concept[conceptid]})
+  from term_conceptdef 
+  selected by authorid="[[USER]]" and grpid="[[GRP]]" and status="SUBMIT"
+  order by conceptid
+
+node get_user_private
+ <H2>("Fiches soumises en attente de validation"),
+  <TABLE>({include get_concept[conceptid]})
+  from term_conceptdef 
+  selected by authorid="[[USER]]" and grpid="[[GRP]]" and status="PRIVATE"
+  order by conceptid
+
+
+node get_concept[selecteurconceptid]
+     {<ROW>(<CELL>(
+       <b>(expand href del_conceptdef[conceptid] (include ICON.del),
+           "Conceptid: ",conceptid),
+       <P_small>("Définition: ",def,
+                 expand href conceptdefX[conceptid] (include ICON.definition),
+                 expand href maj_conceptdef[conceptid] (include ICON.maj)),
+       <P_small>("Ajouter des termes: "
+                 ,expand href new_terms[conceptid,"ENG"](<IMAGE>("http://jg2:8080/img/","ENG",".gif")),
+                 expand href new_terms[conceptid,"FRE"](<IMAGE>("http://jg2:8080/img/","FRE",".gif")),
+                 expand href new_terms[conceptid,"SPA"](<IMAGE>("http://jg2:8080/img/","SPA",".gif")),
+                 expand href new_terms[conceptid,"GER"](<IMAGE>("http://jg2:8080/img/","GER",".gif"))
+                 )
+     ))}
+  from term_conceptdef 
+  selected by conceptid=selecteurconceptid
+
+
+node conceptdefX[selecteurconceptid]
+  <TABLE>(
+     {<ROW>(<CELL>(
+       <b>("Conceptid: ",Conceptid),
+       <P_small>("Définition: ",def),
+       <P_small>("Contexte  : ",context),
+       <P_small>("Notes     : ",notes),
+       <P_small>("RecSource : ",recsource),
+       <P_small>("Origine   : ",origin),
+       include termlangX[conceptid,"ENG"],
+       include termlangX[conceptid,"FRE"],
+       include termlangX[conceptid,"SPA"],
+       include termlangX[conceptid,"GER"]
+     ))})
+  from term_conceptdef 
+  selected by conceptid=selecteurconceptid
+  
+node termlangX[selecteurconceptid,selecteurlang]
+  <TABLE>(
+    <CAPTION>(<IMAGE>("http://jg2:8080/img/",selecteurlang,".gif")),
+     {<ROW>(<CELL>(
+       <b>("Termid: ",Termid,expand href maj_terms[termid] (include ICON.maj) ),
+       <P_small>("Terme     : ",Term ,
+                 "(",<b>(abbr),")"),
+       <P_small>("Source    : ",source),
+       <P_small>("Usage     : ",usage),
+       <P_small>("Origine   : ",origin)
+            ))})
+  from term_terms 
+  selected by conceptid=selecteurconceptid and lang=selecteurlang
+  order by ranking
+
+
+end
+
+
+select sum(length(term)) from term_terms
+where termid in (
+                1,2,3,4,5,6,7,8,9,10,
+                11,12,13,14,15,16,171,18,19,110,
+                111,112,113,114,115,116,117,118,119,1110,
+                1111,1112,1113,1114,1115,1116,1117,1118,1119,11110,
+                11111);
+ 

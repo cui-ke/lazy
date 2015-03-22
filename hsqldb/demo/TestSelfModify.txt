@@ -1,0 +1,34 @@
+--
+-- TestSelfCreate.txt
+--
+
+-- TestSelfCreate.txt is used by TestSelf.java to test the database
+--
+-- This is part of a three part suite of scripts to test persistence in the same DB 
+--
+-- Comment lines must start with -- and are ignored
+-- Lines starting with spaces belongs to last line
+-- Checked lines start with /*<tag>*/ where <tag> is:
+--   c <rows>     ResultSet expects a with <row> columns
+--   r <string>   ResultSet expected with <string> result in first row/column
+--   u <count>    Update count <count> expected
+--   e            Exception must occur
+
+-- TEST 1
+-- Correct handling of index creation for foreign keys
+-- insert some values
+/*u1*/insert into verein values ('abcdefg');
+/*u1*/insert into verein values ('hijklmn');
+/*u1*/insert into verein values ('opqrstu');
+/*u1*/insert into verein values ('vwxyz');
+/*u1*/insert into bewerb values ('abcdefg',1);
+/*e*/insert into bewerb values ('abcdefg',2);
+/*u1*/insert into bewerb values ('hijklmn',5);
+/*e*/insert into bewerb values ('hijklmn',6);
+/*u1*/insert into bewerb values ('opqrstu',8);
+/*e*/insert into bewerb values ('opqrstu',9);
+/*u1*/insert into bewerb values ('vwxyz',10);
+
+-- SHUTDOWN is necessary for test1
+/*u0*/SHUTDOWN;
+

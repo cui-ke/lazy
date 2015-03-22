@@ -1,0 +1,319 @@
+/* Copyrights and Licenses
+ *
+ * This product includes Hypersonic SQL.
+ * Originally developed by Thomas Mueller and the Hypersonic SQL Group. 
+ *
+ * Copyright (c) 1995-2000 by the Hypersonic SQL Group. All rights reserved. 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: 
+ *     -  Redistributions of source code must retain the above copyright notice, this list of conditions
+ *         and the following disclaimer. 
+ *     -  Redistributions in binary form must reproduce the above copyright notice, this list of
+ *         conditions and the following disclaimer in the documentation and/or other materials
+ *         provided with the distribution. 
+ *     -  All advertising materials mentioning features or use of this software must display the
+ *        following acknowledgment: "This product includes Hypersonic SQL." 
+ *     -  Products derived from this software may not be called "Hypersonic SQL" nor may
+ *        "Hypersonic SQL" appear in their names without prior written permission of the
+ *         Hypersonic SQL Group. 
+ *     -  Redistributions of any form whatsoever must retain the following acknowledgment: "This
+ *          product includes Hypersonic SQL." 
+ * This software is provided "as is" and any expressed or implied warranties, including, but
+ * not limited to, the implied warranties of merchantability and fitness for a particular purpose are
+ * disclaimed. In no event shall the Hypersonic SQL Group or its contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential damages (including, but
+ * not limited to, procurement of substitute goods or services; loss of use, data, or profits;
+ * or business interruption). However caused any on any theory of liability, whether in contract,
+ * strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this
+ * software, even if advised of the possibility of such damage. 
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Hypersonic SQL Group.
+ *
+ *
+ * For work added by the HSQL Development Group:
+ *
+ * Copyright (c) 2001-2002, The HSQL Development Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution, including earlier
+ * license statements (above) and comply with all above license conditions.
+ *
+ * Neither the name of the HSQL Development Group nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG, 
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/*
+ * ParameterizableStatementParserTest.java
+ *
+ * Created on June 25, 2002, 7:45 PM
+ */
+package org.hsqldb;
+
+import java.io.File;
+
+/**
+ *
+ * @author  Campbell Boucher-Burnet, Camco & Associates Consulting
+ */
+public class ParameterizableStatementParserTest {
+
+    /**
+     * ParameterizableStatementParserTest is a Main pattern class and does not need construction.
+     */
+    private ParameterizableStatementParserTest() {}
+
+    public static long testParsed(int reps, int rows) throws Exception {
+
+        (new File("parsed.script")).delete();
+        (new File("parsed.data")).delete();
+        (new File("parsed.properties")).delete();
+
+        Database database = new Database("parsed");
+        Session  session  = database.connect("SA", "");
+
+        database.execute("drop table test if exists", session);
+        database.execute(
+            "create temp table test(id int PRIMARY KEY, fname varchar(20), lname varchar(50), zip int)",
+            session);
+
+        String insertQuery = "insert into test values(";
+        String updateQuery = "update test set fname = 'Hans' where id = ";
+        String deleteQuery = "delete from test where id = ";
+        String selectQuery = "select * from test where id = ";
+
+        System.out.println("Testing parsed statement execution");
+
+        long startTime;
+        long total;
+        long grandTotal = 0;
+
+        for (int j = 0; j < reps; j++) {
+            grandTotal = 0;
+
+            System.out.println("\nRun " + j + ":\n");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                database.execute("insert into test values(" + i
+                                 + ",'Julia','Peterson-Clancy'," + i
+                                 + ")", session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to insert " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                database.execute(updateQuery + i, session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to update " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                database.execute(updateQuery + i, session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to select " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                database.execute(deleteQuery + i, session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to delete " + rows + " rows: " + total
+                               + " ms");
+            System.out.println("Total:");
+            System.out.println("----------");
+            System.out.println("" + grandTotal + " ms");
+        }
+
+        database.execute("SHUTDOWN IMMEDIATELY", session);
+
+        return grandTotal;
+    }
+
+    public static long testPrepared(int reps, int rows) throws Exception {
+
+        (new File("prepared.script")).delete();
+        (new File("prepared.data")).delete();
+        (new File("prepared.properties")).delete();
+
+        Database database = new Database("prepared");
+        Session  session  = database.connect("SA", "");
+
+        database.execute("drop table test if exists", session);
+        database.execute(
+            "create temp table test(id int PRIMARY KEY, fname varchar(20), lname varchar(50), zip int)",
+            session);
+
+        ParameterizableStatementParser   parser;
+        ParameterizablePreparedStatement insertStatement;
+        ParameterizablePreparedStatement updateStatement;
+        ParameterizablePreparedStatement deleteStatement;
+        ParameterizablePreparedStatement selectStatement;
+        String insertQuery = "insert into test values(?,?,?,?)";
+        String updateQuery = "update test set fname = 'Hans' where id = ?";
+        String deleteQuery = "delete from test where id = ?";
+        String selectQuery = "select * from test where id = ?";
+
+        parser          = new ParameterizableStatementParser();
+        insertStatement = parser.parse(database, session, insertQuery);
+        updateStatement = parser.parse(database, session, updateQuery);
+        deleteStatement = parser.parse(database, session, deleteQuery);
+        selectStatement = parser.parse(database, session, selectQuery);
+
+        insertStatement.bindParameter(1, "Julia");
+        insertStatement.bindParameter(2, "Peterson-Clancy");
+        System.out.println("Testing prepared statement execution");
+
+        long startTime;
+        long total;
+        long grandTotal = 0;
+
+        for (int j = 0; j < reps; j++) {
+            grandTotal = 0;
+
+            System.out.println("\nRun " + j + ":\n");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                Integer iv = new Integer(i);
+
+                insertStatement.bindParameter(0, iv);
+                insertStatement.bindParameter(3, iv);
+                insertStatement.exec(session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to insert " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                Integer iv = new Integer(i);
+
+                updateStatement.bindParameter(0, iv);
+                updateStatement.exec(session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to update " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                Integer iv = new Integer(i);
+
+                selectStatement.bindParameter(0, iv);
+                selectStatement.exec(session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to select " + rows + " rows: " + total
+                               + " ms");
+
+            startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < rows; i++) {
+                Integer iv = new Integer(i);
+
+                deleteStatement.bindParameter(0, iv);
+                deleteStatement.exec(session);
+            }
+
+            total      = System.currentTimeMillis() - startTime;
+            grandTotal += total;
+
+            System.out.println("Time to delete " + rows + " rows: " + total
+                               + " ms");
+            System.out.println("Total:");
+            System.out.println("----------");
+            System.out.println("" + grandTotal + " ms");
+        }
+
+        database.execute("SHUTDOWN IMMEDIATELY", session);
+
+        return grandTotal;
+    }
+
+    /**
+     *
+     * @param args
+     * @throws SQLException
+     */
+    public static void main(String[] args) throws Exception {
+
+        long prepared;
+        long parsed;
+        int  reps = 300;
+        int  rows = 100;
+
+        if (args.length == 2) {
+            reps = Integer.parseInt(args[0]);
+            rows = Integer.parseInt(args[1]);
+        }
+
+        prepared = testPrepared(reps, rows);
+        parsed   = testParsed(reps, rows);
+
+        double ratio = (((double) parsed / (double) prepared));
+
+        System.out.println();
+        System.out.println("Averaged over " + reps + " runs using " + rows
+                           + " rows,");
+        System.out.println("Prepared statement execution is approximately");
+        System.out.println(
+            "" + ratio + " times faster than parsed statement execution.");
+    }
+}
