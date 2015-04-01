@@ -1,15 +1,14 @@
 #!/bin/sh
 CP=.:$TOMCAT_HOME/lib/servlet.jar:$TOMCAT_HOME/lib/servlet-api.jar:\
 $TOMCAT_HOME/webapps/lazy/WEB-INF/classes
-
-# $JENA_LIB/*.jar
+# $JENA_LIB/\"*\".jar
 
 # ADD Jena lib
 for j in ${JENA_LIB}/*.jar ; do
-    CP=${CP}:$j
+   CP=${CP}:$j
 done
 
-echo $CP
+# echo $CP
 # javac ns.java -classpath ${CP} -Xlint:deprecation -d $TOMCAT_HOME/webapps/lazy/WEB-INF/classes
 javac ns.java -classpath ${CP} -d $TOMCAT_HOME/webapps/lazy/WEB-INF/classes
 

@@ -219,7 +219,7 @@ class Node {
             if (!(N.selector.equals("NODEF"))) {
                 if(!N.nodetype.equals("SPARQL")) 
                     N.selector = " where " + N.selector; // selected by could be optional jg
-            }else
+            }else 
                 N.selector = "";
             
             N.groupby = Q.result.getString("groupby");
@@ -235,6 +235,7 @@ class Node {
                 N.order = "";
             
             N.limit = Q.result.getString("limit");
+            if (N.limit == null) N.limit = "NODEF";  // TEMPORARY FIX **GF
             if (N.limit.equals("NODEF")) N.limit = "";
             
             N.cachesize = Q.result.getInt("cachesize");

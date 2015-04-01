@@ -1,0 +1,92 @@
+{\rtf1\mac\ansicpg10000\cocoartf100
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;\f2\fswiss\fcharset77 Helvetica-Oblique;
+}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11900\viewh11960\viewkind1\viewscale100
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
+
+\f0\b\fs28 \cf0 Glossary of terms
+\f1\b0\fs24 \
+\
+
+\f0\b Node schema
+\f1\b0 : a text, written in the Lazy language, that defines how to construct a node instance (usually an HTML or XML page). It is comprised of \
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\li600\ql\qnatural
+\cf0 a selection part\
+a content part (with links) \
+and parameters\
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
+\cf0 \
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
+
+\f0\b \cf0 Node instance.
+\f1\b0  A hypertext node (usually a HTML or XML page) that is part of a hypertext view. It is an instance of a node schema. Its content depends on the schema definition,  the actual parameter values, and the current database contents (tables). A node is instantiated each time the user clicks on a link to the node, or when the node is include in another one (see inclusion link).\
+\
+
+\f0\b Node type. 
+\f1\b0 The type of content produced when instantiating a node. Currently defined types are : html, xml, pure html (no heading tag is generated), pure xml, svg. The node type is specified at project level, i.e. all the nodes of a project have the same type.\
+\
+
+\f0\b Node server. 
+\f1\b0 The role of the node server is to answer to node requests by instantiating the required node schema with the given parameters. It also performs database actions corresponding to active links.\
+\
+
+\f0\b Node compiler.
+\f1\b0  The program that checks the syntax of a node and transforms is different parts into SQL statements (which may still contain placeholders for parameters).\
+\
+
+\f0\b Link. 
+\f1\b0 A way to interconnect nodes. The source of a link is a content element of a node, its destination is a node. Lazy links can have four different behaviours: reference (jump), inclusion, expand-in-place, and active .\
+
+\f0\b \
+Reference link. 
+\f1\b0 A link from a content element to a node. When the node is instantiated, such a link appears as an undelined text (an HTML anchor). When it is clicked, the referred node is instantiated an replaces the current node (the user "jumps" to the referred node.\
+\
+
+\f0\b Inclusion link.
+\f1\b0 \
+\
+
+\f0\b Active link.
+\f1\b0  \
+\
+
+\f0\b Project
+\f1\b0  : a set of nodes that make up a hyperspace intended for a specific purpose. All the nodes of a project have the same type (html, xml, purexml, purehtml) and refer to the same database connection.\
+Every node belongs to exactly one project. Thus the full name of a node has the form projectname.nodename .\
+\
+
+\f0\b Database connection
+\f1\b0  : an access to a particular database (schema). It is comprised of a database URL (e.g. jdbc:hsqldb:hsql://localhost), a JDBC driver class (e.g. org.hsqldb.jdbcDriver), a username, and a password. The URL and driver are dbms specific (refer to your dbms documentation).\
+\
+
+\f0\b User
+\f1\b0  : a name under which somebody can connect to a Lazy server. By default the username PUBLIC is used when opening a Lazy session. A user can be defined as "administrator". In this case she will have full access to every node and data.\
+\
+
+\f0\b Datagroup
+\f1\b0  : a symbolic name for a set of data in a database. A tuple in a table may belong to zero or one datagroup, thus the same table can hold data belonging to different applications. For instance, a single database can be used to manage different museums. The datagroup of a tuple is indicated by the value of an attribute reserved for this purpose.\
+When loging in, a user can select a datagroup, otherwise she will work in her default datagroup. \
+\
+
+\f0\b Role
+\f1\b0  :  a role represents a set of access rights to nodes (and database tables). For instance, role VISITOR can accees the node MUSEUM.artist_index while role CURATOR can access MUSEUM.update_catalog, etc. \
+An access right is thus a pair (role, project.node) or (role, table). The wildcard form project.* means "all the nodes of this project".\
+The main advantage of roles is to avoid explicitly defining the access rights of each user in each datagroup (see 
+\f2\i grant
+\f1\i0 ).\
+\
+
+\f0\b Grant
+\f1\b0  : when connecting, a user is granted a set of roles. These roles depend on the datagroup she chose to work in. So, for instance, user JOE could have role VISITOR in the MUSEUM_OF_MODERN_ART datagroup and roles VISITOR and CURATOR in CITY_MUSEUM. A grant is thus a triple (user, datagroup, role). If datagroup is * it means that this user has this role in all datagroups.\
+\
+
+\f0\b Servlet
+\f1\b0 \
+\
+
+\f0\b Servlet container
+\f1\b0 \
+\
+\
+}
