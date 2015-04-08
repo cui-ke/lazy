@@ -1647,9 +1647,11 @@ class CompilerSparql {
                echo("group by ");
                next();
 
+               spacesAreTokens();
                while(sym.ttype != TT_EOF && !term("end") && !term("order") && !term("limit") && !term("offset")){
                    copyTokensReplacingParamAndGlobalVars();
                } 
+               spacesNotTokens();
 
                groupbuf = copybuf.toString();
             } else
@@ -1816,7 +1818,17 @@ class CompilerSparql {
      }
 
      void PrefixedName() { // ::= identifier? ':' identifier?
-         if (sym.ttype == TT_WORD) { echo(sym.sval); next(); } // prefix
+         int lastSymInPrefix = sym.ttype;
+         if (sym.ttype == TT_WORD) { 
+             echo(sym.sval); next(); // prefix
+             while (sym.ttype == '-' || sym.ttype == '.' || sym.ttype == TT_WORD) {
+                  if (sym.ttype == TT_WORD) { echo(sym.sval);  } 
+                  else { echo(""+sym.ttype); }
+                  lastSymInPrefix = sym.ttype;
+                  next();
+             }
+         }
+         if (lastSymInPrefix == '.') err("'.' at end of prefix");
          if (sym.ttype == ':') {echo(":"); next(); }
          else err("missing ':' in prefixed name");
          if (sym.ttype == TT_WORD) { echo(sym.sval); next(); } // name
@@ -1830,6 +1842,21 @@ class CompilerSparql {
      
     void variable() {
     }
+    
+    void spacesAreTokens() {
+         sym.ordinaryChar(' ');sym.ordinaryChar('\n');sym.ordinaryChar('\r');sym.ordinaryChar('\t');
+         sym.slashStarComments(false);
+         sym.slashSlashComments(false);
+    }
+    
+    void spacesNotTokens() {
+         sym.slashStarComments(true);
+         sym.slashSlashComments(true);
+         sym.whitespaceChars (' ',' '); sym.whitespaceChars('\n','\n'); sym.whitespaceChars('\r','\r'); 
+         sym.whitespaceChars('\t','\t');
+    }
+    
+
 
     void select_part() {
     
@@ -1845,6 +1872,8 @@ class CompilerSparql {
                 echo(" where {");
                 next();
                 int depth = 0; // inclusion depth of {} parenthesis
+                
+                spacesAreTokens();
                 while(sym.ttype != TT_EOF && !term("end") && !(sym.ttype=='}' && depth == 0)){
 
                    if (sym.ttype == '{') {
@@ -1856,8 +1885,11 @@ class CompilerSparql {
                    copyTokensReplacingParamAndGlobalVars();
 
                 } // end while
+                spacesNotTokens();
+                
                 if (sym.ttype == '}') { echo("}"); next(); }
                 else err("missing } at end of selector");
+
                 
                 stopcopy();
                 String cis = complexExpressionsInContent.toString();
@@ -1879,6 +1911,8 @@ class CompilerSparql {
     }
     
     void copyTokensReplacingParamAndGlobalVars() {
+
+
         if (sym.ttype == '[') { // global or input variable ... or blank node
             String varCat = ""; // inputVar = false;
             next();
@@ -1911,30 +1945,31 @@ class CompilerSparql {
                 echo(ns.paramPrefix  + pi + ns.paramSuffix);
                 next();
             }
-            else { // identifier or Prefixed identifier
+            else { // Reserved word or number or Prefixed identifier
+//                PrefixedName();
                 echo(sym.sval);
                 next();                         
-                if(sym.ttype == ':') {
-                    echo(":");
-                    next();
-                    if(sym.ttype == TT_WORD) {
-                        echo(sym.sval + " "); next();
-                    }
-                    else {
-                        err(" \":\" should be followed by a word or number ");
-                    }
-                }
+//                 if(sym.ttype == ':') {
+//                     echo(":");
+//                     next();
+//                     if(sym.ttype == TT_WORD) {
+//                         echo(sym.sval + " "); next();
+//                     }
+//                     else {
+//                         err(" \":\" should be followed by a word or number ");
+//                     }
+//                }
             }
-            echo(" ");
+            // echo(" ");
         } // end if ttword
         else if (sym.ttype == '\"') {
             echo("\""+doubleQuotes(sym.sval)+"\"");      
             next();
         }   
         else if (sym.ttype == '<') { // IRI
-                sym.ordinaryChar(' ');sym.ordinaryChar('\n');sym.ordinaryChar('\r');sym.ordinaryChar('\t');
-                sym.slashStarComments(false);
-                sym.slashSlashComments(false);
+//                 sym.ordinaryChar(' ');sym.ordinaryChar('\n');sym.ordinaryChar('\r');sym.ordinaryChar('\t');
+//                 sym.slashStarComments(false);
+//                 sym.slashSlashComments(false);
                 echo("<");
                 next();
 
@@ -1951,20 +1986,17 @@ class CompilerSparql {
                 }
                 echo(""+(char)(sym.ttype));
 
-                sym.slashStarComments(true);
-                sym.slashSlashComments(true);
-                sym.whitespaceChars (' ',' ');
-                sym.whitespaceChars('\n','\n');
-                sym.whitespaceChars('\r','\r');
-                sym.whitespaceChars('\t','\t');
+//                 sym.slashStarComments(true);
+//                 sym.slashSlashComments(true);
+//                 sym.whitespaceChars (' ',' '); sym.whitespaceChars('\n','\n'); sym.whitespaceChars('\r','\r');
+//                 sym.whitespaceChars('\t','\t');
                 next();
         } // end if <   
         else { // any other symbol
            echo(String.valueOf((char)sym.ttype));
            next();
         }
-        
-        
+               
     }
     
 
@@ -2200,10 +2232,11 @@ class CompilerSparql {
             if (term("by")) {
                echo("order by ");
                next();
+               spacesAreTokens();
                while(sym.ttype != TT_EOF && !term("end") && !term("limit") && !term("offset")){
                    copyTokensReplacingParamAndGlobalVars();
                } // end while
-
+               spacesNotTokens();
                orderbuf = copybuf.toString();
             } else
                 err("'by' missing after 'order'");
@@ -2217,10 +2250,12 @@ class CompilerSparql {
             echo(sym.sval+" ");
             next();
             
+            spacesAreTokens();
             while(sym.ttype != TT_EOF && !term("end")){
                    copyTokensReplacingParamAndGlobalVars();
             } // end while
-
+            spacesNotTokens();
+            
             limitbuf = copybuf.toString();
         } else
             limitbuf = "NODEF"; // order by is optional jg

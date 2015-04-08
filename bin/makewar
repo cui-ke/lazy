@@ -1,0 +1,2 @@
+cd $LAZY_HOME
+tar -cvf $TOMCAT_HOME/lazy.war *
