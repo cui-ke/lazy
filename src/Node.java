@@ -582,8 +582,9 @@ class Node {
                     }
 					else if (val.isResource()) {
 					    if (val.isURIResource()) {
-					        replaceVal = normalizeURI(val.asResource().toString(), prefixString); 
-					        System.out.println("TEST -------- "+val.asResource().getNameSpace()+":"+val.asResource().getLocalName());
+//					        replaceVal = normalizeURI(val.asResource().toString(), prefixString); 
+                            replaceVal = "<"+val.asResource().toString()+">";
+//					        System.out.println("TEST -------- "+val.asResource().getNameSpace()+":"+val.asResource().getLocalName());
 					        replaceOutVal = replaceVal;
 					    }
 					    else { // blank node (anonymous resource)
