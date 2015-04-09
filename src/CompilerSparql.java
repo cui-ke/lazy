@@ -1591,7 +1591,8 @@ class CompilerSparql {
             order_part(); // jg
             limit_part(); // gf
             // System.out.println("after order:"+sym.sval);
-            
+            if (sym.ttype != TT_EOF && !term("end"))
+                err("Unexpected symbol");
             
             if (errInNodeDef == 0) {
             
@@ -1613,23 +1614,27 @@ class CompilerSparql {
 					int col = e.getColumn();
 					String[] qlines = query.split("\\n");
 					
-					String errLine = qlines[ln-1];
-				
-					err("Error in from part: "+errLine.substring(0, col-1)+" <span style='color: red;'> &nbsp;&nbsp;==&gt;</span>  "+errLine.substring(col-1,errLine.length()));
-				}
-			}
+					if (ln > 0) {
+ 					    String errLine = qlines[ln-1];
+					    err("Error in from part: "+errLine.substring(0, col-1)
+					        +" <span style='color: red;'> &nbsp;&nbsp;==&gt;</span>  "
+					        +errLine.substring(col-1,errLine.length()));
+				    } else {
+				        err("Error in from part: "+errMsg);
+				    }
+			    }
+            }
             
-            
-        } else {
-            frombuf = "";
-            String cis = complexExpressionsInContent.toString();
-            // replace the sparql variable placeholders by variable identifiers because this 
-            // goes into the sparql select string.
-            cis = cis.replaceAll("<<\\[\\?\\?sparql-var-([0-9A-Za-z_]*)\\?\\?\\]>>","?$1");
-            selectwherebuf = "select (1 as $lazy__x) "+cis+" where {rdf:type rdf:type rdf:Property.} limit 1"; 
-            orderbuf = "NODEF";
-            groupbuf = "NODEF";
-            limitbuf = "NODEF";
+       } else {
+			frombuf = "";
+			String cis = complexExpressionsInContent.toString();
+			// replace the sparql variable placeholders by variable identifiers because this 
+			// goes into the sparql select string.
+			cis = cis.replaceAll("<<\\[\\?\\?sparql-var-([0-9A-Za-z_]*)\\?\\?\\]>>","?$1");
+			selectwherebuf = "select (1 as $lazy__x) "+cis+" where {rdf:type rdf:type rdf:Property.} limit 1"; 
+			orderbuf = "NODEF";
+			groupbuf = "NODEF";
+			limitbuf = "NODEF";
         } // FROM PART IS OPTIONAL JG
 
     }
@@ -1896,7 +1901,6 @@ class CompilerSparql {
                 if (sym.ttype == '}') { 
                     echo("}"); 
                     next(); 
-                    if (isWhiteSpace()) next();
                 }
                 else err("missing } at end of selector");
                 
