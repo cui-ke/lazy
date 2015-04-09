@@ -49,6 +49,10 @@ class CompilerSparql {
     int errInNodeDef = 0;
     int tokno = 0;
     int firstline = 1; // line no. of the first line of the current node
+    
+    int additionalLines = 0;  // when the tokenizer is set to recognize \n and \r as
+                              // tokens, its does not count lines
+                              // so we must correct the line count
 
     StreamTokenizer sym;
     BufferedReader txt; // to find node text
@@ -146,7 +150,7 @@ class CompilerSparql {
         sym.slashSlashComments(true);
         sym.slashStarComments(true);
         
-        
+        additionalLines = 0; 
 
         next();
     }
@@ -441,7 +445,7 @@ class CompilerSparql {
     void node_def() {
         // "node"
         nodetypebuf = "SPARQL";
-        firstline = sym.lineno();
+        firstline = sym.lineno() + additionalLines;
         errorbuf = "";
         actionList = new ArrayList();
 
@@ -520,7 +524,7 @@ class CompilerSparql {
             }
 
             // if (fromFile)
-            int lastline = sym.lineno() - 1;
+            int lastline = sym.lineno() - 1 + additionalLines;
             plaintxtbuf = doubleQuotes(getNodeText(firstline, lastline));
             
             // check the syntax
@@ -1856,7 +1860,9 @@ class CompilerSparql {
          sym.whitespaceChars('\t','\t');
     }
     
-
+    boolean isWhiteSpace() {
+         return (sym.ttype == ' ' || sym.ttype == '\n' || sym.ttype == '\r' || sym.ttype == '\t' ) ;
+    } 
 
     void select_part() {
     
@@ -1887,9 +1893,13 @@ class CompilerSparql {
                 } // end while
                 spacesNotTokens();
                 
-                if (sym.ttype == '}') { echo("}"); next(); }
+                if (sym.ttype == '}') { 
+                    echo("}"); 
+                    next(); 
+                    if (isWhiteSpace()) next();
+                }
                 else err("missing } at end of selector");
-
+                
                 
                 stopcopy();
                 String cis = complexExpressionsInContent.toString();
@@ -1994,6 +2004,8 @@ class CompilerSparql {
         } // end if <   
         else { // any other symbol
            echo(String.valueOf((char)sym.ttype));
+//           if (sym.ttype == '\n' || sym.ttype == '\r') additionalLines++ ; // count the line
+           if (sym.ttype == sym.TT_EOL) additionalLines++ ; // count the line
            next();
         }
                

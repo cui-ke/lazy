@@ -1530,21 +1530,25 @@ public class ns extends HttpServlet {
 	 * <pre>
 	 * 
 	 *  Replace:     
-	 *      Before &lt;a href="ns?eip=ZYX<b>SEQ_NO</b>XYZ<b>REQ_ID</b>&amp;a=....&gt;The anchor text&lt;/a&gt; After
+	 *     <a href="ns?eip=ZYX_SEQ_NO_XYZ_REQ_ID_&amp;a=....>The anchor text</a> After
 	 * 
-	 *      where <b>SEQ_NO</b> = seq. no. (a number) of this expand link with the node, <b>REQ_ID</b> = request id of the page to expand
+	 *      where _EQ_NO<_ = seq. no. (a number) of this expand link with the node, 
+	 *            _REQ_ID_ = request id of the page to expand
 	 * 
 	 *  By:  
-	 *      Before 
-	 *     &lt;a href="ns?cip=ZYXXYZ<b>REQ_ID</b>&amp;a=....&gt;&lt;!--#EXPANDED-<b>CURR_REQ</b>--&gt;Closing anchor&lt;!--The anchor text--&gt; &lt;/a&gt;
-	 *     The expanded nodes &lt;!--#END EXPANDED-:<b>CURR_REQ</b>--&gt;
-	 *     After
+	 *     <a href="ns?cip=ZYXXYZ_REQ_ID_&amp;a=....><!--#EXPANDED-_CURR_REQ_-->
+	 *        _cipText_<!--The anchor text--> </a> The expanded nodes 
+	 *        <!--#END EXPANDED-:_CURR_REQ_>-->
 	 * 
-	 *      where <b>CURR_REQ</b> = current request id (reqid of this page)
+	 *      where _CURR_REQ_ = current request id (reqid of this page)
+	 *          _cipText_ is the visual element for closing the expansion
 	 * 
-	 *      &lt;a href="ns?cip=ZYXXYZ<b>REQ_ID</b> will subsequently be replaced by
-	 *      &lt;a href="ns?cip=ZYX<b>CIP_SEQ</b>XYZ<b>REQ_ID</b>  in replaceCIP
-	 *      where <b>CIP_SEQ</b>is a seq. no. for cips in this page
+	 *      <a href="ns?cip=ZYXXYZ_REQ_ID_ will subsequently be replaced by
+	 *      <a href="ns?cip=ZYX_CIP_SEQ_XYZ<b>REQ_ID</b>  in replaceCIP
+	 *      where _CIP_SEQ_ is a seq. no. for cips in this page
+	 *
+	 *     PRECONDITION: the node parameters must not contain the sequence "> this sequence is used
+	 3                   to detect the end of the <a> element.
 	 * 
 	 *     WARNING  : this use of reqID is UNSAFE because it could have been incremented by a concurrent request
 	 *     after we started processing this request.
@@ -1573,7 +1577,7 @@ public class ns extends HttpServlet {
 		}
 
 		if ((ix = s.indexOf(eipPrefix + eipNum, 0)) > -1) {
-			int beginAnchor = s.indexOf(">", ix) + 1;
+			int beginAnchor = s.indexOf("\">", ix) + 2;             //gf 2015-04-09
 			int endAnchor = s.indexOf("</a>", beginAnchor);
 
 			return s.substring(0, ix)
