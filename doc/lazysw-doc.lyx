@@ -119,7 +119,11 @@ Declaring a SPARQL project
 \end_layout
 
 \begin_layout Standard
-Currently the project name must start with SPARQL_ .
+Currently the project name must start with 
+\family typewriter
+SPARQL_
+\family default
+ .
 \end_layout
 
 \begin_layout Standard
@@ -200,15 +204,15 @@ The general structure of a node is similar to the structure of a relational
 \end_layout
 
 \begin_layout LyX-Code
-  ['select'] ['distinct'] '{' GroupGraphPatternX '}'
+  ['select'] ['distinct'] '{' GroupGraphPattern '}'
 \end_layout
 
 \begin_layout LyX-Code
-  ['group by' GroupConditionX+ ['having' HavingConditionX+] ]
+  ['group by' GroupCondition+ ['having' HavingCondition+] ]
 \end_layout
 
 \begin_layout LyX-Code
-  ['order by' OrderConditionX+ ]
+  ['order by' OrderCondition+ ]
 \end_layout
 
 \begin_layout LyX-Code
@@ -220,21 +224,221 @@ The general structure of a node is similar to the structure of a relational
 \end_layout
 
 \begin_layout Standard
-The non-terminals  GroupGraphPatternX, GroupConditionX, etc.
- are defined as in the SPARQL 1.1 definition, with the Var non terminal defined
- as augmented with ParameterIdentifier and '[' SystemParameter ']' 
+The following node displays 20 luxury cars from dbpedia
+\end_layout
+
+\begin_layout LyX-Code
+node luxury_cars 
+\end_layout
+
+\begin_layout LyX-Code
+  <h2>("This node represents all luxury cars"),
+\end_layout
+
+\begin_layout LyX-Code
+  <ul>({ <li>( ?name," is manufactured by - ",?manufacturer) }) 
+\end_layout
+
+\begin_layout LyX-Code
+from {
+\end_layout
+
+\begin_layout LyX-Code
+    ?car <http://purl.org/dc/terms/subject>
+\end_layout
+
+\begin_layout LyX-Code
+           <http://dbpedia.org/resource/Category:Luxury_vehicles> .
+\end_layout
+
+\begin_layout LyX-Code
+    ?car foaf:name ?name .
+\end_layout
+
+\begin_layout LyX-Code
+    ?car dbo:manufacturer ?man .
+\end_layout
+
+\begin_layout LyX-Code
+    ?man foaf:name ?manufacturer 
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout LyX-Code
+limit 20
+\end_layout
+
+\begin_layout Standard
+The non-terminals  
+\emph on
+GroupGraphPattern
+\emph default
+, 
+\emph on
+GroupCondition
+\emph default
+, etc.
+ are defined as in the SPARQL 1.1 definition (http://www.w3.org/TR/sparql11-query/)
+ with a little extension allowing variables to be 
+\end_layout
+
+\begin_layout Itemize
+usual SPARQL variables: ?
+\emph on
+identifier
+\end_layout
+
+\begin_layout Itemize
+node parameters: 
+\emph on
+identifier
+\end_layout
+
+\begin_layout Itemize
+lazy system variables [
+\emph on
+identifier
+\emph default
+], e.g.
+ 
+\family typewriter
+[USER]
+\end_layout
+
+\begin_layout Itemize
+lazy project internationalized strings [?
+\emph on
+identifier
+\emph default
+] 
 \end_layout
 
 \begin_layout Standard
 Parameters may appear anywhere in a node declaration.
- Their actual value is always a string.
- In the display part and in the from part they must be explicitly converted
- to numeric values when necessary.
- For instance with the xsd:decimal() function.
+ Their actual value is either a literal (
+\begin_inset Quotes eld
+\end_inset
+
+xyz
+\begin_inset Quotes erd
+\end_inset
+
+^^type) or a URI (<xyz>).
+ This differs from the relational implementation in which parameters are
+ always considered as strings.
+ 
 \end_layout
 
 \begin_layout Standard
-Limit and offset
+Example: display 
+\begin_inset Formula $n$
+\end_inset
+
+ classes that have a name in Spanish, together with 3 instances of each
+ class.
+\end_layout
+
+\begin_layout LyX-Code
+node OWLClasses[n] 
+\end_layout
+
+\begin_layout LyX-Code
+<h2>(n, " classes with a name in Spanish"), 
+\end_layout
+
+\begin_layout LyX-Code
+<ul>(
+\end_layout
+
+\begin_layout LyX-Code
+  {
+\end_layout
+
+\begin_layout LyX-Code
+   <li>(str(?cname), concat(" IRI: ", ?c)
+\end_layout
+
+\begin_layout LyX-Code
+      , " ",  include SomeInstancesOf[?c]
+\end_layout
+
+\begin_layout LyX-Code
+       )
+\end_layout
+
+\begin_layout LyX-Code
+  })
+\end_layout
+
+\begin_layout LyX-Code
+from   distinct {
+\end_layout
+
+\begin_layout LyX-Code
+    ?c a owl:Class .
+ ?c rdfs:label ?cname .
+\end_layout
+
+\begin_layout LyX-Code
+    FILTER ( lang(?cname) = "es" )
+\end_layout
+
+\begin_layout LyX-Code
+} limit n
+\end_layout
+
+\begin_layout LyX-Code
+   
+\end_layout
+
+\begin_layout LyX-Code
+node SomeInstancesOf[cls]
+\end_layout
+
+\begin_layout LyX-Code
+<ul>(
+\end_layout
+
+\begin_layout LyX-Code
+  {
+\end_layout
+
+\begin_layout LyX-Code
+   <li>(?x)
+\end_layout
+
+\begin_layout LyX-Code
+  })
+\end_layout
+
+\begin_layout LyX-Code
+from { ?x a cls } 
+\end_layout
+
+\begin_layout LyX-Code
+limit 3
+\end_layout
+
+\begin_layout Subsubsection*
+\begin_inset Quotes eld
+\end_inset
+
+LIMIT
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+OFFSET
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -242,8 +446,44 @@ In the official SPARQL syntax, the limit and offset values must be integer
  constants ([0-9]+).
  No function application is allowed.
  To circumvent this problem, when a parameter appears in a limit or offset
- clause it is automatically converted to its numerical value.
- 
+ clause it is automatically converted to its numerical value, as in the
+ following example
+\end_layout
+
+\begin_layout LyX-Code
+node ConceptsSlice[f,lim] 
+\end_layout
+
+\begin_layout LyX-Code
+<h2>("All Concepts"),  
+\end_layout
+
+\begin_layout LyX-Code
+<ul>(
+\end_layout
+
+\begin_layout LyX-Code
+   {    <li>(?k, " ")   }
+\end_layout
+
+\begin_layout LyX-Code
+    ), 
+\end_layout
+
+\begin_layout LyX-Code
+<p>(href ConceptsSlice[f+lim,lim]("next"))
+\end_layout
+
+\begin_layout LyX-Code
+from distinct {?s a ?k } 
+\end_layout
+
+\begin_layout LyX-Code
+order by ?k 
+\end_layout
+
+\begin_layout LyX-Code
+limit lim offset f
 \end_layout
 
 \begin_layout Section
@@ -300,18 +540,10 @@ the query is executed
 
 \begin_layout Enumerate
 for each query answer (variable assignment) the output template is instantiated
- as follows
+ by replacing the SPARQL variable placeholders by their value in the answer
+ and each parameter or Lazy variable by its value
 \end_layout
 
-\begin_deeper
-\begin_layout Enumerate
-variable/parameter placeholders are replaced by the output form of the correspon
-ding variable/parameter if they appear as first level simple expressions
- that are not arguments of a node in a link construct.
- Otherwise they are replaced by their SPARQL value
-\end_layout
-
-\end_deeper
 \begin_layout Section
 Developments
 \end_layout
