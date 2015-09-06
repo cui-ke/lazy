@@ -59,20 +59,20 @@ through a JDBC driver.
 
 - open a terminal,change directory to `$CATALINA_HOME/webapps/lazy/bin` and execute 
 
-    `source lazyenv.sh`    ### to define environment variables
+    `source lazyenv.sh`    to define environment variables
 
-    `./runServer.sh`       ### to start the Hsqldb database server 
-                         ### chmod a+x runServer.sh if necessary
+    `./runServer.sh`       to start the Hsqldb database server 
+                         chmod a+x runServer.sh if necessary
                          
 - open another terminal,change directory to `$CATALINA_HOME/webapps/lazy/bin` and execute 
 
-    `source lazyenv.sh`    ### to define environment variables
+    `source lazyenv.sh`    to define environment variables
  
-    `./startns.sh`         ### to start the Tomcat server
+    `./startns.sh`         to start the Tomcat server
     
     (use the Lazy system ...)
     
-   `./stopns.sh`           ### to stop the Tomcat server
+   `./stopns.sh`           to stop the Tomcat server
     
     
 - open the URL `localhost:8080/lazy` from a web browser
