@@ -1,3 +1,0 @@
-#! /bin/sh
-javac -classpath .:$TOMCAT_HOME/webapps/lazy/WEB-INF/classes \
--d  $TOMCAT_HOME/webapps/lazy/WEB-INF/classes gpwd.java
