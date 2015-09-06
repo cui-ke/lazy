@@ -1,5 +1,5 @@
 
-Lazy for the Semantic Web 
+# Lazy for the Semantic Web 
 
 The Lazy documentation, including the installation instructions, is in
 the doc directory
@@ -19,7 +19,7 @@ Java database engine, it has been tested with Oracle, Access, and
 Postgres. It should work with any relational database system accessible
 through a JDBC driver.
 
-Content of this distribution
+# Content of this distribution
 
 
 bin        scripts to start and manage the Lazy system
@@ -43,7 +43,7 @@ WEB-INF/lib  all the JENA JAR files
 css        css files used by the lazy IDE
 
 
-Installation
+# Installation
 
 - install a distribution of the Apache Tomcat servelet container
 
