@@ -19,63 +19,63 @@ Java database engine, it has been tested with Oracle, Access, and
 Postgres. It should work with any relational database system accessible
 through a JDBC driver.
 
-# Content of this distribution
+## Content of this distribution
 
 
-bin        scripts to start and manage the Lazy system
+`bin`        scripts to start and manage the Lazy system
 
-doc        documentation, including the installation guide
+`doc`        documentation, including the installation guide
 
-examples   example hyperspaces
+`examples`   example hyperspaces
 
-hsqldb     the hsqldb database engine (http://hsqldb.sourceforge.net/ )
-hsqldb/demo	 contains the default lazy dictionary (node definitions, etc.) in
+`hsqldb`     the hsqldb database engine (http://hsqldb.sourceforge.net/ )
+`hsqldb/demo`	 contains the default lazy dictionary (node definitions, etc.) in
              the test database (test.data, test.script, test.properties)
 
-src        the Lazy source code
+`src`        the Lazy source code
 
-src/admin  source code of the Lazy interactive development and environment (written
+`src/admin`  source code of the Lazy interactive development and environment (written
            in Lazy)
 
-WEB-INF    all the servelet stuff
-WEB-INF/lib  all the JENA JAR files
+`WEB-INF`    all the servelet stuff
+`WEB-INF/lib`  all the JENA JAR files
 
-css        css files used by the lazy IDE
+`css`        css files used by the lazy IDE
 
 
-# Installation
+## Installation
 
 - install a distribution of the Apache Tomcat servelet container
 
-- define the CATALINA_HOME environment variable to point to the Tomcat main directory, 
+- define the `CATALINA_HOME` environment variable to point to the Tomcat main directory, 
   e.g. put the command
   
-  export CATALINA_HOME=yourTomcatDirectory
+  `export CATALINA_HOME=yourTomcatDirectory`
   
-  into your ~/.profile file
+  into your `~/.profile` file
 
-- extract the content of the lazy distrinbution file into the $CATALINA_HOME/webapps 
+- extract the content of the lazy distrinbution file into the `$CATALINA_HOME/webapps` 
   directory. It should create a directory called lazy
 
-- open a terminal,change directory to $CATALINA_HOME/webapps/lazy/bin and execute 
+- open a terminal,change directory to `$CATALINA_HOME/webapps/lazy/bin` and execute 
 
-    source lazyenv.sh    ### to define environment variables
+    `source lazyenv.sh`    ### to define environment variables
 
-    ./runServer.sh       ### to start the Hsqldb database server 
+    `./runServer.sh`       ### to start the Hsqldb database server 
                          ### chmod a+x runServer.sh if necessary
                          
-- open another terminal,change directory to $CATALINA_HOME/webapps/lazy/bin and execute 
+- open another terminal,change directory to `$CATALINA_HOME/webapps/lazy/bin` and execute 
 
-    source lazyenv.sh    ### to define environment variables
+    `source lazyenv.sh`    ### to define environment variables
  
-    ./startns.sh         ### to start the Tomcat server
+    `./startns.sh`         ### to start the Tomcat server
     
     (use the Lazy system ...)
     
-   ./stopns.sh           ### to stop the Tomcat server
+   `./stopns.sh`           ### to stop the Tomcat server
     
     
-- open the URL localhost:8080/lazy from a web browser
+- open the URL `localhost:8080/lazy` from a web browser
 
      
      
