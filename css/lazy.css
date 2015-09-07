@@ -1,78 +1,162 @@
-BODY	{					
-	background-color:white;			
-	font-style:normal;			
-	font-weight:normal;			
-	font-size:10pt;			
-	font-family: Helvetica;	
-	text-align:left;			
-	text-indent:0pt;			
-	color:black;				
-	margin:5px 5px;				
-	}
+body	{					
+    background-color:white;			
+    font-style:normal;			
+    font-weight:normal;			
+    font-size:10pt;			
+    font-family: Helvetica;	
+    text-align:left;			
+    text-indent:0pt;			
+    color:black;				
+    margin:5px 5px;				
+}
 
-A:link	{ 
-	color:#0000BB;	font-style:normal;  	text-decoration: none;				
-	}
+a:link	{ 
+    color:#0000BB;
+    font-style:normal;
+    text-decoration: none;				
+}
 
-A:visited	{
-	color: #0000BB;	 font-style:normal;		 	text-decoration: none;
-	}
+a:visited	{
+    color: #0000BB;
+    font-style:normal;
+    text-decoration: none;
+}
 
-A:active	{
-	color:#ff9933;		 	text-decoration: none;			
-	}
-	
-A:hover {
-	color:#ff9933;			 	text-decoration: none;		
-	}
+a:active	{
+    color:#ff9933;
+    text-decoration: none;			
+}
 
-.TABLE { border: 1  solid #888800 ;background-color: #FFFFFF; width=100%}
-.TABLE_BG1 {border: 1 solid #000000 ;background-color: #C0C0C0}
-.TABLE_BG2 { border: 0 solid #880000 ;background-color: white}
-.TABLE_BG3 { border: 1 solid #888800 ;background-color: #191919}
+a:hover {
+    color:#ff9933;
+    text-decoration: none;		
+}
 
-.CAPTION {cellspacing: 0; border: 1 solid #888800 ;background-color: #BBBBFF;
-          font-size: 12 pt; font-family:Trebuchet MS;
-          color: #000000;
-          font-style: bold; font-weight: bold}
+.table { border: 1px solid #888800;
+         background-color: #FFFFFF;
+         width:100%;
+}
+.table_bg1 {
+    border: 1px solid #000000;
+            background-color: #C0C0C0;
+}
+.table_bg2 {
+    border: 0 solid #880000;
+             background-color: white;
+}
+.table_bg3 {
+    border: 1px solid #888800;
+             background-color: #191919;
+}
 
-.CELL_TITLE {cellspacing: 0; border: 0 solid #888800 ;background-color: #BBBBFF;
-          font-size: 10 pt; font-family:Trebuchet MS;
-          color: #000000;
-          font-style: normal; font-weight: bold}
-.CELL_TITLE_R {cellspacing: 0; border: 0 solid #888800 ;background-color: #BBBBFF;
-          color: #000000;
-          font-style: normal; font-weight: bold ; text-align: right;}
+.caption {
+    border: 1px solid #888800;
+    background-color: #BBBBFF;
+    font-size: 12pt;
+    font-family:Trebuchet MS;
+    color: #000000;
+    font-weight: bold}
 
-.ROW {}
-.CELL { background-color: #EEFFFF; padding-left: 2pt; padding-right: 2 pt }
-.CELL_BG1 { background-color: #BBBBFF ; padding-left: 5pt; padding-right: 5 pt  }
-.CELL_BG2 { background-color: white}
-.CELL_BG3 { background-color: #FFFFAA}
+.cell_title {
+    border: 0 solid #888800;
+    background-color: #BBBBFF;
+    font-size: 10pt;
+    font-family:Trebuchet MS;
+    color: #000000;
+    font-style: normal;
+    font-weight: bold}
+.cell_title_r {
+    border: 0 solid #888800;
+    background-color: #BBBBFF;
+    color: #000000;
+    font-style: normal; font-weight: bold ; text-align: right;}
 
-.CELL_R { background-color: #EEFFFF; text-align: right; }
-.CELL_FIX { background-color: #EEFFFF; font-family: Courier }
-.CELL_WARNING { background-color: #FFDDDD;  }
-.CELL_print { background-color: white; font-size: 7pt ; padding-left: 5pt; padding-right: 5 pt}
+.cell { background-color: #EEFFFF;
+        padding-left: 2pt;
+        padding-right: 2pt }
+.cell_bg1 { background-color: #BBBBFF ;
+            padding-left: 5pt;
+            padding-right: 5pt  }
+.cell_bg2 { background-color: white}
+.cell_bg3 { background-color: #FFFFAA}
 
-.ICON {height: 19px ; border: 0 ;}
+.cell_r { background-color: #EEFFFF;
+          text-align: right;
+}
+.cell_fix { background-color: #EEFFFF;
+            font-family: Courier }
+.cell_warning { background-color: #FFDDDD;
+}
+.cell_print { background-color: white;
+              font-size: 7pt;
+              padding-left: 5pt;
+              padding-right: 5pt;
+}
 
-.TITLE_PAGE { text-indent: 0; background-color: #FFFFFF; font-size: 18 pt; font-family: 
-               Trebuchet MS; line-height: 100%; text-align: center ; color: #000000;
-               font-style: normal; font-weight: bold }
-.TITLE2 { text-indent: 0; background-color: #FFFFFF; font-size: 14 pt; font-family: 
-               Trebuchet MS; line-height: 100%; text-align: left; color: #000000;
-               font-style: normal; font-weight: bold }
-.TITLE3 { text-indent: 30; background-color: #FFFFFF; font-size: 13 pt; font-family: 
-               Trebuchet MS; line-height: 100%; text-align: left; color: #000000;
-               font-style: italic}
-               
-.P { text-indent: 0; background-color: #FFFFFF; font-size: 10 pt; font-family: 
-               Trebuchet MS; line-height: 100%; text-align: justify ; color: #000000 }
-.P_small    { text-align: justify; line-height: 100%; text-indent: 0; font-size: 9 pt; font-family: 
-               Trebuchet MS; color: #000000; margin-top: 3; margin-bottom: 0 }
+.icon {
+    height: 19px ;
+    border: 0 ;
+}
 
-.zzz_closeit {background-image : url(/lazy/icon/contact.gif) }
+.title_page { 
+    text-indent: 0;
+    background-color: #FFFFFF;
+    font-size: 18pt;
+    font-family: Trebuchet MS;
+    line-height: 100%;
+    text-align: center;
+    color: #000000;
+    font-style: normal;
+    font-weight: bold;
+}
+.title2 { 
+    text-indent: 0;
+    background-color: #FFFFFF;
+    font-size: 14pt;
+    font-family: Trebuchet MS;
+    line-height: 100%;
+    text-align: left;
+    color: #000000;
+    font-style: normal;
+    font-weight: bold;
+}
+.title3 { 
+    text-indent: 30px;
+    background-color: #FFFFFF;
+    font-size: 13pt;
+    font-family: Trebuchet MS;
+    line-height: 100%;
+    text-align: left;
+    color: #000000;
+    font-style: italic;
+}
 
-.closeit {background-color: #AA0000; text-color=white}
+.p {
+    text-indent: 0;
+    background-color: #FFFFFF;
+    font-size: 10pt;
+    font-family: Trebuchet MS;
+    line-height: 100%;
+    text-align: justify;
+    color: #000000;
+}
+.p_small    { 
+    text-align: justify;
+    line-height: 100%;
+    text-indent: 0;
+    font-size: 9pt;
+    font-family: Trebuchet MS;
+    color: #000000;
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+.zzz_closeit {
+    background-image : url(/lazy/icon/contact.gif);
+}
+
+.closeit {
+    background-color: #AA0000; 
+    color:white;
+}
 
