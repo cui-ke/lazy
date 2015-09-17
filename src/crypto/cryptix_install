@@ -1,2 +1,0 @@
-#!/bin/sh
-java -classpath $TOMCAT_HOME/lib/cryptix32.jar cryptix.provider.Install
