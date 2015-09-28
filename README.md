@@ -20,17 +20,18 @@ through a JDBC driver.
 
 ##Content of this distribution
 
-| directory | content
-| bin     | scripts to start and manage the Lazy system
-| doc     |  documentation, including the installation guide
-| examples  | example hyperspaces
-| hsqldb  |   the hsqldb database engine (http://hsqldb.sourceforge.net/ )
-| hsqldb/demo	| contains the default lazy dictionary (node definitions, etc.) in the test database (test.data, test.script, test.properties)
-|src    |    the Lazy source code
-|src/admin | source code of the Lazy interactive development and environment (written in Lazy)
-|WEB-INF  |  all the servelet stuff
-|WEB-INF/lib   |all the JENA JAR files
-|css  |      css files used by the lazy IDE
+directory | content
+----------|--------
+bin         | scripts to start and manage the Lazy system
+doc         |  documentation, including the installation guide
+examples    | example hyperspaces
+hsqldb      |   the hsqldb database engine ( http://hsqldb.sourceforge.net )
+hsqldb/demo	| contains the default lazy dictionary (node definitions, etc.) in the test database (test.data, test.script, test.properties)
+src         | the Lazy source code
+src/admin   | source code of the Lazy interactive development and environment (written in Lazy)
+WEB-INF     |  all the servelet stuff
+WEB-INF/lib | all the JENA JAR files
+css         | css files used by the lazy IDE
 
 
 ## Installation
