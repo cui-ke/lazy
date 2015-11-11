@@ -162,7 +162,7 @@ public class ns extends HttpServlet {
 	public static boolean verboseCache = false;
 	public static boolean verboseClearCache = false;
 	public static boolean verboseModify = false;
-	public static boolean verboseReplace = false;
+	public static boolean verboseReplace = true;
 	public static boolean verboseTiming = false;
 	public static boolean verboseConnect = false;
 	public static boolean verboseCrypto = false;
@@ -210,6 +210,8 @@ public class ns extends HttpServlet {
 	public static final String SystParamSuffix = "]]";
 	public static final String varPrefix = "<<[??var-";
 	public static final String varSuffix = "??]>>";
+	public static final String varPrefixSparql = "<begin-var-";
+	public static final String varSuffixSparql = "-end-var>";
 	public static final String sparqlVarPrefix = "<<[??sparql-var-";
 	public static final String sparqlOutVarPrefix = "<<[??sparql-out-var-";
 	public static final String paramPrefix = "<<??param-";
@@ -997,7 +999,7 @@ public class ns extends HttpServlet {
 			// caching in browsers
 			out.println("<META NAME=\"generator\" content=\"Lazy node server v"
 					+ nsVersion + "\">");
-			out.println("<MATA NAME=\"description\" content=\"node " + a + "[" /*
+			out.println("<META NAME=\"description\" content=\"node " + a + "[" /*
 																				 * #
 																				 * #
 																				 * #

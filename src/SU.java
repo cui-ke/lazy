@@ -184,9 +184,10 @@ class SU { // strings utilities
 	 *
 	 * Replace variable markers by the variable values. 
 	 *
-	 * There are two styles of variable markers
+	 * There are three styles of variable markers
 	 * old form = [[__VARIABLE_NAME__]]
 	 * new form = <<[??var-__VARIABLE_NAME__??]>>
+	 * sparql form = <begin-var-__VARIABLE_NAME__-end-var>
 	 *
 	 * The different types of variables are
 	 *   ?NAME language dependent variable, defined either for this project or shared by all projects (SHARE)
@@ -200,19 +201,32 @@ class SU { // strings utilities
 		
         int ix = 0, ixf, ixx, ixff;
 		int iy = 0;
+		int iz = 0;
         String replacevalue="";
 		
 		boolean newForm = false;
+		boolean sparqlForm = false;
         
-        while ((ix = s.indexOf(ns.SystParamPrefix, ix)) > -1 | (iy = s.indexOf(ns.varPrefix, ix)) > -1) {
-			if (ns.verboseReplace) System.out.println("ix "+ix+" iy "+iy);
+        while ((ix = s.indexOf(ns.SystParamPrefix, ix)) > -1 
+             | (iy = s.indexOf(ns.varPrefix, ix)) > -1 
+             | (iz = s.indexOf(ns.varPrefixSparql, ix)) > -1) {
+			if (ns.verboseReplace) System.out.println("ix "+ix+" iy "+iy+" iz="+iz);
             int ipara = 0;
-			newForm = (ix == -1) || (iy > -1 && iy < ix); // GF
-			if (newForm) 
-				{ ix = iy; ixf = s.indexOf(ns.varSuffix, ix); ixx = ix + ns.varPrefix.length(); ixff = ixf+ns.varSuffix.length(); 
-				if (ns.verboseReplace) System.out.println("new form "+ix+"--"+ixff);
-				} // GF
-			else 
+			newForm = (ix == -1) || (iy > -1 && iy < ix) || (iz > -1 && iz < ix); // GF
+			if (newForm) {
+			    sparqlForm = (iy == -1 || (iz > -1 && iz < iy));
+			    if (sparqlForm) {
+			        ix = iz; ixf = s.indexOf(ns.varSuffixSparql, ix); ixx = ix + ns.varPrefixSparql.length(); 
+			        ixff = ixf+ns.varSuffixSparql.length(); 
+			        if (ns.verboseReplace) System.out.println("sparql form "+ix+"--"+ixff);
+			    }
+			    else { 
+			        ix = iy; ixf = s.indexOf(ns.varSuffix, ix); ixx = ix + ns.varPrefix.length(); 
+				    ixff = ixf+ns.varSuffix.length(); 
+				    if (ns.verboseReplace) System.out.println("new form "+ix+"--"+ixff);
+				}
+			} // GF
+			else // old form
 				{ixf = s.indexOf(ns.SystParamSuffix, ix); ixx = ix + "[[".length(); ixff = ixf+"]]".length(); }
 				
             String var=s.substring(ixx,ixf);
@@ -253,6 +267,7 @@ class SU { // strings utilities
             +  replacevalue
             + s.substring(ixff, s.length());
             ix=ixx;
+            if (ns.verboseReplace) System.out.println("new s : "+s);
         }
         return s;
     }

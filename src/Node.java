@@ -467,9 +467,7 @@ class Node {
 	/**
 	* This is the main function of the node server :
 	*
-	* query the database to get the (first level) content of a node
-	*
-	* TODO: change the variable substitution process for SPARQL queries
+	* query the sparql endpoint to get the (first level) content of a node
 	*
 	*/
     static void doQuery(String conID, String nodeName, String nodeExecute, String sqlRequest,
@@ -541,7 +539,8 @@ class Node {
             // no quotes for the parametrs in the sparql query
             sparqlRequest = SU.replaceParameters(sparqlRequest, params, SU.NOQUOTE);
             // quotes for the system parameters, session attributes, etc.
-            sparqlRequest = SU.replaceSystemParameters(sparqlRequest,session,Text,projectid, SU.SPARQL_QUOTES);
+            // NO
+            sparqlRequest = SU.replaceSystemParameters(sparqlRequest,session,Text,projectid, SU.NOQUOTE);
             // no quotes in the limit part
             limitPart = SU.replaceParameters(limitPart, params, SU.NOQUOTE);
             // neither for the system parameters

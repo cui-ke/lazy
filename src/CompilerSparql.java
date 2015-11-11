@@ -1939,8 +1939,18 @@ class CompilerSparql {
                    next();
                 }
                 if (sym.ttype == TT_WORD) {
-                    // global or input variables or session attributes are strings
-                    echo("\"" + ns.varPrefix + varCat + sym.sval + ns.varSuffix +"\"");
+                    // global or input variables or session attributes are strings **WRING
+                    //
+                    // create a dummy variable to obtain a syntactically correct expression **DO
+                    //
+                    // echo("\"" + ns.varPrefix + varCat + sym.sval + ns.varSuffix +"\"");
+                    echo(ns.varPrefixSparql + varCat + sym.sval + ns.varSuffixSparql);
+                    //
+                    // **TODO -- update variable expansion
+                    //
+//                     String varCatV = varCat.equals("") ? "V" :
+//                        (varCat.equals("!") ? "G" : "S");
+//                     echo("?LAZY_TEMP_VAR_"+varCatV+"_"+sym.sval+"_END_VAR");
                     next();
                 } else
                   err("variable name expected after [? or [!");
