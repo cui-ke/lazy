@@ -166,7 +166,7 @@ public class ns extends HttpServlet {
 	public static boolean verboseTiming = false;
 	public static boolean verboseConnect = false;
 	public static boolean verboseCrypto = false;
-	public static boolean verbosePreActions = false;
+	public static boolean verbosePreActions = true;
     public static boolean verboseSparql = true;
 
 	public static boolean cacheDefinition = true;

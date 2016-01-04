@@ -490,6 +490,8 @@ class Compiler {
                 } else
                     err("missing '=' after cachesize");
             }
+            
+            on_open();
 
             attrCount = 0;
             attrOnlySet = new TreeSet();
@@ -1826,6 +1828,7 @@ class Compiler {
                     else
                         err("'}' missing after db action list");
                 }
+                else err("'{' expected after 'on open'");
             }
         }
     }
