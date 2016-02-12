@@ -31,6 +31,8 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 
+import com.hp.hpl.jena.update.*;
+
 import java.sql.*;
 import java.net.*;
 import java.lang.reflect.*;
@@ -827,9 +829,9 @@ public class ns extends HttpServlet {
 
 		String newContent = "";
 		
-		System.out.println("Enter doGet ************************************************4");
-		System.out.println("aaaaaaaaaaaaa == " + a );
-        System.out.println("uuuuuuuuuuuuu == " + ul);
+		System.out.println("\n\n**** Enter doGet ************************************************4");
+		System.out.println("**** a == " + a );
+        System.out.println("**** u == " + ul);
 
 		if (isCIP) 
 		{
@@ -1174,33 +1176,57 @@ public class ns extends HttpServlet {
 	 * Execute all the pre actions of a node
 	 * 
 	 */
-	public static void execPreActions(Node n, String[] params,
-			HttpSession session) {
+	public static void execPreActions(Node n, String[] params, HttpSession session) {
 		String conID = Project.getDBConnection(n.projectid);
 		if (conID == null) {
 			conID = "DICTLAZY";
 		}
-		for (int ia = 0; ia < n.preActions.length; ia++) {
-			String sqlRequest = n.preActions[ia];
-			sqlRequest = SU.replaceParameters(sqlRequest, params, SU.SQL_QUOTES);
-			sqlRequest = SU.replaceSystemParameters(sqlRequest, session,
-					Node.Text, n.projectid, SU.SQL_QUOTES);
-			if (ns.verbosePreActions)
-				System.out.println("execPreActions " + ia + ") " + sqlRequest);
-			QueryResult Q = DBServices.execSQLonDB(sqlRequest, conID, false);
+		
+		if (n.nodetype.equals("SPARQL")) {
+		    System.out.println("\n16-02-08: Sparql actions");
+		    conID+="/statements";
+		    for (int ia = 0; ia < n.preActions.length; ia++) {
+				String updateRequest = n.preActions[ia];
+				updateRequest = SU.replaceParameters(updateRequest, params, SU.NOQUOTE);
+				updateRequest = SU.replaceSystemParameters(updateRequest,session,Node.Text, n.projectid, SU.NOQUOTE);
 
-			// Determine the target table of this action
-			StringTokenizer st = new StringTokenizer(sqlRequest, " (,)");
-			String command = st.nextToken();
-			if (command.equals("insert") || command.equals("delete"))
-				st.nextToken();
-			String tableName = st.nextToken();
-			if (ns.verbosePreActions)
-				System.out.println("execPreActions: clearDependentNodes("
-						+ tableName + ")");
-			if (DependentNodeClear)
-				Node.clearDependentNodes(tableName);
+				String prefixString = Node.getProjectPrefix(n.projectid);
+				updateRequest = prefixString +" \n" + updateRequest ;
 
+				try {
+					UpdateRequest urq = new UpdateRequest().add(updateRequest);       
+					UpdateProcessor u = UpdateExecutionFactory.createRemoteForm(urq, conID);
+					System.out.println("\n--- DBG --- : exect update : "+updateRequest);
+					u.execute();
+				} catch (com.hp.hpl.jena.query.QueryParseException e) {
+					   System.out.println("---err---  "+e.getMessage());
+				}
+			}
+        }
+        else { // SQL 
+		
+			for (int ia = 0; ia < n.preActions.length; ia++) {
+				String sqlRequest = n.preActions[ia];
+				sqlRequest = SU.replaceParameters(sqlRequest, params, SU.SQL_QUOTES);
+				sqlRequest = SU.replaceSystemParameters(sqlRequest, session,
+						Node.Text, n.projectid, SU.SQL_QUOTES);
+				if (ns.verbosePreActions)
+					System.out.println("execPreActions " + ia + ") " + sqlRequest);
+				QueryResult Q = DBServices.execSQLonDB(sqlRequest, conID, false);
+
+				// Determine the target table of this action
+				StringTokenizer st = new StringTokenizer(sqlRequest, " (,)");
+				String command = st.nextToken();
+				if (command.equals("insert") || command.equals("delete"))
+					st.nextToken();
+				String tableName = st.nextToken();
+				if (ns.verbosePreActions)
+					System.out.println("execPreActions: clearDependentNodes("
+							+ tableName + ")");
+				if (DependentNodeClear)
+					Node.clearDependentNodes(tableName);
+
+			}
 		}
 		if (!DependentNodeClear)
 			Node.clearAllNodes(); // TODO: optimize this

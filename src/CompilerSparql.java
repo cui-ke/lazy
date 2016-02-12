@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.sparql.syntax.*;
 import com.hp.hpl.jena.sparql.lang.*;
+import com.hp.hpl.jena.update.*;
+
 
 class CompilerSparql {
 
@@ -1590,8 +1592,7 @@ class CompilerSparql {
             group_part(); // jg
             order_part(); // jg
             limit_part(); // gf
-            // System.out.println("after order:"+sym.sval);
-            if (sym.ttype != TT_EOF && !term("end"))
+            if (sym.ttype != TT_EOF && !(term("end") || term("on")))
                 err("Unexpected symbol");
             
             if (errInNodeDef == 0) {
@@ -1599,15 +1600,16 @@ class CompilerSparql {
                 // check the SPARQL syntax of this part
 
 				String query = Node.getProjectPrefix(projectid);
-				query += ("\n" + selectwherebuf.replace(ns.paramPrefix,"?PARAM_").replace(ns.paramSuffix," "));
-				if (!groupbuf.equals("NODEF")) query += ("\n" + groupbuf.replace(ns.paramPrefix,"?PARAM_").replace(ns.paramSuffix," "));
-				if (!orderbuf.equals("NODEF")) query += ("\n" + orderbuf.replace(ns.paramPrefix,"?PARAM_").replace(ns.paramSuffix," "));
-				if (!limitbuf.equals("NODEF")) query += ("\n" + limitbuf.replace(ns.paramPrefix,"1").replace(ns.paramSuffix," "));
+
+				query += ("\n" + replaceVarsAndParmasForSelect(selectwherebuf));
+				if (!groupbuf.equals("NODEF")) query += ("\n" + replaceVarsAndParmasForSelect(groupbuf));
+				if (!orderbuf.equals("NODEF")) query += ("\n" + replaceVarsAndParmasForSelect(orderbuf));
+				if (!limitbuf.equals("NODEF")) query += ("\n" + replaceVarsAndParmasForSelect(limitbuf));
 		
 				try {
 					Query e = QueryFactory.create(query);
 					System.out.println("--------"+e);
-				} catch (com.hp.hpl.jena.query.QueryParseException e) {
+				} catch (QueryParseException e) {
 					System.out.println(e.getMessage());
 					String errMsg = e.getMessage();
 					int ln = e.getLine();
@@ -1923,7 +1925,15 @@ class CompilerSparql {
                 err("'{' missing after 'from graph'"+copybuf);
             
     }
-    
+    /*
+     * Replace
+     *   [!var] ---> varPrefixSparql ! var varSuffixSparql
+     *   [?var] ---> varPrefixSparql ? var varSuffixSparql
+     *   [var] ---> varPrefixSparql var varSuffixSparql
+     *   ?var ---> ?Var
+     *   $var ---> $Var
+     *   var ---> ns.paramPrefix  + paramindex(var) + ns.paramSuffix
+     */
     void copyTokensReplacingParamAndGlobalVars() {
 
 
@@ -1939,11 +1949,6 @@ class CompilerSparql {
                    next();
                 }
                 if (sym.ttype == TT_WORD) {
-                    // global or input variables or session attributes are strings **WRING
-                    //
-                    // create a dummy variable to obtain a syntactically correct expression **DO
-                    //
-                    // echo("\"" + ns.varPrefix + varCat + sym.sval + ns.varSuffix +"\"");
                     echo(ns.varPrefixSparql + varCat + sym.sval + ns.varSuffixSparql);
                     //
                     // **TODO -- update variable expansion
@@ -2323,171 +2328,218 @@ class CompilerSparql {
      * action_list = basic_action {"," basic_action }
      */
     void action_list() {
-        basic_action();
-        while (sym.ttype == ',') {
-            next();
-            basic_action();
-        }
-    }
+
+         startcopy();        
+
+         int depth = 0; // inclusion depth of {} parenthesis
+                
+         spacesAreTokens();
+         while(sym.ttype != TT_EOF && !term("end") && !(sym.ttype=='}' && depth == 0)){
+
+                   if (sym.ttype == '{') {
+                       depth++; 
+                   }
+                   else if (sym.ttype == '}') {
+                       depth--;
+                   }   
+                   copyTokensReplacingParamAndGlobalVars();
+
+        } // end while
+        spacesNotTokens();
+        
+        stopcopy();
+
+// ADDD
+//       check the syntax of copybuf
+         String updatebuf = copybuf.toString();
+         
+         //DBG
+         System.out.println("---DBG--- update action is: "+updatebuf);
+         String SPARQLupdate = replaceVarsAndParmasForUpdate(updatebuf);
+         try {
+             UpdateRequest urq = new UpdateRequest().add( SPARQLupdate);
+             actionList.add(updatebuf); 
+         }
+         catch (QueryParseException e) {
+            System.out.println(e.getMessage());
+			String errMsg = e.getMessage();
+			int ln = e.getLine();
+			int col = e.getColumn();
+			String[] qlines = SPARQLupdate.split("\\n");
+			if (ln > 0) {
+ 				String errLine = qlines[ln-1];
+				err("Error in 'on open' part: "+errLine.substring(0, col-1)
+					        +" <span style='color: red;'> &nbsp;&nbsp;==&gt;</span>  "
+					        +errLine.substring(col-1,errLine.length()));
+		    } else {
+				 err("Error in 'on open' part: "+errMsg);
+			}
+         }
+         catch (QueryException e){
+            System.out.println(e.getMessage());
+			String errMsg = e.getMessage();
+            err("Error in 'on open' part: "+errMsg);
+         }  
+     }
 
     /**
      * basic_action = insert_action | delete_action | update_action
      */
-    void basic_action() {
-        if (term("insert")) {
-            insert_action();
-        }
-        if (term("delete")) {
-            delete_action();
-        }
-        if (term("update")) {
-            update_action();
-        }
-
-    }
+//     void basic_action() {
+//         if (term("insert")) {
+//             insert_action();
+//         }
+//         if (term("delete")) {
+//             delete_action();
+//         }
+//         if (term("update")) {
+//             update_action();
+//         }
+// 
+//     }
 
     /**
      * delete_action = "delete" table_identifier [ "(" condition ")" ]
      */
-    void delete_action() {
-        next(); // skip "delete"
-        startcopy();
-        echo("delete from ");
-        identifier(); // table identifier
-
-        if (sym.ttype == '(') {
-            next();
-            echo(" where ");
-            condition();
-            if (sym.ttype == ')')
-                next();
-            else
-                err("')' missing after delete table(condition");
-        }
-        actionList.add(copybuf.toString());
-    }
+//     void delete_action() {
+//         next(); // skip "delete"
+//         startcopy();
+//         echo("delete from ");
+//         identifier(); // table identifier
+// 
+//         if (sym.ttype == '(') {
+//             next();
+//             echo(" where ");
+//             condition();
+//             if (sym.ttype == ')')
+//                 next();
+//             else
+//                 err("')' missing after delete table(condition");
+//         }
+//         actionList.add(copybuf.toString());
+//     }
 
     /*
      * update_action = "update" table_identifier "(" condition ")" "set" "["
      * attribute ":" simple_expression {"," attribute ":" simple_expression} "]"
      */
-    void update_action() {
-        StringBuffer cond = new StringBuffer();
-        next();
-        startcopy();
-        StringBuffer instruction = copybuf;
-        echo("update ");
-        identifier(); // table identifier
-        if (sym.ttype == '(') {
-            next();
-            copybuf = cond;
-            condition();
-            if (sym.ttype == ')')
-                next();
-            else
-                err("')' missing after update table(condition");
-            copybuf = instruction;
-        }
-        if (term("set"))
-            next();
-        else
-            err("'set' missing after update table(condition)");
-        if (sym.ttype == '[')
-            next();
-        else
-            err("'[' missing after update table(condition) set ");
-
-        echo(" set ");
-
-        identifier(); // attribute
-        if (sym.ttype == ':') {
-            next();
-        } else
-            err("':' missing in update table_name(...) set [attr:expression, ...]");
-        echo("=");
-
-        simple_expression();
-
-        while (sym.ttype == ',') {
-            echo(",");
-            next();
-            identifier();
-            if (sym.ttype == ':') {
-                next();
-            } else
-                err("':' missing in update table_name(...) set [attr:expression, ...]");
-            echo("=");
-            simple_expression();
-        }
-
-        if (sym.ttype == ']') {
-            next();
-        } else
-            err("']' missing after update table_name(...) set [attr:expression, ...");
-
-        if (cond.length() > 0) {
-            echo(" where ");
-            copybuf.append(cond);
-        }
-
-        actionList.add(copybuf.toString());
-
-    }
+//     void update_action() {
+//         StringBuffer cond = new StringBuffer();
+//         next();
+//         startcopy();
+//         StringBuffer instruction = copybuf;
+//         echo("update ");
+//         identifier(); // table identifier
+//         if (sym.ttype == '(') {
+//             next();
+//             copybuf = cond;
+//             condition();
+//             if (sym.ttype == ')')
+//                 next();
+//             else
+//                 err("')' missing after update table(condition");
+//             copybuf = instruction;
+//         }
+//         if (term("set"))
+//             next();
+//         else
+//             err("'set' missing after update table(condition)");
+//         if (sym.ttype == '[')
+//             next();
+//         else
+//             err("'[' missing after update table(condition) set ");
+// 
+//         echo(" set ");
+// 
+//         identifier(); // attribute
+//         if (sym.ttype == ':') {
+//             next();
+//         } else
+//             err("':' missing in update table_name(...) set [attr:expression, ...]");
+//         echo("=");
+// 
+//         simple_expression();
+// 
+//         while (sym.ttype == ',') {
+//             echo(",");
+//             next();
+//             identifier();
+//             if (sym.ttype == ':') {
+//                 next();
+//             } else
+//                 err("':' missing in update table_name(...) set [attr:expression, ...]");
+//             echo("=");
+//             simple_expression();
+//         }
+// 
+//         if (sym.ttype == ']') {
+//             next();
+//         } else
+//             err("']' missing after update table_name(...) set [attr:expression, ...");
+// 
+//         if (cond.length() > 0) {
+//             echo(" where ");
+//             copybuf.append(cond);
+//         }
+// 
+//         actionList.add(copybuf.toString());
+// 
+//     }
 
     /**
      * insert_action = "insert" table_identifier "[" attr_identifier ":"
      * expression "," ... "]"
      */
-    void insert_action() {
-        StringBuffer values = new StringBuffer();
-        values.append("(");
-        next();
-        startcopy();
-        StringBuffer instruction = copybuf;
-        echo("insert into ");
-        identifier(); // table identifier
-
-        if (sym.ttype == '[')
-            next();
-        else
-            err("'[' missing after insert table_name");
-
-        echo("(");
-        identifier(); // attribute
-        if (sym.ttype == ':') {
-            next();
-        } else
-            err("':' missing in insert table_name[...]");
-        copybuf = values; // collect expressions in this StringBuffer
-        simple_expression();
-
-        while (sym.ttype == ',') {
-            next();
-            echo(",");
-            copybuf = instruction;
-            echo(",");
-            identifier();
-            if (sym.ttype == ':') {
-                next();
-            } else
-                err("':' missing in insert table_name[...]");
-            copybuf = values; // collect expressions in this StringBuffer
-            simple_expression();
-        }
-
-        echo(")");
-        copybuf = instruction;
-        echo(") values ");
-        if (sym.ttype == ']')
-            next();
-        else
-            err("']' missing after insert table_name[...]");
-
-        copybuf.append(values);
-
-        actionList.add(copybuf.toString());
-
-    }
+//     void insert_action() {
+//         StringBuffer values = new StringBuffer();
+//         values.append("(");
+//         next();
+//         startcopy();
+//         StringBuffer instruction = copybuf;
+//         echo("insert into ");
+//         identifier(); // table identifier
+// 
+//         if (sym.ttype == '[')
+//             next();
+//         else
+//             err("'[' missing after insert table_name");
+// 
+//         echo("(");
+//         identifier(); // attribute
+//         if (sym.ttype == ':') {
+//             next();
+//         } else
+//             err("':' missing in insert table_name[...]");
+//         copybuf = values; // collect expressions in this StringBuffer
+//         simple_expression();
+// 
+//         while (sym.ttype == ',') {
+//             next();
+//             echo(",");
+//             copybuf = instruction;
+//             echo(",");
+//             identifier();
+//             if (sym.ttype == ':') {
+//                 next();
+//             } else
+//                 err("':' missing in insert table_name[...]");
+//             copybuf = values; // collect expressions in this StringBuffer
+//             simple_expression();
+//         }
+// 
+//         echo(")");
+//         copybuf = instruction;
+//         echo(") values ");
+//         if (sym.ttype == ']')
+//             next();
+//         else
+//             err("']' missing after insert table_name[...]");
+// 
+//         copybuf.append(values);
+// 
+//         actionList.add(copybuf.toString());
+// 
+//     }
 
     // /////////////////////// Actions //////////////////////////
 
@@ -2677,6 +2729,26 @@ class CompilerSparql {
         */
 
     }
+
+    String replaceVarsAndParmasForSelect(String sparqlExpression) {
+         String result = sparqlExpression.replace(ns.paramPrefix,"?PARAM_").replace(ns.paramSuffix," ");
+         result = result.replace(ns.varPrefixSparql+"?","?VAR1_");
+         result = result.replace(ns.varPrefixSparql+"!","?VAR2_");
+         result = result.replace(ns.varPrefixSparql,"?VAR3_");
+         result = result.replace(ns.varSuffixSparql,"");
+         return result;
+   }
+   
+   String replaceVarsAndParmasForUpdate(String sparqlExpression) {
+         String result = sparqlExpression.replace(ns.paramPrefix,"<http://param.a/").replace(ns.paramSuffix,">");
+         result = result.replace(ns.varPrefixSparql+"?","<http://var1.a/");
+         result = result.replace(ns.varPrefixSparql+"!","<http://var2.a/");
+         result = result.replace(ns.varPrefixSparql,"<http://var3.a/");
+         result = result.replace(ns.varSuffixSparql,">");
+         return result;
+   }
+
+
 
     public static void main(String args[]){}
 
