@@ -576,7 +576,12 @@ class Node {
 					if (val.isLiteral())  {
 					    replaceVal = "\""+(val.asLiteral().getLexicalForm().replace("\"","\\\"")) + "\"";
                         if (val.asLiteral().getDatatypeURI() != null)              
-                            replaceVal += "^^"+normalizeURI(val.asLiteral().getDatatypeURI(), prefixString) ;
+                            replaceVal += "^^"+normalizeURI(val.asLiteral().getDatatypeURI()+" ", prefixString) ;
+                            /* !!!
+                             * the " " at the end is necessary to avoid ambiguities if this value is used in an expression
+                             * e.g.         "1"^^xsd:integer-1 is not 0
+                             *      whereas "1"^^xsd:integer -1 is  0
+                             */
                         replaceOutVal = val.asLiteral().getLexicalForm();
                     }
 					else if (val.isResource()) {
